@@ -2,6 +2,8 @@ package proyecto.web.serviceguideBackend.entity;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,15 +20,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Nullable
+    //@NotBlank
     private String name;
 
-    @Nullable
+    //@NotBlank
     private String lastName;
 
-    @Nullable
+    //@Email
     private String email;
 
-    @Nullable
+    //@NotBlank
     private String password;
 }

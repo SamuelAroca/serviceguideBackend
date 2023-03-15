@@ -1,18 +1,31 @@
 package proyecto.web.serviceguideBackend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PublicServicesReceipt {
 
     @Id
+    @Column(length = 255)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    //@NotBlank
+    private Double waterPrice;
+
+    //@NotBlank
+    private Double sewerPrice;
+
+    //@NotBlank
+    private Double electricityPrice;
+
+    //@NotBlank
+    private Double gasPrice;
 }
