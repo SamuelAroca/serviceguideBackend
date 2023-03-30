@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.dto.CredentialsDto;
+import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.dto.UserDto;
 import proyecto.web.serviceguideBackend.entities.Users;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -12,6 +13,7 @@ import proyecto.web.serviceguideBackend.mappers.UserMapper;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 
 import java.nio.CharBuffer;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -36,5 +38,21 @@ public class UserService {
         }
 
         throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
+    }
+
+    public UserDto register(SignUpDto userDto) {
+        Optional<Users> optionalUsers = userRepository.findByLogin(userDto.getLogin());
+
+        if (optionalUsers.isPresent()) {
+            throw new AppException("Login already exist", HttpStatus.BAD_REQUEST);
+        }
+
+        Users users = userMapper.signUpToUser(userDto);
+
+        users.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
+
+        Users savedUser = userRepository.save(users);
+
+        return userMapper.toUserDto(users);
     }
 }
