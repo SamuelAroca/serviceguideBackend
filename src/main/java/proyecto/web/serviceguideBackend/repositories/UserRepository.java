@@ -1,11 +1,11 @@
 package proyecto.web.serviceguideBackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import proyecto.web.serviceguideBackend.entities.Users;
+import proyecto.web.serviceguideBackend.entities.User;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<Users, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<Users> findByLogin(String login);
+    Optional<User> findByLogin(String login);
 }

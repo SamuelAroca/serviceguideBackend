@@ -1,11 +1,17 @@
 package proyecto.web.serviceguideBackend.mappers;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.dto.UserDto;
-import proyecto.web.serviceguideBackend.entities.Users;
+import proyecto.web.serviceguideBackend.entities.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    UserDto toUserDto(Users users);
+    UserDto toUserDto(User user);
+
+    @Mapping(target = "password", ignore = true)
+    User signUpToUser(SignUpDto signUpDto);
+
 }
