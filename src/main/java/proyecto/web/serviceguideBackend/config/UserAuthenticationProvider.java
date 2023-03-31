@@ -19,7 +19,7 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Component
-public class UserAuthProvider {
+public class UserAuthenticationProvider {
 
     @Value("${secret.key}")
     private String secretKey;
@@ -28,29 +28,33 @@ public class UserAuthProvider {
 
     @PostConstruct
     protected void init() {
+        // this is to avoid having the raw secret key available in the JVM
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String login) {
-
+    public String createToken(String email) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 3_600_000);
+        Date validity = new Date(now.getTime() + 3600000); // 1 hour
 
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
-                .withIssuer(login)
+                .withIssuer(email)
                 .withIssuedAt(now)
                 .withExpiresAt(validity)
-                .sign(Algorithm.HMAC256(secretKey));
+                .sign(algorithm);
     }
 
     public Authentication validateToken(String token) {
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secretKey))
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+
+        JWTVerifier verifier = JWT.require(algorithm)
                 .build();
 
         DecodedJWT decoded = verifier.verify(token);
 
-        UserDto user = userService.findByLogin(decoded.getIssuer());
+        UserDto user = userService.findByEmail(decoded.getIssuer());
 
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
+
 }

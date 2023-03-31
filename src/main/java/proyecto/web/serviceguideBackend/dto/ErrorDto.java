@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 
 @AllArgsConstructor
-@Builder
 @Data
+@Builder
 public class ErrorDto {
 
     private String message;

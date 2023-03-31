@@ -1,33 +1,35 @@
 package proyecto.web.serviceguideBackend.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
-public class Users {
+@Getter
+@Setter
+@Entity
+@Table(name = "app_user")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false)
+    @Size(max = 100)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "last_name", nullable = false)
+    @Size(max = 100)
     private String lastName;
 
     @Column(nullable = false)
+    @Size(max = 100)
     private String login;
 
     @Column(nullable = false)
+    @Size(max = 100)
     private String password;
 }

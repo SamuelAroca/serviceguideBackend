@@ -1,18 +1,27 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@RequiredArgsConstructor
-@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SignUpDto {
 
+    @NotEmpty
     private String firstName;
+
+    @NotEmpty
     private String lastName;
+
+    @NotEmpty
     private String login;
+
+    @NotEmpty
     private char[] password;
+
 }

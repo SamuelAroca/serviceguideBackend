@@ -1,11 +1,13 @@
 package proyecto.web.serviceguideBackend.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import proyecto.web.serviceguideBackend.config.UserAuthProvider;
+import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.dto.UserDto;
@@ -15,24 +17,23 @@ import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/users/auth")
 public class AuthController {
 
     private final UserService userService;
-    private final UserAuthProvider userAuthProvider;
+    private final UserAuthenticationProvider userAuthenticationProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody CredentialsDto credentialsDto) {
-        UserDto user = userService.login(credentialsDto);
-
-        user.setToken(userAuthProvider.createToken(user.getLogin()));
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
+        UserDto userDto = userService.login(credentialsDto);
+        userDto.setToken(userAuthenticationProvider.createToken(userDto.getLogin()));
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody SignUpDto signUpDto) {
-        UserDto user = userService.register(signUpDto);
-        user.setToken(userAuthProvider.createToken(user.getLogin()));
-        return ResponseEntity.created(URI.create("/users/" + user.getId()))
-                .body(user);
+    public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
+        UserDto createdUser = userService.register(user);
+        createdUser.setToken(userAuthenticationProvider.createToken(user.getLogin()));
+        return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
     }
 }
