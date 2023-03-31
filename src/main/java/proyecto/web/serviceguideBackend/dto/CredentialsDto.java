@@ -1,4 +1,4 @@
-package proyecto.web.serviceguideBackend.auth;
+package proyecto.web.serviceguideBackend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest {
+@Builder
+public class CredentialsDto {
 
-    private String email;
-    private String password;
+    private String login;
+    private char[] password;
+
 }
