@@ -23,7 +23,7 @@ public class ReceiptService {
     private final ReceiptMapper receiptMapper;
 
     public ReceiptDto addNewReceipt(NewReceiptDto newReceiptDto) {
-        Optional<User> optionalUser = userRepository.findByIdUser(newReceiptDto.getUser().getId());
+        Optional<User> optionalUser = userRepository.findById(newReceiptDto.getUser().getId());
 
         if (optionalUser.isEmpty()) {
             throw new AppException("User not exists", HttpStatus.BAD_REQUEST);
