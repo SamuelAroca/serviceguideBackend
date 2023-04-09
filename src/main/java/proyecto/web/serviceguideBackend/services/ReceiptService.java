@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.dto.NewReceiptDto;
-import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -22,7 +21,7 @@ public class ReceiptService {
     private final ReceiptsRepository receiptsRepository;
     private final ReceiptMapper receiptMapper;
 
-    public ReceiptDto addNewReceipt(NewReceiptDto newReceiptDto) {
+    public NewReceiptDto addNewReceipt(NewReceiptDto newReceiptDto) {
         Optional<User> optionalUser = userRepository.findById(newReceiptDto.getUser().getId());
 
         if (optionalUser.isEmpty()) {

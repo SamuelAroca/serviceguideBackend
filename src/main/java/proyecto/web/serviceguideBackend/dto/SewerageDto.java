@@ -4,23 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import proyecto.web.serviceguideBackend.entities.*;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NewReceiptDto {
+public class SewerageDto {
 
     private Long id;
 
-    private Water water;
+    private Long price;
 
-    private Sewerage sewerage;
+    private Long amount;
 
-    private Energy energy;
-
-    private Gas gas;
-
-    private User user;
+    private Date date;
 }

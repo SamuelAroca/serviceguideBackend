@@ -18,25 +18,21 @@ public class Receipt {
     @Column(name = "id_receipt")
     private Long id;
 
-    @Column(name = "water_price")
-    private Long waterPrice;
-    @Column(name = "water_amount")
-    private Long waterAmount;
+    @OneToOne
+    @JoinColumn(name = "water_id")
+    private Water water;
 
-    @Column(name = "sewerage_price")
-    private Long seweragePrice;
-    @Column(name = "sewerage_amount")
-    private Long sewerageAmount;
+    @OneToOne
+    @JoinColumn(name = "sewerage_id")
+    private Sewerage sewerage;
 
-    @Column(name = "energy_price")
-    private Long energyPrice;
-    @Column(name = "energy_amount")
-    private Long energyAmount;
+    @OneToOne
+    @JoinColumn(name = "energy_id")
+    private Energy energy;
 
-    @Column(name = "gas_price")
-    private Long gasPrice;
-    @Column(name = "gas_amount")
-    private Long gasAmount;
+    @OneToOne
+    @JoinColumn(name = "gas_id")
+    private Gas gas;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")

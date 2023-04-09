@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.NewReceiptDto;
-import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.repositories.ReceiptsRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
@@ -26,8 +25,8 @@ public class ReceiptsController {
     private final ReceiptsRepository receiptsRepository;
 
     @PostMapping("/add")
-    ResponseEntity<ReceiptDto> addReceipts(@RequestBody @Valid NewReceiptDto receipt) {
-        ReceiptDto createdReceipt = receiptService.addNewReceipt(receipt);
+    ResponseEntity<NewReceiptDto> addReceipts(@RequestBody @Valid NewReceiptDto receipt) {
+        NewReceiptDto createdReceipt = receiptService.addNewReceipt(receipt);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdReceipt.getId()).toUri();
