@@ -7,8 +7,9 @@ import proyecto.web.serviceguideBackend.entities.Water;
 @Mapper(componentModel = "spring")
 public interface WaterMapper {
 
-    WaterDto waterDto (Water water);
+    WaterDto waterDto(Water water);
 
     Water newWater(WaterDto waterDto);
 
 }
+

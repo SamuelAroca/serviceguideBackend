@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import proyecto.web.serviceguideBackend.entities.User;
 
 import java.util.Date;
 
@@ -16,9 +17,16 @@ public class WaterDto {
 
     private Long id;
 
+    @NotNull
     private Long price;
 
+    @NotNull
     private Long amount;
 
+    @NotNull
     private Date date;
+
+    @NotNull
+    private User user;
+
 }

@@ -7,7 +7,6 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -37,7 +36,16 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Receipt> receipts = new ArrayList<>();
+    private List<Water> waters = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Sewerage> sewerage = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Energy> energy = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Gas> gases = new ArrayList<>();
 
     public void setId(Long id) {
         this.id = id;
@@ -59,10 +67,31 @@ public class User {
         this.password = password;
     }
 
-    public void setReceipts(List<Receipt> receipts) {
-        this.receipts = receipts;
-        for (Receipt receipt : receipts) {
-            receipt.setUser(this);
+    public void setWaters(List<Water> waters) {
+        this.waters = waters;
+        for (Water water : waters) {
+            water.setUser(this);
+        }
+    }
+
+    public void setSewerage(List<Sewerage> sewerage) {
+        this.sewerage = sewerage;
+        for (Sewerage sewerage1 : sewerage) {
+            sewerage1.setUser(this);
+        }
+    }
+
+    public void setEnergy(List<Energy> energy) {
+        this.energy = energy;
+        for (Energy energy1 : energy) {
+            energy1.setUser(this);
+        }
+    }
+
+    public void setGases(List<Gas> gases) {
+        this.gases = gases;
+        for (Gas gas : gases) {
+            gas.setUser(this);
         }
     }
 }

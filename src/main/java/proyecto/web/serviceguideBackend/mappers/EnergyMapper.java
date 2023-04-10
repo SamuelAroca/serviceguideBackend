@@ -7,8 +7,8 @@ import proyecto.web.serviceguideBackend.entities.Energy;
 @Mapper(componentModel = "spring")
 public interface EnergyMapper {
 
-    EnergyDto energyDto (Energy energy);
+    EnergyDto energyDto(Energy energy);
 
-    Energy newEnergy(Energy energyDto);
+    Energy newEnergy(EnergyDto energyDto);
 
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import proyecto.web.serviceguideBackend.entities.User;
 
 import java.util.Date;
 
@@ -20,5 +21,7 @@ public class GasDto {
     private Long amount;
 
     private Date date;
+
+    private User user;
 
 }
