@@ -7,7 +7,7 @@ import proyecto.web.serviceguideBackend.entities.SewerageReceipt;
 @Mapper(componentModel = "spring")
 public interface SewerageMapper {
 
-    SewerageDto waterDto(SewerageReceipt sewerageReceipt);
+    SewerageDto sewerageDto(SewerageReceipt sewerageReceipt);
 
     SewerageReceipt newSewerage(SewerageDto sewerageDto);
 
