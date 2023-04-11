@@ -18,6 +18,9 @@ public class WaterDto {
     private Long id;
 
     @NotNull
+    private String receiptName;
+
+    @NotNull
     private Long price;
 
     @NotNull

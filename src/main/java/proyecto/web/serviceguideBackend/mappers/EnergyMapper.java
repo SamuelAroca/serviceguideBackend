@@ -2,13 +2,13 @@ package proyecto.web.serviceguideBackend.mappers;
 
 import org.mapstruct.Mapper;
 import proyecto.web.serviceguideBackend.dto.EnergyDto;
-import proyecto.web.serviceguideBackend.entities.Energy;
+import proyecto.web.serviceguideBackend.entities.EnergyReceipt;
 
 @Mapper(componentModel = "spring")
 public interface EnergyMapper {
 
-    EnergyDto energyDto(Energy energy);
+    EnergyDto energyDto(EnergyReceipt energyReceipt);
 
-    Energy newEnergy(EnergyDto energyDto);
+    EnergyReceipt newEnergy(EnergyDto energyDto);
 
 }

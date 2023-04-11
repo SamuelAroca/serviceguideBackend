@@ -2,13 +2,13 @@ package proyecto.web.serviceguideBackend.mappers;
 
 import org.mapstruct.Mapper;
 import proyecto.web.serviceguideBackend.dto.SewerageDto;
-import proyecto.web.serviceguideBackend.entities.Sewerage;
+import proyecto.web.serviceguideBackend.entities.SewerageReceipt;
 
 @Mapper(componentModel = "spring")
 public interface SewerageMapper {
 
-    SewerageDto waterDto(Sewerage sewerage);
+    SewerageDto waterDto(SewerageReceipt sewerageReceipt);
 
-    Sewerage newSewerage(SewerageDto sewerageDto);
+    SewerageReceipt newSewerage(SewerageDto sewerageDto);
 
 }

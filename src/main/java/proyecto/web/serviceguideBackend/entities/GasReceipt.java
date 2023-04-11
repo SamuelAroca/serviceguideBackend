@@ -14,12 +14,15 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "sewerage")
-public class Sewerage {
+@Table(name = "gas_receipt")
+public class GasReceipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
+    private String receiptName;
 
     @NotNull
     private Long price;

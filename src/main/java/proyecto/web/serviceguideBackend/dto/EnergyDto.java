@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,12 +17,19 @@ public class EnergyDto {
 
     private Long id;
 
+    @NotNull
+    private String receiptName;
+
+    @NotNull
     private Long price;
 
+    @NotNull
     private Long amount;
 
+    @NotNull
     private Date date;
 
+    @NotNull
     private User user;
 
 }

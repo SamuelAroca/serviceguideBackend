@@ -2,12 +2,12 @@ package proyecto.web.serviceguideBackend.mappers;
 
 import org.mapstruct.Mapper;
 import proyecto.web.serviceguideBackend.dto.GasDto;
-import proyecto.web.serviceguideBackend.entities.Gas;
+import proyecto.web.serviceguideBackend.entities.GasReceipt;
 
 @Mapper(componentModel = "spring")
 public interface GasMapper {
 
-    GasDto gasDto(Gas gas);
+    GasDto gasDto(GasReceipt gasReceipt);
 
-    Gas newGas(GasDto gasDto);
+    GasReceipt newGas(GasDto gasDto);
 }

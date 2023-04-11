@@ -6,13 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.WaterDto;
-import proyecto.web.serviceguideBackend.entities.Water;
-import proyecto.web.serviceguideBackend.repositories.WaterRepository;
+import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.WaterReceipt;
 import proyecto.web.serviceguideBackend.services.WaterService;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,11 +29,19 @@ public class WaterController {
         return ResponseEntity.created(location).body(createdWater);
     }
 
-    @GetMapping("listAll")
-    public ResponseEntity<Collection<Water>> listAllWater() {
+    @GetMapping("/listAll")
+    public ResponseEntity<Collection<WaterReceipt>> listAllWater() {
 
-        Collection<Water> listWater = waterService.listAll();
+        Collection<WaterReceipt> listWaterReceipt = waterService.listAll();
 
-        return ResponseEntity.ok(listWater);
+        return ResponseEntity.ok(listWaterReceipt);
+    }
+
+    @GetMapping("/findAllByUser/{id}")
+    public ResponseEntity<Collection<WaterReceipt>> findAllByUser(@PathVariable User id) {
+
+        Collection<WaterReceipt> findAllByUser = waterService.findAllByUser(id);
+
+        return ResponseEntity.ok(findAllByUser);
     }
 }

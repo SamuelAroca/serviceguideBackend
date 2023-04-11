@@ -1,7 +1,13 @@
 package proyecto.web.serviceguideBackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import proyecto.web.serviceguideBackend.entities.Energy;
+import proyecto.web.serviceguideBackend.entities.EnergyReceipt;
+import proyecto.web.serviceguideBackend.entities.User;
 
-public interface EnergyRepository extends JpaRepository<Energy, Long> {
+import java.util.Collection;
+
+public interface EnergyRepository extends JpaRepository<EnergyReceipt, Long> {
+
+    Collection<EnergyReceipt> findAllByUser(User user);
+
 }

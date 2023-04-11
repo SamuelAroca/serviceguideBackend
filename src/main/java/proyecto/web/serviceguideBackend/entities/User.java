@@ -36,16 +36,16 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Water> waters = new ArrayList<>();
+    private List<WaterReceipt> waterReceipts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Sewerage> sewerage = new ArrayList<>();
+    private List<SewerageReceipt> sewerageReceipt = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Energy> energy = new ArrayList<>();
+    private List<EnergyReceipt> energyReceipts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Gas> gases = new ArrayList<>();
+    private List<GasReceipt> gasReceipts = new ArrayList<>();
 
     public void setId(Long id) {
         this.id = id;
@@ -67,31 +67,31 @@ public class User {
         this.password = password;
     }
 
-    public void setWaters(List<Water> waters) {
-        this.waters = waters;
-        for (Water water : waters) {
-            water.setUser(this);
+    public void setWaterReceipts(List<WaterReceipt> waterReceipts) {
+        this.waterReceipts = waterReceipts;
+        for (WaterReceipt waterReceipt : waterReceipts) {
+            waterReceipt.setUser(this);
         }
     }
 
-    public void setSewerage(List<Sewerage> sewerage) {
-        this.sewerage = sewerage;
-        for (Sewerage sewerage1 : sewerage) {
-            sewerage1.setUser(this);
+    public void setSewerageReceipt(List<SewerageReceipt> sewerageReceipt) {
+        this.sewerageReceipt = sewerageReceipt;
+        for (SewerageReceipt sewerageReceipt1 : sewerageReceipt) {
+            sewerageReceipt1.setUser(this);
         }
     }
 
-    public void setEnergy(List<Energy> energy) {
-        this.energy = energy;
-        for (Energy energy1 : energy) {
-            energy1.setUser(this);
+    public void setEnergyReceipts(List<EnergyReceipt> energyReceipts) {
+        this.energyReceipts = energyReceipts;
+        for (EnergyReceipt energyReceipt1 : energyReceipts) {
+            energyReceipt1.setUser(this);
         }
     }
 
-    public void setGases(List<Gas> gases) {
-        this.gases = gases;
-        for (Gas gas : gases) {
-            gas.setUser(this);
+    public void setGasReceipts(List<GasReceipt> gasReceipts) {
+        this.gasReceipts = gasReceipts;
+        for (GasReceipt gasReceipt : gasReceipts) {
+            gasReceipt.setUser(this);
         }
     }
 }

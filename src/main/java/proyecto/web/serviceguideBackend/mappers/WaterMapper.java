@@ -2,14 +2,14 @@ package proyecto.web.serviceguideBackend.mappers;
 
 import org.mapstruct.Mapper;
 import proyecto.web.serviceguideBackend.dto.WaterDto;
-import proyecto.web.serviceguideBackend.entities.Water;
+import proyecto.web.serviceguideBackend.entities.WaterReceipt;
 
 @Mapper(componentModel = "spring")
 public interface WaterMapper {
 
-    WaterDto waterDto(Water water);
+    WaterDto waterDto(WaterReceipt waterReceipt);
 
-    Water newWater(WaterDto waterDto);
+    WaterReceipt newWater(WaterDto waterDto);
 
 }
 
