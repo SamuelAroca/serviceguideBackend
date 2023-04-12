@@ -2,11 +2,15 @@ package proyecto.web.serviceguideBackend.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

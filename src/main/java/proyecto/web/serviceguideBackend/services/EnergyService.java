@@ -23,6 +23,7 @@ public class EnergyService {
     private final EnergyMapper energyMapper;
 
     public EnergyDto newEnergy(EnergyDto energyDto) {
+
         Optional<User> optionalUser = userRepository.findById(energyDto.getUser().getId());
 
         if (optionalUser.isEmpty()) {

@@ -17,26 +17,26 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-public class UsersController {
+public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("listUsers")
+    @GetMapping("/listUsers")
     public ResponseEntity<List<User>> listUsers() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @PutMapping("update/{id}")
-    public Optional<User> updateUser(@RequestBody SignUpDto newUser, @PathVariable Long id) {
+    @PutMapping("/update/{id}")
+    public Optional<User> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
         return Optional.ofNullable(userRepository.findById(id)
                 .map(user -> {
-                    Optional<User> optionalUser = userRepository.findByLogin(newUser.getLogin());
+                    Optional<User> optionalUser = userRepository.findByLogin(updateUser.getLogin());
                     if (optionalUser.isPresent()) {
-                        user.setFirstName(newUser.getFirstName());
-                        user.setLastName(newUser.getLastName());
-                        user.setLogin(newUser.getLogin());
-                        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(newUser.getPassword())));
+                        user.setFirstName(updateUser.getFirstName());
+                        user.setLastName(updateUser.getLastName());
+                        user.setLogin(updateUser.getLogin());
+                        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
                         return userRepository.save(user);
                     } else {
                         throw new AppException("Username does not exist", HttpStatus.NOT_FOUND);
@@ -44,14 +44,14 @@ public class UsersController {
                 }).orElseThrow(() -> new AppException("Username does not exist", HttpStatus.NOT_FOUND)));
     }
 
-    @GetMapping("user/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<User> userById(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException("Username does not exist", HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         Optional<User> userOptional = userRepository.findById(id);
 

@@ -11,6 +11,7 @@ import proyecto.web.serviceguideBackend.mappers.GasMapper;
 import proyecto.web.serviceguideBackend.repositories.GasRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,5 +36,13 @@ public class GasService {
         GasReceipt gasReceiptSaved = gasRepository.save(gasReceipt);
 
         return gasMapper.gasDto(gasReceiptSaved);
+    }
+
+    public Collection<GasReceipt> listAll() {
+        return gasRepository.findAll();
+    }
+
+    public Collection<GasReceipt> findAllByUser(User userId) {
+        return gasRepository.findAllByUser(userId);
     }
 }

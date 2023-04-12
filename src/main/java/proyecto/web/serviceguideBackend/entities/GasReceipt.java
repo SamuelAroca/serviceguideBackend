@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
+@SuppressWarnings("ALL")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
