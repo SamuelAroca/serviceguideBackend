@@ -21,22 +21,21 @@ public class EnergyController {
     private final EnergyService energyService;
 
     @PostMapping("/add")
-    public ResponseEntity<EnergyDto> newWater(@RequestBody @Valid EnergyDto energyDto) {
+    public ResponseEntity<EnergyDto> newEnergy(@RequestBody @Valid EnergyDto energyDto) {
 
         EnergyDto createdEnergy = energyService.newEnergy(energyDto);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdEnergy.getId()).toUri();
         return ResponseEntity.created(location).body(createdEnergy);
-
     }
 
     @GetMapping("/listAll")
-    public ResponseEntity<Collection<EnergyReceipt>> listAllWater() {
+    public ResponseEntity<Collection<EnergyReceipt>> listAllEnergy() {
 
-        Collection<EnergyReceipt> listWaterReceipt = energyService.listAll();
+        Collection<EnergyReceipt> listGasReceipt = energyService.listAll();
 
-        return ResponseEntity.ok(listWaterReceipt);
+        return ResponseEntity.ok(listGasReceipt);
     }
 
     @GetMapping("/findAllByUser/{id}")

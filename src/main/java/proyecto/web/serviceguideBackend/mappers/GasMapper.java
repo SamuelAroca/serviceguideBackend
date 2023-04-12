@@ -10,4 +10,5 @@ public interface GasMapper {
     GasDto gasDto(GasReceipt gasReceipt);
 
     GasReceipt newGas(GasDto gasDto);
+
 }
