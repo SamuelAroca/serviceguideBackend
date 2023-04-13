@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ServiceguideBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ServiceguideBackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ServiceguideBackendApplication.class, args);
+    }
 
 }

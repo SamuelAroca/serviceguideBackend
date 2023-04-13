@@ -5,25 +5,31 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import proyecto.web.serviceguideBackend.entities.User;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class SewerageDto {
 
     private Long id;
 
     @NotNull
-    private String firstName;
+    private String receiptName;
 
     @NotNull
-    private String lastName;
+    private Long price;
 
     @NotNull
-    private String login;
+    private Long amount;
 
     @NotNull
-    private String token;
+    private Date date;
+
+    @NotNull
+    private User user;
 
 }
