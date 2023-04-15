@@ -45,4 +45,12 @@ public class AuthController {
 
         return ResponseEntity.ok(whoIAm);
     }
+
+    @GetMapping("/whoismyid/{token}")
+    public ResponseEntity<Long> whoIsMyId(@PathVariable String token) {
+
+        Long whoIsMyId = userAuthenticationProvider.whoIsMyId(token);
+
+        return ResponseEntity.ok(whoIsMyId);
+    }
 }
