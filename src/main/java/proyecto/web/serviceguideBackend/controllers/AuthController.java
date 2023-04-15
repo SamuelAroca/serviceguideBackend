@@ -3,10 +3,7 @@ package proyecto.web.serviceguideBackend.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.CredentialsDto;
@@ -39,5 +36,13 @@ public class AuthController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdUser.getId()).toUri();
         return ResponseEntity.created(location).body(createdUser);
+    }
+
+    @GetMapping("/whoiam/{token}")
+    public ResponseEntity<String> whoIAm(@PathVariable String token) {
+
+        String whoIAm = userAuthenticationProvider.whoIAm(token);
+
+        return ResponseEntity.ok(whoIAm);
     }
 }
