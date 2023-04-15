@@ -1,30 +1,35 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import proyecto.web.serviceguideBackend.entities.User;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NewReceiptDto {
+public class EnergyDto {
 
     private Long id;
 
-    private Long waterPrice;
-    private Long waterAmount;
+    @NotNull
+    private String receiptName;
 
-    private Long seweragePrice;
-    private Long sewerageAmount;
+    @NotNull
+    private Long price;
 
-    private Long energyPrice;
-    private Long energyAmount;
+    @NotNull
+    private Long amount;
 
-    private Long gasPrice;
-    private Long gasAmount;
+    @NotNull
+    private Date date;
 
+    @NotNull
     private User user;
+
 }
