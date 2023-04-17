@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.WaterDto;
@@ -21,6 +22,7 @@ public class WaterController {
     private final WaterService waterService;
 
     @PostMapping("/add")
+    @Transactional
     public ResponseEntity<WaterDto> newWater(@RequestBody @Valid WaterDto waterDto) {
         WaterDto createdWater = waterService.newWater(waterDto);
 

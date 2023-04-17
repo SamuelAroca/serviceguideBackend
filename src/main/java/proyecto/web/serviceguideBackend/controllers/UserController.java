@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.entities.User;
@@ -28,6 +29,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
+    @Transactional
     public Optional<User> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
         return Optional.ofNullable(userRepository.findById(id)
                 .map(user -> {
@@ -52,6 +54,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @Transactional
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         Optional<User> userOptional = userRepository.findById(id);
 
