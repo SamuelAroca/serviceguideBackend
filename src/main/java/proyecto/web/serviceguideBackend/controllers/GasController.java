@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.GasDto;
@@ -21,6 +22,7 @@ public class GasController {
     private final GasService gasService;
 
     @PostMapping("/add")
+    @Transactional
     public ResponseEntity<GasDto> newGas(@RequestBody @Valid GasDto gasDto) {
 
         GasDto createdGas = gasService.newGas(gasDto);
