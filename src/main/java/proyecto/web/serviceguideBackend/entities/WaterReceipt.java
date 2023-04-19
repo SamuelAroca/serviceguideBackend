@@ -31,7 +31,7 @@ public class WaterReceipt {
     @NotNull
     private Long amount;
 
-    @NotNull
+    //@NotNull
     private Integer stratum;
 
     @Temporal(TemporalType.DATE)
