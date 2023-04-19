@@ -12,6 +12,7 @@ import proyecto.web.serviceguideBackend.repositories.EnergyRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -44,5 +45,9 @@ public class EnergyService {
 
     public Collection<EnergyReceipt> findAllByUser(User userId) {
         return energyRepository.findAllByUser(userId);
+    }
+
+    public Collection<EnergyReceipt> findAllByDateAndUser(Date date, User userId) {
+        return energyRepository.findAllByDateAndUser(date, userId);
     }
 }

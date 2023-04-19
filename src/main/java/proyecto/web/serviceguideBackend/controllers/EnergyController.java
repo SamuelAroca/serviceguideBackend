@@ -47,4 +47,12 @@ public class EnergyController {
 
         return ResponseEntity.ok(findAllByUser);
     }
+
+    /*@GetMapping("/findAllByDateByUser/{id}")
+    public ResponseEntity<Collection<EnergyReceipt>> findAllByDateByUser(@PathVariable User id) {
+
+        Collection<EnergyReceipt> findAllByDateByUser = energyService.findAllByDateByUser();
+
+        return ResponseEntity.ok(findAllByUser);
+    }*/
 }
