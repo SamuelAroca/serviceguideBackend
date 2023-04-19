@@ -31,13 +31,17 @@ public class EnergyReceipt {
     @NotNull
     private Long amount;
 
+    @NotNull
+    private Integer stratum;
+
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, fallbackPatterns = {"MM/dd/yyyy"})
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
     private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
     private User user;
 }
