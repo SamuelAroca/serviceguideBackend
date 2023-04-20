@@ -12,3 +12,4 @@ public interface EnergyMapper {
     EnergyReceipt newEnergy(EnergyDto energyDto);
 
 }
+

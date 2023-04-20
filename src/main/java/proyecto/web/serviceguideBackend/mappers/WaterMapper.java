@@ -12,4 +12,3 @@ public interface WaterMapper {
     WaterReceipt newWater(WaterDto waterDto);
 
 }
-

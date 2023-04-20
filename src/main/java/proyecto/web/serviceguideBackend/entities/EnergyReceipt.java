@@ -26,10 +26,10 @@ public class EnergyReceipt {
     private String receiptName;
 
     @NotNull
-    private Long price;
+    private Double price;
 
     @NotNull
-    private Long amount;
+    private Double amount;
 
     @NotNull
     private Integer stratum;
