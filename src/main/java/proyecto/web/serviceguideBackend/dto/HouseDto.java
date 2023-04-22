@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,29 +8,33 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import proyecto.web.serviceguideBackend.entities.User;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GasDto {
+public class HouseDto {
 
+    @Nullable
     private Long id;
 
     @NotNull
-    private String receiptName;
+    private String name;
 
     @NotNull
-    private Double price;
+    private Integer stratum;
 
     @NotNull
-    private Double amount;
+    private String city;
 
     @NotNull
-    private Date date;
+    private String neighborhood;
+
+    @Nullable
+    private String address;
 
     @NotNull
+    private String contract;
+
+    @Nullable
     private User user;
-
 }

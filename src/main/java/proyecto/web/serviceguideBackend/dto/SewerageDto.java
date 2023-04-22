@@ -21,10 +21,10 @@ public class SewerageDto {
     private String receiptName;
 
     @NotNull
-    private Long price;
+    private Double price;
 
     @NotNull
-    private Long amount;
+    private Double amount;
 
     @NotNull
     private Date date;

@@ -1,6 +1,7 @@
 package proyecto.web.serviceguideBackend.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,6 +52,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<GasReceipt> gasReceipts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<House> house = new ArrayList<>();
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -96,6 +100,13 @@ public class User {
         this.gasReceipts = gasReceipts;
         for (GasReceipt gasReceipt : gasReceipts) {
             gasReceipt.setUser(this);
+        }
+    }
+
+    public void setHouse(List<House> houses) {
+        this.house = houses;
+        for (House house : houses) {
+            house.setUser(this);
         }
     }
 }

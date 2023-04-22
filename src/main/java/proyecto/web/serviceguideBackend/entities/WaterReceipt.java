@@ -26,19 +26,20 @@ public class WaterReceipt {
     private String receiptName;
 
     @NotNull
-    private Long price;
+    private Double price;
 
     @NotNull
-    private Long amount;
+    private Double amount;
 
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, fallbackPatterns = {"MM/dd/yyyy"})
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
     private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
     private User user;
 
 }

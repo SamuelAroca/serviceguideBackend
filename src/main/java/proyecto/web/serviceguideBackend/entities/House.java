@@ -1,40 +1,41 @@
 package proyecto.web.serviceguideBackend.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
-
-@SuppressWarnings("ALL")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
 @Entity
-@Table(name = "energy_receipt")
-public class EnergyReceipt {
+@Table(name = "house")
+public class House {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private String receiptName;
+    private String name;
 
     @NotNull
-    private Double price;
+    private Integer stratum;
 
     @NotNull
-    private Double amount;
+    private String city;
 
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
-    private Date date;
+    private String neighborhood;
+
+    @Nullable
+    private String address;
+
+    @NotNull
+    private String contract;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
