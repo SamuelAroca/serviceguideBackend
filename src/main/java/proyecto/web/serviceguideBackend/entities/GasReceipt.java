@@ -31,9 +31,6 @@ public class GasReceipt {
     @NotNull
     private Double amount;
 
-    @NotNull
-    private Integer stratum;
-
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
