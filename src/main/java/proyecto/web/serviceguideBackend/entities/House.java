@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -37,9 +40,49 @@ public class House {
     @NotNull
     private String contract;
 
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
+    private List<WaterReceipt> waterReceipts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
+    private List<SewerageReceipt> sewerageReceipt = new ArrayList<>();
+
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
+    private List<EnergyReceipt> energyReceipts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
+    private List<GasReceipt> gasReceipts = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private User user;
+
+    public void setWaterReceipts(List<WaterReceipt> waterReceipts) {
+        this.waterReceipts = waterReceipts;
+        for (WaterReceipt waterReceipt : waterReceipts) {
+            waterReceipt.setHouse(this);
+        }
+    }
+
+    public void setSewerageReceipt(List<SewerageReceipt> sewerageReceipt) {
+        this.sewerageReceipt = sewerageReceipt;
+        for (SewerageReceipt sewerageReceipt1 : sewerageReceipt) {
+            sewerageReceipt1.setHouse(this);
+        }
+    }
+
+    public void setEnergyReceipts(List<EnergyReceipt> energyReceipts) {
+        this.energyReceipts = energyReceipts;
+        for (EnergyReceipt energyReceipt1 : energyReceipts) {
+            energyReceipt1.setHouse(this);
+        }
+    }
+
+    public void setGasReceipts(List<GasReceipt> gasReceipts) {
+        this.gasReceipts = gasReceipts;
+        for (GasReceipt gasReceipt : gasReceipts) {
+            gasReceipt.setHouse(this);
+        }
+    }
 }

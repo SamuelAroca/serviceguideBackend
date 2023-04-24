@@ -7,11 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import proyecto.web.serviceguideBackend.dto.EnergyDto;
 import proyecto.web.serviceguideBackend.dto.GasDto;
-import proyecto.web.serviceguideBackend.entities.EnergyReceipt;
 import proyecto.web.serviceguideBackend.entities.GasReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.repositories.GasRepository;
 import proyecto.web.serviceguideBackend.services.GasService;
@@ -39,18 +37,10 @@ public class GasController {
         return ResponseEntity.created(location).body(createdGas);
     }
 
-    @GetMapping("/listAll")
-    public ResponseEntity<Collection<GasReceipt>> listAllGas() {
+    @GetMapping("findAllByHouse/{id}")
+    public ResponseEntity<Collection<GasReceipt>> findAllByHouse(@PathVariable House id) {
 
-        Collection<GasReceipt> listGasReceipt = gasService.listAll();
-
-        return ResponseEntity.ok(listGasReceipt);
-    }
-
-    @GetMapping("findAllByUser/{id}")
-    public ResponseEntity<Collection<GasReceipt>> findAllByUser(@PathVariable User id) {
-
-        Collection<GasReceipt> findAllByUser = gasService.findAllByUser(id);
+        Collection<GasReceipt> findAllByUser = gasService.findAllByHouse(id);
 
         return ResponseEntity.ok(findAllByUser);
     }
@@ -67,7 +57,6 @@ public class GasController {
                         gasReceipt.setPrice(gasDto.getPrice());
                         gasReceipt.setAmount(gasDto.getAmount());
                         gasReceipt.setDate(gasDto.getDate());
-
                         return gasRepository.save(gasReceipt);
                     } else {
                         throw new AppException("Gas receipt not found", HttpStatus.NOT_FOUND);

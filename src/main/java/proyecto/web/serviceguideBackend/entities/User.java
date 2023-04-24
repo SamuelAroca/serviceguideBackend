@@ -41,18 +41,6 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<WaterReceipt> waterReceipts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<SewerageReceipt> sewerageReceipt = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<EnergyReceipt> energyReceipts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<GasReceipt> gasReceipts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<House> house = new ArrayList<>();
 
     public void setId(Long id) {
@@ -73,34 +61,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setWaterReceipts(List<WaterReceipt> waterReceipts) {
-        this.waterReceipts = waterReceipts;
-        for (WaterReceipt waterReceipt : waterReceipts) {
-            waterReceipt.setUser(this);
-        }
-    }
-
-    public void setSewerageReceipt(List<SewerageReceipt> sewerageReceipt) {
-        this.sewerageReceipt = sewerageReceipt;
-        for (SewerageReceipt sewerageReceipt1 : sewerageReceipt) {
-            sewerageReceipt1.setUser(this);
-        }
-    }
-
-    public void setEnergyReceipts(List<EnergyReceipt> energyReceipts) {
-        this.energyReceipts = energyReceipts;
-        for (EnergyReceipt energyReceipt1 : energyReceipts) {
-            energyReceipt1.setUser(this);
-        }
-    }
-
-    public void setGasReceipts(List<GasReceipt> gasReceipts) {
-        this.gasReceipts = gasReceipts;
-        for (GasReceipt gasReceipt : gasReceipts) {
-            gasReceipt.setUser(this);
-        }
     }
 
     public void setHouse(List<House> houses) {

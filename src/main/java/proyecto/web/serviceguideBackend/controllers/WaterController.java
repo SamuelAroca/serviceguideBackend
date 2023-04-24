@@ -38,10 +38,10 @@ public class WaterController {
         return ResponseEntity.created(location).body(createdWater);
     }
 
-    @GetMapping("/findAllByUser/{id}")
-    public ResponseEntity<Collection<WaterReceipt>> findAllByUser(@PathVariable User id) {
+    @GetMapping("/findAllByHouse/{id}")
+    public ResponseEntity<Collection<WaterReceipt>> findAllByHouse(@PathVariable House id) {
 
-        Collection<WaterReceipt> findAllByUser = waterService.findAllByUser(id);
+        Collection<WaterReceipt> findAllByUser = waterService.findAllByHouse(id);
 
         return ResponseEntity.ok(findAllByUser);
     }
