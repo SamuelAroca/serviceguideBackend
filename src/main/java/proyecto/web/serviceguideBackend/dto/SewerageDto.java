@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.House;
 
 import java.util.Date;
 
@@ -30,6 +30,6 @@ public class SewerageDto {
     private Date date;
 
     @NotNull
-    private User user;
+    private House house;
 
 }

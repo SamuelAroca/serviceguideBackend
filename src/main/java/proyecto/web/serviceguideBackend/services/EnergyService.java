@@ -5,49 +5,40 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.dto.EnergyDto;
 import proyecto.web.serviceguideBackend.entities.EnergyReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.EnergyMapper;
 import proyecto.web.serviceguideBackend.repositories.EnergyRepository;
-import proyecto.web.serviceguideBackend.repositories.UserRepository;
+import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class EnergyService {
 
-    private final UserRepository userRepository;
+    private final HouseRepository houseRepository;
     private final EnergyRepository energyRepository;
     private final EnergyMapper energyMapper;
 
     public EnergyDto newEnergy(EnergyDto energyDto) {
 
-        Optional<User> optionalUser = userRepository.findById(energyDto.getUser().getId());
+        Optional<House> optionalHouse = houseRepository.findById(energyDto.getHouse().getId());
 
-        if (optionalUser.isEmpty()) {
+        if (optionalHouse.isEmpty()) {
             throw new AppException("User does not exist", HttpStatus.NOT_FOUND);
         }
 
         EnergyReceipt energyReceipt = energyMapper.newEnergy(energyDto);
-        energyReceipt.setUser(optionalUser.get());
+        energyReceipt.setHouse(optionalHouse.get());
 
         EnergyReceipt energyReceiptSaved = energyRepository.save(energyReceipt);
 
         return energyMapper.energyDto(energyReceiptSaved);
     }
 
-    public Collection<EnergyReceipt> listAll() {
-        return energyRepository.findAll();
-    }
-
-    public Collection<EnergyReceipt> findAllByUser(User userId) {
-        return energyRepository.findAllByUser(userId);
-    }
-
-    public Collection<EnergyReceipt> findAllByDateAndUser(Date date, User userId) {
-        return energyRepository.findAllByDateAndUser(date, userId);
+    public Collection<EnergyReceipt> findAllByHouse(House houseId) {
+        return energyRepository.findAllByHouse(houseId);
     }
 }

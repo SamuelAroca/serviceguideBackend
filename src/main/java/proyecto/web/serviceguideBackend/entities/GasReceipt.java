@@ -37,8 +37,8 @@ public class GasReceipt {
     private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "house_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
-    private User user;
+    private House house;
 }

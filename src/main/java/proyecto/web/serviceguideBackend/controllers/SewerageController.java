@@ -8,13 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.SewerageDto;
-import proyecto.web.serviceguideBackend.dto.WaterDto;
+import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.SewerageReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
-import proyecto.web.serviceguideBackend.entities.WaterReceipt;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.repositories.SewerageRepository;
-import proyecto.web.serviceguideBackend.repositories.WaterRepository;
 import proyecto.web.serviceguideBackend.services.SewerageService;
 
 import java.net.URI;
@@ -39,10 +36,10 @@ public class SewerageController {
         return ResponseEntity.created(location).body(createdSewerage);
     }
 
-    @GetMapping("/findAllByUser/{id}")
-    public ResponseEntity<Collection<SewerageReceipt>> findAllByUser(@PathVariable User id) {
+    @GetMapping("/findAllByHouse/{id}")
+    public ResponseEntity<Collection<SewerageReceipt>> findAllByHouse(@PathVariable House id) {
 
-        Collection<SewerageReceipt> findAllByUser = sewerageService.findAllByUser(id);
+        Collection<SewerageReceipt> findAllByUser = sewerageService.findAllByHouse(id);
 
         return ResponseEntity.ok(findAllByUser);
     }
@@ -59,7 +56,6 @@ public class SewerageController {
                         sewerageReceipt.setPrice(sewerageDto.getPrice());
                         sewerageReceipt.setAmount(sewerageDto.getAmount());
                         sewerageReceipt.setDate(sewerageDto.getDate());
-
                         return sewerageRepository.save(sewerageReceipt);
                     } else {
                         throw new AppException("Sewerage receipt not found", HttpStatus.NOT_FOUND);

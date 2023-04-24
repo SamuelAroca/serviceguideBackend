@@ -8,10 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.EnergyDto;
-import proyecto.web.serviceguideBackend.dto.SewerageDto;
 import proyecto.web.serviceguideBackend.entities.EnergyReceipt;
-import proyecto.web.serviceguideBackend.entities.SewerageReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.repositories.EnergyRepository;
 import proyecto.web.serviceguideBackend.services.EnergyService;
@@ -39,18 +37,10 @@ public class EnergyController {
         return ResponseEntity.created(location).body(createdEnergy);
     }
 
-    @GetMapping("/listAll")
-    public ResponseEntity<Collection<EnergyReceipt>> listAllEnergy() {
+    @GetMapping("/findAllByHouse/{id}")
+    public ResponseEntity<Collection<EnergyReceipt>> findAllByHouse(@PathVariable House id) {
 
-        Collection<EnergyReceipt> listGasReceipt = energyService.listAll();
-
-        return ResponseEntity.ok(listGasReceipt);
-    }
-
-    @GetMapping("/findAllByUser/{id}")
-    public ResponseEntity<Collection<EnergyReceipt>> findAllByUser(@PathVariable User id) {
-
-        Collection<EnergyReceipt> findAllByUser = energyService.findAllByUser(id);
+        Collection<EnergyReceipt> findAllByUser = energyService.findAllByHouse(id);
 
         return ResponseEntity.ok(findAllByUser);
     }
@@ -67,7 +57,6 @@ public class EnergyController {
                         energyReceipt.setPrice(energyDto.getPrice());
                         energyReceipt.setAmount(energyDto.getAmount());
                         energyReceipt.setDate(energyDto.getDate());
-
                         return energyRepository.save(energyReceipt);
                     } else {
                         throw new AppException("Energy receipt not found", HttpStatus.NOT_FOUND);

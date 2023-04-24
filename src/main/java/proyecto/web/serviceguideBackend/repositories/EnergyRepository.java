@@ -1,15 +1,14 @@
 package proyecto.web.serviceguideBackend.repositories;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import proyecto.web.serviceguideBackend.entities.EnergyReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.House;
 
 import java.util.Collection;
-import java.util.Date;
 
 public interface EnergyRepository extends JpaRepository<EnergyReceipt, Long> {
 
-    Collection<EnergyReceipt> findAllByUser(User user);
-    Collection<EnergyReceipt> findAllByDateAndUser(Date date, User userId);
+    Collection<EnergyReceipt> findAllByHouse(@NotNull House house);
 
 }

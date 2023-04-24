@@ -1,12 +1,17 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -35,6 +40,6 @@ public class HouseDto {
     @NotNull
     private String contract;
 
-    @Nullable
+    @NotNull
     private User user;
 }

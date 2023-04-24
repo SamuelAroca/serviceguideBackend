@@ -5,11 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.dto.GasDto;
 import proyecto.web.serviceguideBackend.entities.GasReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.GasMapper;
 import proyecto.web.serviceguideBackend.repositories.GasRepository;
-import proyecto.web.serviceguideBackend.repositories.UserRepository;
+import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -18,31 +18,27 @@ import java.util.Optional;
 @Service
 public class GasService {
 
-    private final UserRepository userRepository;
+    private final HouseRepository houseRepository;
     private final GasRepository gasRepository;
     private final GasMapper gasMapper;
 
     public GasDto newGas(GasDto gasDto) {
 
-        Optional<User> optionalUser = userRepository.findById(gasDto.getUser().getId());
+        Optional<House> optionalHouse = houseRepository.findById(gasDto.getHouse().getId());
 
-        if (optionalUser.isEmpty()) {
+        if (optionalHouse.isEmpty()) {
             throw new AppException("User does not exist", HttpStatus.NOT_FOUND);
         }
 
         GasReceipt gasReceipt = gasMapper.newGas(gasDto);
-        gasReceipt.setUser(optionalUser.get());
+        gasReceipt.setHouse(optionalHouse.get());
 
         GasReceipt gasReceiptSaved = gasRepository.save(gasReceipt);
 
         return gasMapper.gasDto(gasReceiptSaved);
     }
 
-    public Collection<GasReceipt> listAll() {
-        return gasRepository.findAll();
-    }
-
-    public Collection<GasReceipt> findAllByUser(User userId) {
-        return gasRepository.findAllByUser(userId);
+    public Collection<GasReceipt> findAllByHouse(House houseId) {
+        return gasRepository.findAllByHouse(houseId);
     }
 }

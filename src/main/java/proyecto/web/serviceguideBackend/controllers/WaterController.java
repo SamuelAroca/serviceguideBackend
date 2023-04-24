@@ -7,10 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.WaterDto;
 import proyecto.web.serviceguideBackend.entities.House;
-import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.entities.WaterReceipt;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.repositories.WaterRepository;
@@ -38,10 +36,10 @@ public class WaterController {
         return ResponseEntity.created(location).body(createdWater);
     }
 
-    @GetMapping("/findAllByUser/{id}")
-    public ResponseEntity<Collection<WaterReceipt>> findAllByUser(@PathVariable User id) {
+    @GetMapping("/findAllByHouse/{id}")
+    public ResponseEntity<Collection<WaterReceipt>> findAllByHouse(@PathVariable House id) {
 
-        Collection<WaterReceipt> findAllByUser = waterService.findAllByUser(id);
+        Collection<WaterReceipt> findAllByUser = waterService.findAllByHouse(id);
 
         return ResponseEntity.ok(findAllByUser);
     }
