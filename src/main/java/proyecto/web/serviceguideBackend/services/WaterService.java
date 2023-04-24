@@ -5,12 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.dto.WaterDto;
 import proyecto.web.serviceguideBackend.entities.House;
-import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.entities.WaterReceipt;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.WaterMapper;
 import proyecto.web.serviceguideBackend.repositories.HouseRepository;
-import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.repositories.WaterRepository;
 
 import java.util.Collection;

@@ -8,14 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.SewerageDto;
-import proyecto.web.serviceguideBackend.dto.WaterDto;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.SewerageReceipt;
-import proyecto.web.serviceguideBackend.entities.User;
-import proyecto.web.serviceguideBackend.entities.WaterReceipt;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.repositories.SewerageRepository;
-import proyecto.web.serviceguideBackend.repositories.WaterRepository;
 import proyecto.web.serviceguideBackend.services.SewerageService;
 
 import java.net.URI;
