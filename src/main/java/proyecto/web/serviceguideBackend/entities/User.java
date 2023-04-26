@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @Getter
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"login"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User {
 
     @Id
@@ -33,7 +33,7 @@ public class User {
 
     @Column(nullable = false)
     @Size(max = 100)
-    private String login;
+    private String email;
 
     @Column(nullable = false)
     @Size(max = 100)
@@ -54,8 +54,8 @@ public class User {
         this.lastName = lastName;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {

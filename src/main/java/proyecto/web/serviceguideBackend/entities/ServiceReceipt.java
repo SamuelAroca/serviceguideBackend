@@ -8,15 +8,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-@SuppressWarnings("ALL")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
 @Entity
-@Table(name = "sewerage_receipt")
-public class SewerageReceipt {
+@Table(name = "service_receipt")
+public class ServiceReceipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +35,13 @@ public class SewerageReceipt {
     @NotNull
     private Date date;
 
+    @OneToOne
+    @JoinColumn(name = "FK_TYPE_SERVICE", updatable = false, nullable = false)
+    @NotNull
+    private TypeServices typeServices;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "house_id")
+    @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private House house;

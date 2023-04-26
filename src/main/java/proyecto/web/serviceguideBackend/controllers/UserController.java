@@ -33,11 +33,11 @@ public class UserController {
     public Optional<User> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
         return Optional.ofNullable(userRepository.findById(id)
                 .map(user -> {
-                    Optional<User> optionalUser = userRepository.findByLogin(updateUser.getLogin());
+                    Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
                     if (optionalUser.isPresent()) {
                         user.setFirstName(updateUser.getFirstName());
                         user.setLastName(updateUser.getLastName());
-                        user.setLogin(updateUser.getLogin());
+                        user.setEmail(updateUser.getEmail());
                         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
                         return userRepository.save(user);
                     } else {

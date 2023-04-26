@@ -56,7 +56,7 @@ public class HouseController {
                     if (optionalHouse.isPresent()){
                         house.setName(houseDto.getName());
                         house.setStratum(houseDto.getStratum());
-                        house.setCity(houseDto.getCity());
+                        house.setCities(houseDto.getCities());
                         house.setNeighborhood(houseDto.getNeighborhood());
                         house.setAddress(houseDto.getAddress());
                         house.setContract(houseDto.getContract());
@@ -80,5 +80,16 @@ public class HouseController {
         houseRepository.delete(optionalHouse.get());
 
         return ResponseEntity.ok("Delete success");
+    }
+
+    @GetMapping("/findOneByName/{name}")
+    public ResponseEntity<Optional<House>> findOneByName(@PathVariable String name) {
+
+        Optional<House> optionalHouse = houseService.findOneByName(name);
+
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(optionalHouse);
     }
 }

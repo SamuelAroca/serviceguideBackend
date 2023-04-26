@@ -1,25 +1,26 @@
-package proyecto.web.serviceguideBackend.entities;
+package proyecto.web.serviceguideBackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import proyecto.web.serviceguideBackend.entities.House;
+import proyecto.web.serviceguideBackend.entities.TypeServices;
 
 import java.util.Date;
 
-@SuppressWarnings("ALL")
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Getter
-@Setter
-@Entity
-@Table(name = "energy_receipt")
-public class EnergyReceipt {
+public class ServiceReceiptDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Nullable
     private Long id;
 
     @NotNull
@@ -31,14 +32,12 @@ public class EnergyReceipt {
     @NotNull
     private Double amount;
 
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
     private Date date;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "house_id")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
+    private TypeServices typeServices;
+
     @NotNull
     private House house;
 }

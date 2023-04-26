@@ -25,7 +25,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
         UserDto userDto = userService.login(credentialsDto);
-        userDto.setToken(userAuthenticationProvider.createToken(userDto.getLogin()));
+        userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
         return ResponseEntity.ok(userDto);
     }
 
@@ -33,7 +33,7 @@ public class AuthController {
     @Transactional
     public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
         UserDto createdUser = userService.register(user);
-        createdUser.setToken(userAuthenticationProvider.createToken(user.getLogin()));
+        createdUser.setToken(userAuthenticationProvider.createToken(user.getEmail()));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdUser.getId()).toUri();
