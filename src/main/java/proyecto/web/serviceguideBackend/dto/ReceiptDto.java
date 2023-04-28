@@ -1,16 +1,10 @@
 package proyecto.web.serviceguideBackend.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.*;
 import proyecto.web.serviceguideBackend.entities.House;
-import proyecto.web.serviceguideBackend.entities.TypeServices;
+import proyecto.web.serviceguideBackend.entities.TypeService;
 
 import java.util.Date;
 
@@ -18,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ServiceReceiptDto {
+public class ReceiptDto {
 
     @Nullable
     private Long id;
@@ -35,9 +29,9 @@ public class ServiceReceiptDto {
     @NotNull
     private Date date;
 
-    @NotNull
-    private TypeServices typeServices;
+    @Nullable
+    private TypeService typeService;
 
-    @NotNull
+    @Nullable
     private House house;
 }

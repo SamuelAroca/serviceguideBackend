@@ -42,7 +42,7 @@ public class House {
     private ColombianCities cities;
 
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
-    private List<ServiceReceipt> serviceReceipts = new ArrayList<>();
+    private List<Receipt> receipts = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "FK_USER")
@@ -50,10 +50,10 @@ public class House {
     @NotNull
     private User user;
 
-    public void setServiceReceipt(List<ServiceReceipt> serviceReceipts) {
-        this.serviceReceipts = serviceReceipts;
-        for (ServiceReceipt serviceReceipt : serviceReceipts) {
-            serviceReceipt.setHouse(this);
+    public void setServiceReceipt(List<Receipt> receipts) {
+        this.receipts = receipts;
+        for (Receipt receipt : receipts) {
+            receipt.setHouse(this);
         }
     }
 }

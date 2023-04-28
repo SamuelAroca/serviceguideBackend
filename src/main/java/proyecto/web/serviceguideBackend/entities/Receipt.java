@@ -14,8 +14,8 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "service_receipt")
-public class ServiceReceipt {
+@Table(name = "receipt")
+public class Receipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class ServiceReceipt {
     @OneToOne
     @JoinColumn(name = "FK_TYPE_SERVICE", updatable = false, nullable = false)
     @NotNull
-    private TypeServices typeServices;
+    private TypeService typeService;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "FK_HOUSE")

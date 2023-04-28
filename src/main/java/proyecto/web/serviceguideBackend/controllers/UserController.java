@@ -31,7 +31,7 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     @Transactional
-    public Optional<User> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
+    public Optional<ResponseEntity<Message>> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
         return Optional.ofNullable(userRepository.findById(id)
                 .map(user -> {
                     Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
@@ -40,7 +40,8 @@ public class UserController {
                         user.setLastName(updateUser.getLastName());
                         user.setEmail(updateUser.getEmail());
                         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
-                        return userRepository.save(user);
+                        userRepository.save(user);
+                        return ResponseEntity.ok(new Message("User updated successfully"));
                     } else {
                         throw new AppException("Username does not exist", HttpStatus.NOT_FOUND);
                     }

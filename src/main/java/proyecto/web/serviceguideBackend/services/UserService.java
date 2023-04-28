@@ -20,9 +20,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final UserMapper userMapper;
 
     public UserDto login(CredentialsDto credentialsDto) {
@@ -32,7 +30,7 @@ public class UserService {
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
-        throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
+        throw new AppException("Wrong email or password", HttpStatus.BAD_REQUEST);
     }
 
     public UserDto register(SignUpDto userDto) {
@@ -52,7 +50,7 @@ public class UserService {
 
     public UserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Wrong email or password", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);
     }
 

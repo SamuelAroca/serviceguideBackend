@@ -10,6 +10,6 @@ public interface HouseMapper {
 
     HouseDto houseDto(House house);
 
-    @Mapping(target = "serviceReceipts", ignore = true)
+    @Mapping(target = "receipts", ignore = true)
     House newHouse(HouseDto houseDto);
 }

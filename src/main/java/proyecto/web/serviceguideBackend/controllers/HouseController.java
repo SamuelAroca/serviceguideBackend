@@ -35,7 +35,6 @@ public class HouseController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdHouse.getId()).toUri();
-
         return ResponseEntity.created(location).body(createdHouse);
     }
 
