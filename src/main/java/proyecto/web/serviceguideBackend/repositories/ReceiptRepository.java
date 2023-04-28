@@ -13,7 +13,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     Optional<Receipt> findByReceiptName(@NotNull String name);
     Collection<Receipt> findByHouse(@NotNull House house);
-    Collection<Receipt> findByTypeService(@NotNull TypeService typeService);
+    Collection<Receipt> findByTypeServiceAndHouse(@NotNull TypeService typeService, @NotNull House house);
     Collection<Receipt> findAllById(@NotNull Long id);
 
 }
