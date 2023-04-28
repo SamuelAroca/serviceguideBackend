@@ -7,8 +7,8 @@
 </head>
 <body>
     <h2>Recover password</h2>
-    <h3><span>Hi </span><span>User</span></h3>
+    <h3><span>Hi </span><span th:text="${userName}"></span></h3>
     <h4>Click on the following link to access your account</h4>
-    <a th:href="@{https://start.spring.io/}"><button>Go to my account</button></a>
+    <a th:href="@{${url}}"><button>Go to my account</button></a>
 </body>
 </html>

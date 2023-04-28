@@ -55,4 +55,16 @@ public class UserService {
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);
     }
+
+    public Optional<User> getByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findByTokenPassword(String tokenPassword) {
+        return userRepository.findByTokenPassword(tokenPassword);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
 }

@@ -39,6 +39,8 @@ public class User {
     @Size(max = 100)
     private String password;
 
+    private String tokenPassword;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<House> house = new ArrayList<>();
 
@@ -60,6 +62,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setTokenPassword(String tokenPassword) {
+        this.tokenPassword = tokenPassword;
     }
 
     public void setHouse(List<House> houses) {

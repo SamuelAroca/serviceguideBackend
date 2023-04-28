@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -55,13 +56,13 @@ public class UserController {
 
     @DeleteMapping("/delete/{id}")
     @Transactional
-    public ResponseEntity<User> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Message> deleteUser(@PathVariable Long id) {
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isEmpty()) {
             throw new AppException("Username does not exist", HttpStatus.NOT_FOUND);
         }
         userRepository.delete(userOptional.get());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new Message("Delete success"));
     }
 }
