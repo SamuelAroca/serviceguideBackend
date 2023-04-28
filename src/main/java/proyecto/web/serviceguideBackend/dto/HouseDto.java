@@ -1,17 +1,12 @@
 package proyecto.web.serviceguideBackend.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import proyecto.web.serviceguideBackend.entities.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -29,9 +24,6 @@ public class HouseDto {
     private Integer stratum;
 
     @NotNull
-    private String city;
-
-    @NotNull
     private String neighborhood;
 
     @Nullable
@@ -39,6 +31,9 @@ public class HouseDto {
 
     @NotNull
     private String contract;
+
+    @NotNull
+    private ColombianCities cities;
 
     @NotNull
     private User user;

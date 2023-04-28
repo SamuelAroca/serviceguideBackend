@@ -1,35 +1,22 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import proyecto.web.serviceguideBackend.entities.House;
-
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SewerageDto {
+public class ColombianCitiesDto {
 
+    @Nullable
     private Long id;
 
     @NotNull
-    private String receiptName;
-
-    @NotNull
-    private Double price;
-
-    @NotNull
-    private Double amount;
-
-    @NotNull
-    private Date date;
-
-    @NotNull
-    private House house;
+    private String city;
 
 }

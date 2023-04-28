@@ -28,7 +28,8 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register", "/api/email/send-email", "/api/email/change-password").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/email/send-email").permitAll()
                         .anyRequest().authenticated())
         ;
         return http.build();

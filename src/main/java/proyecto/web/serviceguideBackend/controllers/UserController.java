@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -30,16 +31,17 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     @Transactional
-    public Optional<User> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
+    public Optional<ResponseEntity<Message>> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
         return Optional.ofNullable(userRepository.findById(id)
                 .map(user -> {
-                    Optional<User> optionalUser = userRepository.findByLogin(updateUser.getLogin());
+                    Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
                     if (optionalUser.isPresent()) {
                         user.setFirstName(updateUser.getFirstName());
                         user.setLastName(updateUser.getLastName());
-                        user.setLogin(updateUser.getLogin());
+                        user.setEmail(updateUser.getEmail());
                         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
-                        return userRepository.save(user);
+                        userRepository.save(user);
+                        return ResponseEntity.ok(new Message("User updated successfully"));
                     } else {
                         throw new AppException("Username does not exist", HttpStatus.NOT_FOUND);
                     }
@@ -55,13 +57,13 @@ public class UserController {
 
     @DeleteMapping("/delete/{id}")
     @Transactional
-    public ResponseEntity<User> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Message> deleteUser(@PathVariable Long id) {
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isEmpty()) {
             throw new AppException("Username does not exist", HttpStatus.NOT_FOUND);
         }
         userRepository.delete(userOptional.get());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new Message("Delete success"));
     }
 }

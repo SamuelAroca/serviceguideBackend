@@ -69,10 +69,10 @@ public class UserAuthenticationProvider {
 
         DecodedJWT decoded = verifier.verify(token);
 
-        User user = userRepository.findByLogin(decoded.getIssuer())
+        User user = userRepository.findByEmail(decoded.getIssuer())
                 .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
 
-        return user.getLogin();
+        return user.getEmail();
     }
 
     public Long whoIsMyId(String token) {
@@ -83,7 +83,7 @@ public class UserAuthenticationProvider {
 
         DecodedJWT decoded = verifier.verify(token);
 
-        User user = userRepository.findByLogin(decoded.getIssuer())
+        User user = userRepository.findByEmail(decoded.getIssuer())
                 .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
 
         return user.getId();

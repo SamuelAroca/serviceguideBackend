@@ -21,7 +21,7 @@ public class UserDto {
     private String lastName;
 
     @NotNull
-    private String login;
+    private String email;
 
     @NotNull
     private String token;

@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @Getter
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"login"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User {
 
     @Id
@@ -33,11 +33,13 @@ public class User {
 
     @Column(nullable = false)
     @Size(max = 100)
-    private String login;
+    private String email;
 
     @Column(nullable = false)
     @Size(max = 100)
     private String password;
+
+    private String tokenPassword;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<House> house = new ArrayList<>();
@@ -54,12 +56,16 @@ public class User {
         this.lastName = lastName;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setTokenPassword(String tokenPassword) {
+        this.tokenPassword = tokenPassword;
     }
 
     public void setHouse(List<House> houses) {

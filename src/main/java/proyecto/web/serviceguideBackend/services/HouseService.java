@@ -41,4 +41,8 @@ public class HouseService {
     public Collection<House> findAllByUser(User userId){
         return houseRepository.findAllByUser(userId);
     }
+
+    public Optional<House> findOneByName(String name) {
+        return houseRepository.findOneByName(name);
+    }
 }

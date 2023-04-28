@@ -1,11 +1,10 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import proyecto.web.serviceguideBackend.entities.House;
+import proyecto.web.serviceguideBackend.entities.TypeService;
 
 import java.util.Date;
 
@@ -13,8 +12,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EnergyDto {
+public class ReceiptDto {
 
+    @Nullable
     private Long id;
 
     @NotNull
@@ -29,7 +29,9 @@ public class EnergyDto {
     @NotNull
     private Date date;
 
-    @NotNull
-    private House house;
+    @Nullable
+    private TypeService typeService;
 
+    @Nullable
+    private House house;
 }

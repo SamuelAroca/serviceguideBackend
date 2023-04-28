@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
+import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -34,7 +35,6 @@ public class HouseController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdHouse.getId()).toUri();
-
         return ResponseEntity.created(location).body(createdHouse);
     }
 
@@ -56,7 +56,7 @@ public class HouseController {
                     if (optionalHouse.isPresent()){
                         house.setName(houseDto.getName());
                         house.setStratum(houseDto.getStratum());
-                        house.setCity(houseDto.getCity());
+                        house.setCities(houseDto.getCities());
                         house.setNeighborhood(houseDto.getNeighborhood());
                         house.setAddress(houseDto.getAddress());
                         house.setContract(houseDto.getContract());
@@ -70,7 +70,7 @@ public class HouseController {
 
     @DeleteMapping("/delete/{id}")
     @Transactional
-    public ResponseEntity<String> deleteHouse(@PathVariable Long id){
+    public ResponseEntity<Message> deleteHouse(@PathVariable Long id){
 
         Optional<House> optionalHouse = houseRepository.findById(id);
         if (optionalHouse.isEmpty()){
@@ -79,6 +79,17 @@ public class HouseController {
 
         houseRepository.delete(optionalHouse.get());
 
-        return ResponseEntity.ok("Delete success");
+        return ResponseEntity.ok(new Message("Delete success"));
+    }
+
+    @GetMapping("/findOneByName/{name}")
+    public ResponseEntity<Optional<House>> findOneByName(@PathVariable String name) {
+
+        Optional<House> optionalHouse = houseService.findOneByName(name);
+
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(optionalHouse);
     }
 }
