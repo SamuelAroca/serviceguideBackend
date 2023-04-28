@@ -54,8 +54,8 @@ public class ReceiptService {
         return receiptRepository.findByHouse(house);
     }
 
-    public Collection<Receipt> findByTypeService(TypeService typeService) {
-        return receiptRepository.findByTypeService(typeService);
+    public Collection<Receipt> findByTypeService(TypeService typeService, House house) {
+        return receiptRepository.findByTypeServiceAndHouse(typeService, house);
     }
 
     public Collection<Receipt> findAllById(Long id) {
