@@ -40,7 +40,7 @@ public class ColombianCitiesService {
         return optionalCity;
     }
 
-    public Optional<ColombianCities> findOneByCity(String city) {
-        return colombianCitiesRepository.findOneByCity(city);
+    public Optional<ColombianCities> findIdByCity(String city) {
+        return colombianCitiesRepository.findIdByCity(city);
     }
 }

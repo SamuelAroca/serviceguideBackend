@@ -54,8 +54,8 @@ public class ReceiptService {
         return receiptRepository.findByHouse(house);
     }
 
-    public Collection<Receipt> findByTypeService(TypeService typeService) {
-        return receiptRepository.findByTypeService(typeService);
+    public Collection<Receipt> findByTypeService(TypeService typeService, House house) {
+        return receiptRepository.findByTypeServiceAndHouse(typeService, house);
     }
 
     public Collection<Receipt> findAllById(Long id) {
@@ -74,7 +74,7 @@ public class ReceiptService {
                         receipt.setTypeService(receiptDto.getTypeService());
                         receipt.setHouse(receiptDto.getHouse());
                         receiptRepository.save(receipt);
-                        return new Message("User updated successfully");
+                        return new Message("User updated successfully", HttpStatus.OK);
                     } else {
                         throw new AppException("Receipt not found", HttpStatus.NOT_FOUND);
                     }
@@ -87,6 +87,6 @@ public class ReceiptService {
             throw new AppException("Receipt not found", HttpStatus.NOT_FOUND);
         }
         receiptRepository.delete(optionalReceipt.get());
-        return new Message("Received deleted successfully");
+        return new Message("Received deleted successfully", HttpStatus.OK);
     }
 }
