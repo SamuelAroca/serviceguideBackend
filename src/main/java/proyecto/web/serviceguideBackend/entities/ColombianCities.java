@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "colombian_cities")
 public class ColombianCities {
 
     @Id

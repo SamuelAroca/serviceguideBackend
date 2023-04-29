@@ -12,6 +12,7 @@ import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
+import proyecto.web.serviceguideBackend.repositories.ColombianCitiesRepository;
 import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.services.HouseService;
 
@@ -26,6 +27,7 @@ public class HouseController {
 
     private final HouseService houseService;
     private final HouseRepository houseRepository;
+    private final ColombianCitiesRepository colombianCitiesRepository;
 
     @PostMapping("/add")
     @Transactional
@@ -40,10 +42,17 @@ public class HouseController {
 
     @GetMapping("/findAllByUser/{id}")
     public ResponseEntity<Collection<House>> findAllByUser(@PathVariable User id){
+        return ResponseEntity.ok(houseService.findAllByUser(id));
+    }
 
-        Collection<House> findAllByUser = houseService.findAllByUser(id);
+    @GetMapping("/findNameById/{id}")
+    public ResponseEntity<Optional<House>> findNameById(@PathVariable Long id) {
+        return ResponseEntity.ok(houseService.findNameById(id));
+    }
 
-        return ResponseEntity.ok(findAllByUser);
+    @GetMapping("/findIdByName/{name}")
+    public ResponseEntity<Optional<House>> findIdByName(@PathVariable String name) {
+        return ResponseEntity.ok(houseService.findIdByName(name));
     }
 
     @PutMapping("/update/{id}")
@@ -80,16 +89,5 @@ public class HouseController {
         houseRepository.delete(optionalHouse.get());
 
         return ResponseEntity.ok(new Message("Delete success"));
-    }
-
-    @GetMapping("/findOneByName/{name}")
-    public ResponseEntity<Optional<House>> findOneByName(@PathVariable String name) {
-
-        Optional<House> optionalHouse = houseService.findOneByName(name);
-
-        if (optionalHouse.isEmpty()) {
-            throw new AppException("House not found", HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(optionalHouse);
     }
 }

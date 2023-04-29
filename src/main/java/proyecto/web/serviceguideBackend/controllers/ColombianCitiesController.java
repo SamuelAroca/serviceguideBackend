@@ -42,10 +42,7 @@ public class ColombianCitiesController {
 
     @GetMapping("/listAll")
     public ResponseEntity<Collection<ColombianCities>> listAll() {
-
-        Collection<ColombianCities> listAll = colombianCitiesService.listAll();
-
-        return ResponseEntity.ok(listAll);
+        return ResponseEntity.ok(colombianCitiesService.listAll());
     }
 
     @GetMapping("/findOneByCity/{city}")
@@ -56,5 +53,10 @@ public class ColombianCitiesController {
             throw new AppException("City not found", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(optional);
+    }
+
+    @GetMapping("/findIdByCity/{city}")
+    public ResponseEntity<Optional<ColombianCities>> findIdByCity(@PathVariable String city) {
+        return ResponseEntity.ok(colombianCitiesService.findIdByCity(city));
     }
 }
