@@ -36,11 +36,11 @@ public class Receipt {
     private Date date;
 
     @OneToOne
-    @JoinColumn(name = "FK_TYPE_SERVICE", updatable = false, nullable = false)
+    @JoinColumn(name = "FK_TYPE_SERVICE", nullable = false)
     @NotNull
     private TypeService typeService;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull

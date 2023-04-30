@@ -12,5 +12,6 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     Collection<House> findAllByUser(@NotNull User user);
     Optional<House> findByUserAndName(@NotNull User user, @NotNull String name);
     Optional<House> findByName(@NotNull String house);
+    Optional<House> findByName(@NotNull House house);
 
 }

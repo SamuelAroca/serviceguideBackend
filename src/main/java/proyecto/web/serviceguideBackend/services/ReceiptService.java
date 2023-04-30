@@ -8,11 +8,13 @@ import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.TypeService;
+import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.ReceiptMapper;
 import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.repositories.TypeServiceRepository;
+import proyecto.web.serviceguideBackend.repositories.UserRepository;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -26,38 +28,28 @@ public class ReceiptService {
     private final ReceiptMapper receiptMapper;
     private final HouseRepository houseRepository;
     private final TypeServiceRepository typeServiceRepository;
+    private final HouseService houseService;
 
-    public ReceiptDto newReceipt(ReceiptDto receiptDto) {
-        Optional<Receipt> optionalReceipt = receiptRepository.findByReceiptName(receiptDto.getReceiptName());
+    public ReceiptDto newReceipt(ReceiptDto receiptDto, User idUser) {
+        Optional<House> optionalHouse = houseService.findByUserAndName(idUser, Objects.requireNonNull(receiptDto.getHouse()).getName());
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptName(optionalHouse.get(), receiptDto.getReceiptName());
         if (optionalReceipt.isPresent()) {
             throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
         }
-        /*Optional<TypeService> optionalTypeService = typeServiceRepository.findByType(receiptDto.getTypeService());
+        Optional<TypeService> optionalTypeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(receiptDto.getTypeService()).getType());
         if (optionalTypeService.isEmpty()) {
-            throw new AppException("TypeService not found", HttpStatus.NOT_FOUND);
-            TOCA REVISAR
-        }*/
-        Optional<House> optionalHouse = houseRepository.findByName(Objects.requireNonNull(receiptDto.getHouse()).getName());
-        if (optionalHouse.isPresent()) {
-            Optional<House> houseOptional = houseRepository.findById(optionalHouse.get().getId());
-            if (houseOptional.isEmpty()) {
-                throw new AppException("House not found", HttpStatus.NOT_FOUND);
-            }
-            Optional<TypeService> serviceOptional = typeServiceRepository.findById(Objects.requireNonNull(receiptDto.getTypeService()).getId());
-            if (serviceOptional.isEmpty()) {
-                throw new AppException("TypeService not found", HttpStatus.NOT_FOUND);
-            }
-
-            Receipt receipt = receiptMapper.serviceReceipt(receiptDto);
-            receipt.setTypeService(serviceOptional.get());
-            receipt.setHouse(houseOptional.get());
-
-            Receipt receiptSaved = receiptRepository.save(receipt);
-
-            return receiptMapper.serviceReceiptDto(receiptSaved);
-        } else {
-            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+            throw new AppException("Type service not found", HttpStatus.NOT_FOUND);
         }
+
+        Receipt receipt = receiptMapper.serviceReceipt(receiptDto);
+        receipt.setHouse(optionalHouse.get());
+        receipt.setTypeService(optionalTypeService.get());
+
+        Receipt receiptSaved = receiptRepository.save(receipt);
+        return receiptMapper.serviceReceiptDto(receiptSaved);
     }
 
     public Collection<Receipt> findByHouse(House house) {
@@ -79,7 +71,7 @@ public class ReceiptService {
                     if (optionalReceipt.isPresent()) {
                         throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
                     }
-                    Optional<TypeService> optionalTypeService = typeServiceRepository.findByType(receiptDto.getTypeService());
+                    Optional<TypeService> optionalTypeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(Objects.requireNonNull(receiptDto.getTypeService()).getType()));
                     if (optionalTypeService.isEmpty()) {
                         throw new AppException("TypeService not found", HttpStatus.NOT_FOUND);
                     }
