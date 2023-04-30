@@ -36,9 +36,9 @@ public class HouseController {
         return ResponseEntity.created(location).body(createdHouse);
     }
 
-    @GetMapping("/findAllByUser/{user}")
-    public ResponseEntity<Collection<House>> findAllByUser(@PathVariable User user){
-        return ResponseEntity.ok(houseService.findAllByUser(user));
+    @GetMapping("/findAllByUserOrderById/{user}")
+    public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable User user){
+        return ResponseEntity.ok(houseService.findAllByUserOrderById(user));
     }
 
     @GetMapping("/findByUserAndName/{user}/{name}")

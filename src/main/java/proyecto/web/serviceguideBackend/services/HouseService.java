@@ -50,8 +50,8 @@ public class HouseService {
         }
     }
 
-    public Collection<House> findAllByUser(User userId){
-        return houseRepository.findAllByUser(userId);
+    public Collection<House> findAllByUserOrderById(User userId){
+        return houseRepository.findAllByUserOrderById(userId);
     }
 
     public Optional<House> findByUserAndName(User user, String name) {
