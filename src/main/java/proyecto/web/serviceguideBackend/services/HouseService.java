@@ -2,8 +2,10 @@ package proyecto.web.serviceguideBackend.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
+import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.ColombianCities;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
@@ -59,5 +61,33 @@ public class HouseService {
 
     public Optional<House> findIdByName(String name) {
         return houseRepository.findIdByName(name);
+    }
+
+    public Optional<Message> updateHouse(HouseDto houseDto, Long id) {
+        return Optional.of(houseRepository.findById(id)
+                .map(house -> {
+                    Optional<House> optionalHouse = houseRepository.findById(id);
+                    if (optionalHouse.isPresent()){
+                        house.setName(houseDto.getName());
+                        house.setStratum(houseDto.getStratum());
+                        house.setCities(houseDto.getCities());
+                        house.setNeighborhood(houseDto.getNeighborhood());
+                        house.setAddress(houseDto.getAddress());
+                        house.setContract(houseDto.getContract());
+                        houseRepository.save(house);
+                        return new Message("House updated successfully", HttpStatus.OK);
+                    } else {
+                        throw new AppException("House not found", HttpStatus.NOT_FOUND);
+                    }
+                }).orElseThrow(() -> new AppException("House not found", HttpStatus.NOT_FOUND)));
+    }
+
+    public Message deleteHouse(Long id) {
+        Optional<House> optionalHouse = houseRepository.findById(id);
+        if (optionalHouse.isEmpty()){
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        houseRepository.delete(optionalHouse.get());
+        return new Message("Delete success", HttpStatus.OK);
     }
 }
