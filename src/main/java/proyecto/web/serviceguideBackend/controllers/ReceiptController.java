@@ -15,6 +15,7 @@ import proyecto.web.serviceguideBackend.services.ReceiptService;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -47,6 +48,11 @@ public class ReceiptController {
     @GetMapping("/findAllById/{id}")
     public ResponseEntity<Collection<Receipt>> findAllById(@PathVariable Long id) {
         return ResponseEntity.ok(receiptService.findAllById(id));
+    }
+
+    @GetMapping("/findByUserId/{id}")
+    public ResponseEntity<List<List<Receipt>>> findByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(receiptService.findAllByUserId(id));
     }
 
     @PutMapping("/update/{id}")
