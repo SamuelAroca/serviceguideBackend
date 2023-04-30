@@ -9,10 +9,8 @@ import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
 
-    Collection<House> findAllByUser(@NotNull User user);
+    Collection<House> findAllByUserOrderById(@NotNull User user);
     Optional<House> findByUserAndName(@NotNull User user, @NotNull String name);
-    Optional<House> findByName(@NotNull String house);
-    Optional<House> findByName(@NotNull House house);
     Collection<House> findByUser(@NotNull User user);
 
 }
