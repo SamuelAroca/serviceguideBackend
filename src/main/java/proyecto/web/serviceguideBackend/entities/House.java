@@ -38,7 +38,7 @@ public class House {
     private String contract;
 
     @OneToOne
-    @JoinColumn(name = "FK_COLOMBIAN_CITY", updatable = false, nullable = false)
+    @JoinColumn(name = "FK_COLOMBIAN_CITY", nullable = false)
     private ColombianCities cities;
 
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)

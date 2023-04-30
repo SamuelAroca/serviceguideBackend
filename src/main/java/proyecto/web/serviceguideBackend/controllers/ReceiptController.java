@@ -38,9 +38,9 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.findByHouse(house));
     }
 
-    @GetMapping("/findByTypeService/{typeService}/{house}")
-    public ResponseEntity<Collection<Receipt>> findByTypeService(@PathVariable TypeService typeService, @PathVariable House house) {
-        return ResponseEntity.ok(receiptService.findByTypeService(typeService, house));
+    @GetMapping("/findByTypeServiceAndHouse/{typeService}/{house}")
+    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable TypeService typeService, @PathVariable House house) {
+        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(typeService, house));
     }
 
     @GetMapping("/findAllById/{id}")

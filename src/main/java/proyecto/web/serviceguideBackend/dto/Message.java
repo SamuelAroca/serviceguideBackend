@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 public class Message {
 
     private String message;
-    private HttpStatus httpStatus;
+    private HttpStatus status;
 
     public Message(String message) {
         this.message = message;

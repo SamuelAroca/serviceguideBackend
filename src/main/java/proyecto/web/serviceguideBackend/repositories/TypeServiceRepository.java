@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface TypeServiceRepository extends JpaRepository<TypeService, Long> {
 
-    Optional<TypeService> findByTypeOrId(@NotNull TypeService type, @NotNull TypeService id);
+    Optional<TypeService> findByType(@NotNull TypeService type);
 
 }

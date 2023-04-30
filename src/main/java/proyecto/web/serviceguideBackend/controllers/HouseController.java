@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.controllers;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -10,8 +11,7 @@ import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
-import proyecto.web.serviceguideBackend.repositories.ColombianCitiesRepository;
-import proyecto.web.serviceguideBackend.repositories.HouseRepository;
+import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
@@ -36,19 +36,14 @@ public class HouseController {
         return ResponseEntity.created(location).body(createdHouse);
     }
 
-    @GetMapping("/findAllByUser/{id}")
-    public ResponseEntity<Collection<House>> findAllByUser(@PathVariable User id){
-        return ResponseEntity.ok(houseService.findAllByUser(id));
+    @GetMapping("/findAllByUser/{user}")
+    public ResponseEntity<Collection<House>> findAllByUser(@PathVariable User user){
+        return ResponseEntity.ok(houseService.findAllByUser(user));
     }
 
-    @GetMapping("/findNameById/{id}")
-    public ResponseEntity<Optional<House>> findNameById(@PathVariable Long id) {
-        return ResponseEntity.ok(houseService.findNameById(id));
-    }
-
-    @GetMapping("/findIdByName/{name}")
-    public ResponseEntity<Optional<House>> findIdByName(@PathVariable String name) {
-        return ResponseEntity.ok(houseService.findIdByName(name));
+    @GetMapping("/findByUserAndName/{user}/{name}")
+    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable User user, @PathVariable String name){
+        return ResponseEntity.ok(houseService.findByUserAndName(user, name));
     }
 
     @PutMapping("/update/{id}")
