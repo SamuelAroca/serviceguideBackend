@@ -10,6 +10,7 @@ import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.TypeService;
+import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
 
 import java.net.URI;
@@ -23,10 +24,10 @@ public class ReceiptController {
 
     private final ReceiptService receiptService;
 
-    @PostMapping("/add")
-    public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto) {
+    @PostMapping("/add/{idUser}")
+    public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto, @PathVariable User idUser) {
 
-        ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto);
+        ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto, idUser);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdReceipt.getId()).toUri();
@@ -38,9 +39,9 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.findByHouse(house));
     }
 
-    @GetMapping("/findByTypeService/{typeService}/{house}")
-    public ResponseEntity<Collection<Receipt>> findByTypeService(@PathVariable TypeService typeService, @PathVariable House house) {
-        return ResponseEntity.ok(receiptService.findByTypeService(typeService, house));
+    @GetMapping("/findByTypeServiceAndHouse/{typeService}/{house}")
+    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable TypeService typeService, @PathVariable House house) {
+        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(typeService, house));
     }
 
     @GetMapping("/findAllById/{id}")
