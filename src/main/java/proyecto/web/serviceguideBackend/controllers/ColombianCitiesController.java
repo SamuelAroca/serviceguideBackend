@@ -11,6 +11,7 @@ import proyecto.web.serviceguideBackend.services.ColombianCitiesService;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -37,6 +38,11 @@ public class ColombianCitiesController {
     @GetMapping("/listAll")
     public ResponseEntity<Collection<ColombianCities>> listAll() {
         return ResponseEntity.ok(colombianCitiesService.listAll());
+    }
+
+    @GetMapping("/allCities")
+    public ResponseEntity<List<String>> allCities() {
+        return ResponseEntity.ok(colombianCitiesService.allCities());
     }
 
     @GetMapping("/findIdByCity/{city}")

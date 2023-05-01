@@ -10,6 +10,7 @@ import proyecto.web.serviceguideBackend.mappers.ColombianCitiesMapper;
 import proyecto.web.serviceguideBackend.repositories.ColombianCitiesRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -38,6 +39,10 @@ public class ColombianCitiesService {
             throw new AppException("City not found", HttpStatus.NOT_FOUND);
         }
         return optionalCity;
+    }
+
+    public List<String> allCities() {
+        return colombianCitiesRepository.allCities();
     }
 
     public Optional<ColombianCities> findIdByCity(String city) {
