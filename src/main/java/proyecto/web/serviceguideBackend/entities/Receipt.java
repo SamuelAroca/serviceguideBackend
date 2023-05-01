@@ -1,6 +1,7 @@
 package proyecto.web.serviceguideBackend.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -36,11 +37,14 @@ public class Receipt {
     private Date date;
 
     @OneToOne
-    @JoinColumn(name = "FK_TYPE_SERVICE", updatable = false, nullable = false)
+    @JoinColumn(name = "FK_TYPE_SERVICE", nullable = false)
     @NotNull
     private TypeService typeService;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @Nullable
+    private String houseName;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull

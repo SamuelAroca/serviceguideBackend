@@ -10,8 +10,6 @@ import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
-import proyecto.web.serviceguideBackend.repositories.ColombianCitiesRepository;
-import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
@@ -36,30 +34,25 @@ public class HouseController {
         return ResponseEntity.created(location).body(createdHouse);
     }
 
-    @GetMapping("/findAllByUser/{id}")
-    public ResponseEntity<Collection<House>> findAllByUser(@PathVariable User id){
-        return ResponseEntity.ok(houseService.findAllByUser(id));
+    @GetMapping("/findAllByUserOrderById/{user}")
+    public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable User user){
+        return ResponseEntity.ok(houseService.findAllByUserOrderById(user));
     }
 
-    @GetMapping("/findNameById/{id}")
-    public ResponseEntity<Optional<House>> findNameById(@PathVariable Long id) {
-        return ResponseEntity.ok(houseService.findNameById(id));
+    @GetMapping("/findByUserAndName/{user}/{name}")
+    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable User user, @PathVariable String name){
+        return ResponseEntity.ok(houseService.findByUserAndName(user, name));
     }
 
-    @GetMapping("/findIdByName/{name}")
-    public ResponseEntity<Optional<House>> findIdByName(@PathVariable String name) {
-        return ResponseEntity.ok(houseService.findIdByName(name));
-    }
-
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{idHouse}")
     @Transactional
-    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long id){
-        return houseService.updateHouse(houseDto, id);
+    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse){
+        return houseService.updateHouse(houseDto, idHouse);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{idHouse}")
     @Transactional
-    public Message deleteHouse(@PathVariable Long id){
-        return houseService.deleteHouse(id);
+    public Message deleteHouse(@PathVariable Long idHouse){
+        return houseService.deleteHouse(idHouse);
     }
 }
