@@ -50,9 +50,9 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.findAllById(idReceipt));
     }
 
-    @GetMapping("/findByUserId/{idUser}")
-    public ResponseEntity<List<List<Receipt>>> findByUserId(@PathVariable Long idUser) {
-        return ResponseEntity.ok(receiptService.findAllByUserId(idUser));
+    @GetMapping("/findAllByUserId/{token}")
+    public ResponseEntity<List<List<Receipt>>> findAllByUserId(@PathVariable String token) {
+        return ResponseEntity.ok(receiptService.findAllByUserId(token));
     }
 
     @PutMapping("/update/{idReceipt}")

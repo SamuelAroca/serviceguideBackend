@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.entities.House;
@@ -28,6 +29,7 @@ public class ReceiptService {
     private final TypeServiceRepository typeServiceRepository;
     private final HouseService houseService;
     private final UserRepository userRepository;
+    private final UserAuthenticationProvider authenticationProvider;
 
     public ReceiptDto newReceipt(ReceiptDto receiptDto, User idUser) {
         Optional<House> optionalHouse = houseService.findByUserAndName(idUser, Objects.requireNonNull(receiptDto.getHouse()).getName());
@@ -64,8 +66,9 @@ public class ReceiptService {
         return receiptRepository.findAllById(id);
     }
 
-    public List<List<Receipt>> findAllByUserId(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
+    public List<List<Receipt>> findAllByUserId(String token) {
+        Long user = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(user);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
