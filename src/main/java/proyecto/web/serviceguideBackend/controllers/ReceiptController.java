@@ -45,23 +45,23 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(typeService, house));
     }
 
-    @GetMapping("/findAllById/{id}")
-    public ResponseEntity<Collection<Receipt>> findAllById(@PathVariable Long id) {
-        return ResponseEntity.ok(receiptService.findAllById(id));
+    @GetMapping("/findAllById/{idReceipt}")
+    public ResponseEntity<Collection<Receipt>> findAllById(@PathVariable Long idReceipt) {
+        return ResponseEntity.ok(receiptService.findAllById(idReceipt));
     }
 
-    @GetMapping("/findByUserId/{id}")
-    public ResponseEntity<List<List<Receipt>>> findByUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(receiptService.findAllByUserId(id));
+    @GetMapping("/findByUserId/{idUser}")
+    public ResponseEntity<List<List<Receipt>>> findByUserId(@PathVariable Long idUser) {
+        return ResponseEntity.ok(receiptService.findAllByUserId(idUser));
     }
 
-    @PutMapping("/update/{id}")
-    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long id) {
-        return receiptService.updateReceipt(receiptDto, id);
+    @PutMapping("/update/{idReceipt}")
+    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt) {
+        return receiptService.updateReceipt(receiptDto, idReceipt);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public Message deleteReceipt(@PathVariable Long id) {
-        return receiptService.deleteReceipt(id);
+    @DeleteMapping("/delete/{idReceipt}")
+    public Message deleteReceipt(@PathVariable Long idReceipt) {
+        return receiptService.deleteReceipt(idReceipt);
     }
 }

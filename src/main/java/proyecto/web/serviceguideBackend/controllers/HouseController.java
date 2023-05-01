@@ -46,15 +46,15 @@ public class HouseController {
         return ResponseEntity.ok(houseService.findByUserAndName(user, name));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{idHouse}")
     @Transactional
-    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long id){
-        return houseService.updateHouse(houseDto, id);
+    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse){
+        return houseService.updateHouse(houseDto, idHouse);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{idHouse}")
     @Transactional
-    public Message deleteHouse(@PathVariable Long id){
-        return houseService.deleteHouse(id);
+    public Message deleteHouse(@PathVariable Long idHouse){
+        return houseService.deleteHouse(idHouse);
     }
 }

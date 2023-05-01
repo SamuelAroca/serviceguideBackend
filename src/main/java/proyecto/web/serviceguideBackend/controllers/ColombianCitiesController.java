@@ -29,9 +29,9 @@ public class ColombianCitiesController {
         return ResponseEntity.created(location).body(createdCity);
     }
 
-    @GetMapping("/findById/{id}")
-    public ResponseEntity<Optional<ColombianCities>> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(colombianCitiesService.findById(id));
+    @GetMapping("/findById/{idCity}")
+    public ResponseEntity<Optional<ColombianCities>> findById(@PathVariable Long idCity) {
+        return ResponseEntity.ok(colombianCitiesService.findById(idCity));
     }
 
     @GetMapping("/listAll")
