@@ -29,10 +29,10 @@ public class UserController {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{idUser}")
     @Transactional
-    public Optional<ResponseEntity<Message>> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long id) {
-        return Optional.ofNullable(userRepository.findById(id)
+    public Optional<ResponseEntity<Message>> updateUser(@RequestBody SignUpDto updateUser, @PathVariable Long idUser) {
+        return Optional.ofNullable(userRepository.findById(idUser)
                 .map(user -> {
                     Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
                     if (optionalUser.isPresent()) {
@@ -48,17 +48,17 @@ public class UserController {
                 }).orElseThrow(() -> new AppException("Username does not exist", HttpStatus.NOT_FOUND)));
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<User> userById(@PathVariable Long id) {
-        User user = userRepository.findById(id)
+    @GetMapping("/user/{idUser}")
+    public ResponseEntity<User> userById(@PathVariable Long idUser) {
+        User user = userRepository.findById(idUser)
                 .orElseThrow(() -> new AppException("Username does not exist", HttpStatus.NOT_FOUND));
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{idUser}")
     @Transactional
-    public ResponseEntity<Message> deleteUser(@PathVariable Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
+    public ResponseEntity<Message> deleteUser(@PathVariable Long idUser) {
+        Optional<User> userOptional = userRepository.findById(idUser);
 
         if (userOptional.isEmpty()) {
             throw new AppException("Username does not exist", HttpStatus.NOT_FOUND);

@@ -3,7 +3,6 @@ package proyecto.web.serviceguideBackend.controllers;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -11,7 +10,6 @@ import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
-import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
@@ -46,15 +44,15 @@ public class HouseController {
         return ResponseEntity.ok(houseService.findByUserAndName(user, name));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{idHouse}")
     @Transactional
-    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long id){
-        return houseService.updateHouse(houseDto, id);
+    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse){
+        return houseService.updateHouse(houseDto, idHouse);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{idHouse}")
     @Transactional
-    public Message deleteHouse(@PathVariable Long id){
-        return houseService.deleteHouse(id);
+    public Message deleteHouse(@PathVariable Long idHouse){
+        return houseService.deleteHouse(idHouse);
     }
 }
