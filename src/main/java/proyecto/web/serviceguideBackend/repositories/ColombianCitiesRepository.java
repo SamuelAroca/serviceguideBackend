@@ -2,7 +2,6 @@ package proyecto.web.serviceguideBackend.repositories;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import proyecto.web.serviceguideBackend.entities.ColombianCities;
 
 import java.util.Optional;
