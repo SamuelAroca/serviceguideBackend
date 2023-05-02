@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.ColombianCities;
@@ -26,6 +27,7 @@ public class HouseService {
     private final HouseRepository houseRepository;
     private final HouseMapper houseMapper;
     private final ColombianCitiesRepository colombianCitiesRepository;
+    private final UserAuthenticationProvider authenticationProvider;
 
     public HouseDto newHouse(HouseDto houseDto){
         Optional<House> optionalHouse = houseRepository.findByUserAndName(houseDto.getUser(), houseDto.getName());
@@ -50,8 +52,13 @@ public class HouseService {
         }
     }
 
-    public Collection<House> findAllByUserOrderById(User userId){
-        return houseRepository.findAllByUserOrderById(userId);
+    public Collection<House> findAllByUserOrderById(String token){
+        Long user = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(user);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        return houseRepository.findAllByUserOrderById(optionalUser.get());
     }
 
     public Optional<House> findByUserAndName(User user, String name) {
