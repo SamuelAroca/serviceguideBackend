@@ -14,6 +14,7 @@ import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -42,6 +43,11 @@ public class HouseController {
     @GetMapping("/findByUserAndName/{user}/{name}")
     public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable User user, @PathVariable String name){
         return ResponseEntity.ok(houseService.findByUserAndName(user, name));
+    }
+
+    @GetMapping("/prueba/{id}")
+    public ResponseEntity<List<String>> prueba(@PathVariable Long id) {
+        return ResponseEntity.ok(houseService.prueba(id));
     }
 
     @PutMapping("/update/{idHouse}")

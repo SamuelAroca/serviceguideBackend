@@ -16,12 +16,13 @@ import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.repositories.TypeServiceRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
+import proyecto.web.serviceguideBackend.serviceInterface.ReceiptInterface;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class ReceiptService {
+public class ReceiptService implements ReceiptInterface {
 
     private final ReceiptRepository receiptRepository;
     private final ReceiptMapper receiptMapper;
@@ -31,8 +32,15 @@ public class ReceiptService {
     private final UserRepository userRepository;
     private final UserAuthenticationProvider authenticationProvider;
 
-    public ReceiptDto newReceipt(ReceiptDto receiptDto, User idUser) {
-        Optional<House> optionalHouse = houseService.findByUserAndName(idUser, Objects.requireNonNull(receiptDto.getHouse()).getName());
+    @Override
+    public ReceiptDto newReceipt(ReceiptDto receiptDto, String token) {
+
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseService.findByUserAndName(optionalUser.get(), Objects.requireNonNull(receiptDto.getHouse()).getName());
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
@@ -54,18 +62,17 @@ public class ReceiptService {
         return receiptMapper.serviceReceiptDto(receiptSaved);
     }
 
+    @Override
     public Collection<Receipt> findByHouse(House house) {
         return receiptRepository.findByHouse(house);
     }
 
+    @Override
     public Collection<Receipt> findByTypeServiceAndHouse(TypeService typeService, House house) {
         return receiptRepository.findByTypeServiceAndHouse(typeService, house);
     }
 
-    public Collection<Receipt> findAllById(Long id) {
-        return receiptRepository.findAllById(id);
-    }
-
+    @Override
     public List<List<Receipt>> findAllByUserId(String token) {
         Long user = authenticationProvider.whoIsMyId(token);
         Optional<User> optionalUser = userRepository.findById(user);
@@ -80,6 +87,7 @@ public class ReceiptService {
         return receipts;
     }
 
+    @Override
     public Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id) {
         return Optional.of(receiptRepository.findById(id)
                 .map(receipt -> {
@@ -119,6 +127,7 @@ public class ReceiptService {
                 }).orElseThrow(() -> new AppException("Receipt not found", HttpStatus.NOT_FOUND)));
     }
 
+    @Override
     public Message deleteReceipt(Long id) {
         Optional<Receipt> optionalReceipt = receiptRepository.findById(id);
         if (optionalReceipt.isEmpty()) {

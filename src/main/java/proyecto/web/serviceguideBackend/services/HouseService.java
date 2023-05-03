@@ -6,29 +6,29 @@ import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
-import proyecto.web.serviceguideBackend.entities.ColombianCities;
+import proyecto.web.serviceguideBackend.entities.City;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.HouseMapper;
-import proyecto.web.serviceguideBackend.repositories.ColombianCitiesRepository;
+import proyecto.web.serviceguideBackend.repositories.CityRepository;
 import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
+import proyecto.web.serviceguideBackend.serviceInterface.HouseInterface;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
-public class HouseService {
+public class HouseService implements HouseInterface {
 
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
     private final HouseMapper houseMapper;
-    private final ColombianCitiesRepository colombianCitiesRepository;
+    private final CityRepository cityRepository;
     private final UserAuthenticationProvider authenticationProvider;
 
+    @Override
     public HouseDto newHouse(HouseDto houseDto){
         Optional<House> optionalHouse = houseRepository.findByUserAndName(houseDto.getUser(), houseDto.getName());
         if (optionalHouse.isPresent()) {
@@ -38,7 +38,7 @@ public class HouseService {
         if (optionalUser.isEmpty()){
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        Optional<ColombianCities> optionalColombianCities = colombianCitiesRepository.findByCity(houseDto.getCities().getCity());
+        Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
         if (optionalColombianCities.isPresent()) {
 
             House house = houseMapper.newHouse(houseDto);
@@ -52,6 +52,7 @@ public class HouseService {
         }
     }
 
+    @Override
     public Collection<House> findAllByUserOrderById(String token){
         Long user = authenticationProvider.whoIsMyId(token);
         Optional<User> optionalUser = userRepository.findById(user);
@@ -61,6 +62,7 @@ public class HouseService {
         return houseRepository.findAllByUserOrderById(optionalUser.get());
     }
 
+    @Override
     public Optional<House> findByUserAndName(User user, String name) {
         Optional<User> optionalUser = userRepository.findById(user.getId());
         if (optionalUser.isEmpty()) {
@@ -73,6 +75,7 @@ public class HouseService {
         return houseRepository.findByUserAndName(user, name);
     }
 
+    @Override
     public Optional<Message> updateHouse(HouseDto houseDto, Long id) {
         return Optional.of(houseRepository.findById(id)
                 .map(house -> {
@@ -84,7 +87,7 @@ public class HouseService {
                     if (houseOptional.isEmpty()) {
                         throw new AppException("House not found", HttpStatus.NOT_FOUND);
                     }
-                    Optional<ColombianCities> optionalColombianCities = colombianCitiesRepository.findByCity(houseDto.getCities().getCity());
+                    Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
                     if (optionalColombianCities.isEmpty()) {
                         throw new AppException("City not found", HttpStatus.NOT_FOUND);
                     }
@@ -100,6 +103,7 @@ public class HouseService {
                 }).orElseThrow(() -> new AppException("House not found", HttpStatus.NOT_FOUND)));
     }
 
+    @Override
     public Message deleteHouse(Long id) {
         Optional<House> optionalHouse = houseRepository.findById(id);
         if (optionalHouse.isEmpty()){
@@ -107,5 +111,17 @@ public class HouseService {
         }
         houseRepository.delete(optionalHouse.get());
         return new Message("Delete success", HttpStatus.OK);
+    }
+
+    @Override
+    public List<String> prueba(Long id) {
+        List<String> optional = houseRepository.prueba(id);
+        List<String> prueba2 = new ArrayList<>();
+        for(String prueba : optional) {
+            String[] lista = prueba.split(",");
+            String campoId = lista[0];
+            prueba2.add(campoId);
+        }
+        return prueba2;
     }
 }
