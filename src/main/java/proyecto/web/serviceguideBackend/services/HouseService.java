@@ -29,14 +29,15 @@ public class HouseService implements HouseInterface {
     private final UserAuthenticationProvider authenticationProvider;
 
     @Override
-    public HouseDto newHouse(HouseDto houseDto){
+    public HouseDto newHouse(HouseDto houseDto, String token){
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()){
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
         Optional<House> optionalHouse = houseRepository.findByUserAndName(houseDto.getUser(), houseDto.getName());
         if (optionalHouse.isPresent()) {
             throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
-        }
-        Optional<User> optionalUser = userRepository.findById(Objects.requireNonNull(houseDto.getUser()).getId());
-        if (optionalUser.isEmpty()){
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
         Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
         if (optionalColombianCities.isPresent()) {
@@ -63,16 +64,22 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Optional<House> findByUserAndName(User user, String name) {
-        Optional<User> optionalUser = userRepository.findById(user.getId());
+    public Optional<House> findByUserAndName(String token, String name) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        Optional<House> optionalHouse = houseRepository.findByUserAndName(user, name);
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), name);
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
-        return houseRepository.findByUserAndName(user, name);
+        return optionalHouse;
+    }
+
+    @Override
+    public Optional<House> findById(Long id) {
+        return houseRepository.findById(id);
     }
 
     @Override
@@ -114,14 +121,12 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public List<String> prueba(Long id) {
-        List<String> optional = houseRepository.prueba(id);
-        List<String> prueba2 = new ArrayList<>();
-        for(String prueba : optional) {
-            String[] lista = prueba.split(",");
-            String campoId = lista[0];
-            prueba2.add(campoId);
+    public String prueba(String token) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        return prueba2;
+        return houseRepository.prueba(optionalUser.get().getId());
     }
 }

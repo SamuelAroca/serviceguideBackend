@@ -12,7 +12,7 @@ public interface CityInterface {
     CityDto newCity(CityDto cityDto);
     Collection<City> listAll();
     Optional<City> findById(Long id);
-    List<String> allCities();
-    Optional<City> findIdByCity(String city);
+    Collection<String> allCities();
+    Optional<City> findByCity(String city);
 
 }

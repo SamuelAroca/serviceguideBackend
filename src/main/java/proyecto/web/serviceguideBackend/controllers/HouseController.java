@@ -14,7 +14,6 @@ import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -24,11 +23,11 @@ public class HouseController {
 
     private final HouseService houseService;
 
-    @PostMapping("/add")
+    @PostMapping("/add/{token}")
     @Transactional
-    public ResponseEntity<HouseDto> newHouse(@RequestBody @Valid HouseDto houseDto){
+    public ResponseEntity<HouseDto> newHouse(@RequestBody @Valid HouseDto houseDto, @PathVariable String token){
 
-        HouseDto createdHouse = houseService.newHouse(houseDto);
+        HouseDto createdHouse = houseService.newHouse(houseDto, token);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdHouse.getId()).toUri();
@@ -40,14 +39,14 @@ public class HouseController {
         return ResponseEntity.ok(houseService.findAllByUserOrderById(token));
     }
 
-    @GetMapping("/findByUserAndName/{user}/{name}")
-    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable User user, @PathVariable String name){
-        return ResponseEntity.ok(houseService.findByUserAndName(user, name));
+    @GetMapping("/findByUserAndName/{token}/{name}")
+    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable String token, @PathVariable String name){
+        return ResponseEntity.ok(houseService.findByUserAndName(token, name));
     }
 
-    @GetMapping("/prueba/{id}")
-    public ResponseEntity<List<String>> prueba(@PathVariable Long id) {
-        return ResponseEntity.ok(houseService.prueba(id));
+    @GetMapping("/prueba/{token}")
+    public ResponseEntity<String> prueba(@PathVariable String token) {
+        return ResponseEntity.ok(houseService.prueba(token));
     }
 
     @PutMapping("/update/{idHouse}")

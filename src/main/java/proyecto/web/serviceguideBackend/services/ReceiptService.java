@@ -34,13 +34,7 @@ public class ReceiptService implements ReceiptInterface {
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, String token) {
-
-        Long idUser = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(idUser);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        Optional<House> optionalHouse = houseService.findByUserAndName(optionalUser.get(), Objects.requireNonNull(receiptDto.getHouse()).getName());
+        Optional<House> optionalHouse = houseService.findByUserAndName(token, Objects.requireNonNull(receiptDto.getHouse()).getName());
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
@@ -103,7 +97,7 @@ public class ReceiptService implements ReceiptInterface {
                     if (optionalUser.isEmpty()) {
                         throw new AppException("User not found", HttpStatus.NOT_FOUND);
                     }
-                    Optional<House> houseOptional = houseService.findByUserAndName(optionalUser.get(), Objects.requireNonNull(receiptDto.getHouse()).getName());
+                    Optional<House> houseOptional = houseService.findByUserAndName(String.valueOf(optionalUser.get()), Objects.requireNonNull(receiptDto.getHouse()).getName());
                     if (houseOptional.isEmpty()) {
                         throw new AppException("House not found", HttpStatus.NOT_FOUND);
                     }
