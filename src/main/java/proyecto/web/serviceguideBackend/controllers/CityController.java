@@ -17,7 +17,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cities")
-public class ColombianCitiesController {
+public class CityController {
 
     private final CityService cityService;
 

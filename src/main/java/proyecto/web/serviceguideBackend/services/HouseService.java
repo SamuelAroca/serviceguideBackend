@@ -16,9 +16,7 @@ import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.HouseInterface;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -115,5 +113,15 @@ public class HouseService implements HouseInterface {
         return new Message("Delete success", HttpStatus.OK);
     }
 
-
+    @Override
+    public List<String> prueba(Long id) {
+        List<String> optional = houseRepository.prueba(id);
+        List<String> prueba2 = new ArrayList<>();
+        for(String prueba : optional) {
+            String[] lista = prueba.split(",");
+            String campoId = lista[0];
+            prueba2.add(campoId);
+        }
+        return prueba2;
+    }
 }

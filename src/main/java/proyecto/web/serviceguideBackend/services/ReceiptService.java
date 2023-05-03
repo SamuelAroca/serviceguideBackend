@@ -33,8 +33,14 @@ public class ReceiptService implements ReceiptInterface {
     private final UserAuthenticationProvider authenticationProvider;
 
     @Override
-    public ReceiptDto newReceipt(ReceiptDto receiptDto, User idUser) {
-        Optional<House> optionalHouse = houseService.findByUserAndName(idUser, Objects.requireNonNull(receiptDto.getHouse()).getName());
+    public ReceiptDto newReceipt(ReceiptDto receiptDto, String token) {
+
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseService.findByUserAndName(optionalUser.get(), Objects.requireNonNull(receiptDto.getHouse()).getName());
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
@@ -64,11 +70,6 @@ public class ReceiptService implements ReceiptInterface {
     @Override
     public Collection<Receipt> findByTypeServiceAndHouse(TypeService typeService, House house) {
         return receiptRepository.findByTypeServiceAndHouse(typeService, house);
-    }
-
-    @Override
-    public Collection<Receipt> findAllById(Long id) {
-        return receiptRepository.findAllById(id);
     }
 
     @Override
