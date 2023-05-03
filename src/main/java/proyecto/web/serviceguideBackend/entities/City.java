@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "colombian_cities")
+@Table(name = "city")
 public class City {
 
     @Id

@@ -23,6 +23,10 @@ public class CityService implements CityInterface {
 
     @Override
     public CityDto newCity(CityDto cityDto) {
+        Optional<City> optionalCity = cityRepository.findAllByCityIgnoreCase(cityDto.getCity());
+        if (optionalCity.isPresent()) {
+            throw new AppException("City already registered", HttpStatus.BAD_REQUEST);
+        }
         City cities = cityMapper.colombianCities(cityDto);
 
         City citySaved = cityRepository.save(cities);
@@ -46,12 +50,12 @@ public class CityService implements CityInterface {
     }
 
     @Override
-    public List<String> allCities() {
+    public Collection<String> allCities() {
         return cityRepository.allCities();
     }
 
     @Override
-    public Optional<City> findIdByCity(String city) {
-        return cityRepository.findIdByCity(city);
+    public Optional<City> findByCity(String city) {
+        return cityRepository.findByCity(city);
     }
 }

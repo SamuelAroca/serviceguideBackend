@@ -5,15 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import proyecto.web.serviceguideBackend.entities.City;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface CityRepository extends JpaRepository<City, Long> {
 
-    Optional<City> findIdByCity(@NotNull String city);
     Optional<City> findByCity(@NotNull String city);
+    Optional<City> findAllByCityIgnoreCase(@NotNull String city);
 
     @Query(value = "select c.city from City c")
-    List<String> allCities();
+    Collection<String> allCities();
 
 }

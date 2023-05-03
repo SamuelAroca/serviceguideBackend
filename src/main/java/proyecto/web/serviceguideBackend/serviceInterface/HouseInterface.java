@@ -6,16 +6,15 @@ import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.User;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public interface HouseInterface {
 
-    HouseDto newHouse(HouseDto houseDto);
+    HouseDto newHouse(HouseDto houseDto, String token);
     Collection<House> findAllByUserOrderById(String token);
-    Optional<House> findByUserAndName(User user, String name);
+    Optional<House> findByUserAndName(String token, String name);
+    Optional<House> findById(Long id);
     Optional<Message> updateHouse(HouseDto houseDto, Long id);
     Message deleteHouse(Long id);
-
-    List<String> prueba(Long id);
+    String prueba(String token);
 }

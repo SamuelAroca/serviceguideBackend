@@ -11,7 +11,6 @@ import proyecto.web.serviceguideBackend.services.CityService;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -41,12 +40,12 @@ public class CityController {
     }
 
     @GetMapping("/allCities")
-    public ResponseEntity<List<String>> allCities() {
+    public ResponseEntity<Collection<String>> allCities() {
         return ResponseEntity.ok(cityService.allCities());
     }
 
-    @GetMapping("/findIdByCity/{city}")
+    @GetMapping("/findByCity/{city}")
     public ResponseEntity<Optional<City>> findIdByCity(@PathVariable String city) {
-        return ResponseEntity.ok(cityService.findIdByCity(city));
+        return ResponseEntity.ok(cityService.findByCity(city));
     }
 }

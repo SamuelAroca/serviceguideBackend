@@ -11,10 +11,8 @@ import java.util.Optional;
 
 public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
-    Optional<Receipt> findByReceiptName(@NotNull String name);
     Collection<Receipt> findByHouse(@NotNull House house);
     Collection<Receipt> findByTypeServiceAndHouse(@NotNull TypeService typeService, @NotNull House house);
-    Collection<Receipt> findAllById(@NotNull Long id);
     Optional<Receipt> findByHouseAndReceiptName(@NotNull House house, @NotNull String receiptName);
 
 }
