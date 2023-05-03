@@ -11,18 +11,20 @@ import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.UserMapper;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
+import proyecto.web.serviceguideBackend.serviceInterface.UserInterface;
 
 import java.nio.CharBuffer;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserInterface {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
+    @Override
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
@@ -33,6 +35,7 @@ public class UserService {
         throw new AppException("Wrong email or password", HttpStatus.BAD_REQUEST);
     }
 
+    @Override
     public UserDto register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
 
@@ -48,20 +51,24 @@ public class UserService {
         return userMapper.toUserDto(savedUser);
     }
 
+    @Override
     public UserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("Wrong email or password", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);
     }
 
+    @Override
     public Optional<User> getByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    @Override
     public Optional<User> findByTokenPassword(String tokenPassword) {
         return userRepository.findByTokenPassword(tokenPassword);
     }
 
+    @Override
     public void save(User user) {
         userRepository.save(user);
     }

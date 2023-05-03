@@ -42,17 +42,11 @@ public class AuthController {
 
     @GetMapping("/whoiam/{token}")
     public ResponseEntity<String> whoIAm(@PathVariable String token) {
-
-        String whoIAm = userAuthenticationProvider.whoIAm(token);
-
-        return ResponseEntity.ok(whoIAm);
+        return ResponseEntity.ok(userAuthenticationProvider.whoIAm(token));
     }
 
     @GetMapping("/whoismyid/{token}")
     public ResponseEntity<Long> whoIsMyId(@PathVariable String token) {
-
-        Long whoIsMyId = userAuthenticationProvider.whoIsMyId(token);
-
-        return ResponseEntity.ok(whoIsMyId);
+        return ResponseEntity.ok(userAuthenticationProvider.whoIsMyId(token));
     }
 }

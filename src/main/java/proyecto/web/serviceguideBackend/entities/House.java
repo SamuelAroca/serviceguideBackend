@@ -39,7 +39,7 @@ public class House {
 
     @OneToOne
     @JoinColumn(name = "FK_COLOMBIAN_CITY", nullable = false)
-    private ColombianCities cities;
+    private City cities;
 
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
     private List<Receipt> receipts = new ArrayList<>();

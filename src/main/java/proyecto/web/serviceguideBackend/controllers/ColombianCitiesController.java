@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import proyecto.web.serviceguideBackend.dto.ColombianCitiesDto;
-import proyecto.web.serviceguideBackend.entities.ColombianCities;
-import proyecto.web.serviceguideBackend.services.ColombianCitiesService;
+import proyecto.web.serviceguideBackend.dto.CityDto;
+import proyecto.web.serviceguideBackend.entities.City;
+import proyecto.web.serviceguideBackend.services.CityService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -19,11 +19,11 @@ import java.util.Optional;
 @RequestMapping("/api/cities")
 public class ColombianCitiesController {
 
-    private final ColombianCitiesService colombianCitiesService;
+    private final CityService cityService;
 
     @PostMapping("/add")
-    public ResponseEntity<ColombianCitiesDto> newCity(@RequestBody @Valid ColombianCitiesDto colombianCitiesDto) {
-        ColombianCitiesDto createdCity = colombianCitiesService.newCity(colombianCitiesDto);
+    public ResponseEntity<CityDto> newCity(@RequestBody @Valid CityDto cityDto) {
+        CityDto createdCity = cityService.newCity(cityDto);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdCity.getId()).toUri();
@@ -31,22 +31,22 @@ public class ColombianCitiesController {
     }
 
     @GetMapping("/findById/{idCity}")
-    public ResponseEntity<Optional<ColombianCities>> findById(@PathVariable Long idCity) {
-        return ResponseEntity.ok(colombianCitiesService.findById(idCity));
+    public ResponseEntity<Optional<City>> findById(@PathVariable Long idCity) {
+        return ResponseEntity.ok(cityService.findById(idCity));
     }
 
     @GetMapping("/listAll")
-    public ResponseEntity<Collection<ColombianCities>> listAll() {
-        return ResponseEntity.ok(colombianCitiesService.listAll());
+    public ResponseEntity<Collection<City>> listAll() {
+        return ResponseEntity.ok(cityService.listAll());
     }
 
     @GetMapping("/allCities")
     public ResponseEntity<List<String>> allCities() {
-        return ResponseEntity.ok(colombianCitiesService.allCities());
+        return ResponseEntity.ok(cityService.allCities());
     }
 
     @GetMapping("/findIdByCity/{city}")
-    public ResponseEntity<Optional<ColombianCities>> findIdByCity(@PathVariable String city) {
-        return ResponseEntity.ok(colombianCitiesService.findIdByCity(city));
+    public ResponseEntity<Optional<City>> findIdByCity(@PathVariable String city) {
+        return ResponseEntity.ok(cityService.findIdByCity(city));
     }
 }

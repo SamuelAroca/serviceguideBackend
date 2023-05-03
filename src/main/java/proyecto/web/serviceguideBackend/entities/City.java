@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "colombian_cities")
-public class ColombianCities {
+public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
