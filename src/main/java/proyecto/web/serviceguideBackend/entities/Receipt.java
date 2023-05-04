@@ -31,22 +31,28 @@ public class Receipt {
     @NotNull
     private Double amount;
 
+    @Nullable
+    private String houseName;
+
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
     private Date date;
+
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Nullable
+    private Date creationDate;
 
     @OneToOne
     @JoinColumn(name = "FK_TYPE_SERVICE", nullable = false)
     @NotNull
     private TypeService typeService;
 
-    @Nullable
-    private String houseName;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private House house;
+
 }
