@@ -1,6 +1,8 @@
 package proyecto.web.serviceguideBackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.auditing.CurrentDateTimeProvider;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
@@ -51,6 +53,9 @@ public class ReceiptService implements ReceiptInterface {
         receipt.setHouse(optionalHouse.get());
         receipt.setHouseName(optionalHouse.get().getName());
         receipt.setTypeService(optionalTypeService.get());
+        long millis = System.currentTimeMillis();
+        Date date = new Date(millis);
+        receipt.setCreationDate(date);
 
         Receipt receiptSaved = receiptRepository.save(receipt);
         return receiptMapper.serviceReceiptDto(receiptSaved);

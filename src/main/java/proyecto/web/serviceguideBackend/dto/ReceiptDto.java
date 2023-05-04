@@ -26,15 +26,19 @@ public class ReceiptDto {
     @NotNull
     private Double amount;
 
-    @NotNull
-    private Date date;
-
     @Nullable
     private String houseName;
+
+    @NotNull
+    private Date date;
 
     @Nullable
     private TypeService typeService;
 
     @Nullable
+    private Date creationDate;
+
+    @Nullable
     private House house;
+
 }
