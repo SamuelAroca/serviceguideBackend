@@ -50,11 +50,6 @@ public class CityService implements CityInterface {
     }
 
     @Override
-    public Collection<String> allCities() {
-        return cityRepository.allCities();
-    }
-
-    @Override
     public Optional<City> findByCity(String city) {
         return cityRepository.findByCity(city);
     }

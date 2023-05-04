@@ -57,13 +57,35 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Collection<Receipt> findByHouse(House house) {
-        return receiptRepository.findByHouse(house);
+    public Collection<Receipt> findByHouse(String house, String token) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), house);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        return receiptRepository.findByHouse(optionalHouse.get());
     }
 
     @Override
-    public Collection<Receipt> findByTypeServiceAndHouse(TypeService typeService, House house) {
-        return receiptRepository.findByTypeServiceAndHouse(typeService, house);
+    public Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, String token) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<TypeService> optionalTypeService = typeServiceRepository.findByTypeIgnoreCase(typeService);
+        if (optionalTypeService.isEmpty()) {
+            throw new AppException("Type service not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), house);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        return receiptRepository.findByTypeServiceAndHouse(optionalTypeService.get(), optionalHouse.get());
     }
 
     @Override
@@ -82,7 +104,13 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id) {
+    public List<Receipt> allReceiptsByUserId(String token) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        return receiptRepository.getReceiptByUser(id);
+    }
+
+    @Override
+    public Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id, String token) {
         return Optional.of(receiptRepository.findById(id)
                 .map(receipt -> {
                     Optional<Receipt> optionalReceipt = receiptRepository.findById(id);
@@ -93,11 +121,7 @@ public class ReceiptService implements ReceiptInterface {
                     if (optionalHouse.isEmpty()) {
                         throw new AppException("House not found", HttpStatus.NOT_FOUND);
                     }
-                    Optional<User> optionalUser = userRepository.findById(optionalHouse.get().getUser().getId());
-                    if (optionalUser.isEmpty()) {
-                        throw new AppException("User not found", HttpStatus.NOT_FOUND);
-                    }
-                    Optional<House> houseOptional = houseService.findByUserAndName(String.valueOf(optionalUser.get()), Objects.requireNonNull(receiptDto.getHouse()).getName());
+                    Optional<House> houseOptional = houseService.findByUserAndName(token, Objects.requireNonNull(receiptDto.getHouse()).getName());
                     if (houseOptional.isEmpty()) {
                         throw new AppException("House not found", HttpStatus.NOT_FOUND);
                     }

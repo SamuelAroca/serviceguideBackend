@@ -2,11 +2,13 @@ package proyecto.web.serviceguideBackend.repositories;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.TypeService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
@@ -15,4 +17,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     Collection<Receipt> findByTypeServiceAndHouse(@NotNull TypeService typeService, @NotNull House house);
     Optional<Receipt> findByHouseAndReceiptName(@NotNull House house, @NotNull String receiptName);
 
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1")
+    List<Receipt> getReceiptByUser(Long id);
 }
+

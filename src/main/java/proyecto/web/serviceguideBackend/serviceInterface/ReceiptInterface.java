@@ -13,10 +13,12 @@ import java.util.Optional;
 public interface ReceiptInterface {
 
     ReceiptDto newReceipt(ReceiptDto receiptDto, String token);
-    Collection<Receipt> findByHouse(House house);
-    Collection<Receipt> findByTypeServiceAndHouse(TypeService typeService, House house);
+    Collection<Receipt> findByHouse(String house, String token);
+    Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, String token);
     List<List<Receipt>> findAllByUserId(String token);
-    Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
+
+    List<Receipt> allReceiptsByUserId(String token);
+    Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id, String token);
     Message deleteReceipt(Long id);
 
 }

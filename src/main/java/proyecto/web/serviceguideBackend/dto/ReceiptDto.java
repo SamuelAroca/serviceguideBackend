@@ -30,6 +30,9 @@ public class ReceiptDto {
     private Date date;
 
     @Nullable
+    private String houseName;
+
+    @Nullable
     private TypeService typeService;
 
     @Nullable

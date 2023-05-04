@@ -9,7 +9,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
-import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
@@ -42,11 +41,6 @@ public class HouseController {
     @GetMapping("/findByUserAndName/{token}/{name}")
     public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable String token, @PathVariable String name){
         return ResponseEntity.ok(houseService.findByUserAndName(token, name));
-    }
-
-    @GetMapping("/prueba/{token}")
-    public ResponseEntity<String> prueba(@PathVariable String token) {
-        return ResponseEntity.ok(houseService.prueba(token));
     }
 
     @PutMapping("/update/{idHouse}")

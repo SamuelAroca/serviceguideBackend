@@ -16,5 +16,5 @@ public interface HouseInterface {
     Optional<House> findById(Long id);
     Optional<Message> updateHouse(HouseDto houseDto, Long id);
     Message deleteHouse(Long id);
-    String prueba(String token);
+
 }

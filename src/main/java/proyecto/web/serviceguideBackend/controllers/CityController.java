@@ -39,11 +39,6 @@ public class CityController {
         return ResponseEntity.ok(cityService.listAll());
     }
 
-    @GetMapping("/allCities")
-    public ResponseEntity<Collection<String>> allCities() {
-        return ResponseEntity.ok(cityService.allCities());
-    }
-
     @GetMapping("/findByCity/{city}")
     public ResponseEntity<Optional<City>> findIdByCity(@PathVariable String city) {
         return ResponseEntity.ok(cityService.findByCity(city));
