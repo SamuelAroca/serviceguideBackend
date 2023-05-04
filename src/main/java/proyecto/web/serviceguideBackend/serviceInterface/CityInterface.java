@@ -12,7 +12,6 @@ public interface CityInterface {
     CityDto newCity(CityDto cityDto);
     Collection<City> listAll();
     Optional<City> findById(Long id);
-    Collection<String> allCities();
     Optional<City> findByCity(String city);
 
 }

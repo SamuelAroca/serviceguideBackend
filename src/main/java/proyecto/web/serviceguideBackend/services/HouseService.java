@@ -119,14 +119,4 @@ public class HouseService implements HouseInterface {
         houseRepository.delete(optionalHouse.get());
         return new Message("Delete success", HttpStatus.OK);
     }
-
-    @Override
-    public String prueba(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        return houseRepository.prueba(optionalUser.get().getId());
-    }
 }

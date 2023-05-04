@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @AllArgsConstructor
@@ -49,6 +50,9 @@ public class House {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private User user;
+
+    public House(Collection<House> houses) {
+    }
 
     public void setServiceReceipt(List<Receipt> receipts) {
         this.receipts = receipts;

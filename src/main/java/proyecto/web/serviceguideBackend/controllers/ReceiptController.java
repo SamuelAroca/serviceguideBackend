@@ -34,24 +34,24 @@ public class ReceiptController {
         return ResponseEntity.created(location).body(createdReceipt);
     }
 
-    @GetMapping("/findByHouse/{house}")
-    public ResponseEntity<Collection<Receipt>> findByHouse(@PathVariable House house) {
-        return ResponseEntity.ok(receiptService.findByHouse(house));
+    @GetMapping("/findByHouse/{StringHouse}/{token}")
+    public ResponseEntity<Collection<Receipt>> findByHouse(@PathVariable String StringHouse, @PathVariable String token) {
+        return ResponseEntity.ok(receiptService.findByHouse(StringHouse, token));
     }
 
-    @GetMapping("/findByTypeServiceAndHouse/{typeService}/{house}")
-    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable TypeService typeService, @PathVariable House house) {
-        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(typeService, house));
+    @GetMapping("/findByTypeServiceAndHouse/{StringTypeService}/{StringHouse}/{token}")
+    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable String StringTypeService, @PathVariable String StringHouse, @PathVariable String token) {
+        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(StringTypeService, StringHouse, token));
     }
 
-    @GetMapping("/findAllByUserId/{token}")
-    public ResponseEntity<List<List<Receipt>>> findAllByUserId(@PathVariable String token) {
-        return ResponseEntity.ok(receiptService.findAllByUserId(token));
+    @GetMapping("/allReceiptsByUserId/{token}")
+    public ResponseEntity<List<Receipt>> allReceiptsByUserId(@PathVariable String token) {
+        return ResponseEntity.ok(receiptService.allReceiptsByUserId(token));
     }
 
-    @PutMapping("/update/{idReceipt}")
-    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt) {
-        return receiptService.updateReceipt(receiptDto, idReceipt);
+    @PutMapping("/update/{idReceipt}/{token}")
+    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt, @PathVariable String token) {
+        return receiptService.updateReceipt(receiptDto, idReceipt, token);
     }
 
     @DeleteMapping("/delete/{idReceipt}")
