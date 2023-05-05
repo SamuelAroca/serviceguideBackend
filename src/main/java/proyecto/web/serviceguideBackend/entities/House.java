@@ -51,9 +51,6 @@ public class House {
     @NotNull
     private User user;
 
-    public House(Collection<House> houses) {
-    }
-
     public void setServiceReceipt(List<Receipt> receipts) {
         this.receipts = receipts;
         for (Receipt receipt : receipts) {

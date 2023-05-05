@@ -14,6 +14,8 @@ public interface HouseInterface {
     Collection<House> findAllByUserOrderById(String token);
     Optional<House> findByUserAndName(String token, String name);
     Optional<House> findById(Long id);
+
+    Collection<String> getHouseName(String token);
     Optional<Message> updateHouse(HouseDto houseDto, Long id);
     Message deleteHouse(Long id);
 

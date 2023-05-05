@@ -1,8 +1,6 @@
 package proyecto.web.serviceguideBackend.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
@@ -40,21 +38,20 @@ public class ReceiptService implements ReceiptInterface {
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
-        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptName(optionalHouse.get(), receiptDto.getReceiptName());
+        Optional<TypeService> typeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(receiptDto.getTypeService()).getType());
+        if (typeService.isEmpty()) {
+            throw new AppException("Receipt Type not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(),typeService.get());
         if (optionalReceipt.isPresent()) {
             throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
-        }
-        Optional<TypeService> optionalTypeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(receiptDto.getTypeService()).getType());
-        if (optionalTypeService.isEmpty()) {
-            throw new AppException("Type service not found", HttpStatus.NOT_FOUND);
         }
 
         Receipt receipt = receiptMapper.serviceReceipt(receiptDto);
         receipt.setHouse(optionalHouse.get());
         receipt.setHouseName(optionalHouse.get().getName());
-        receipt.setTypeService(optionalTypeService.get());
-        long millis = System.currentTimeMillis();
-        Date date = new Date(millis);
+        receipt.setTypeService(typeService.get());
+        Date date = new Date();
         receipt.setCreationDate(date);
 
         Receipt receiptSaved = receiptRepository.save(receipt);
@@ -118,6 +115,10 @@ public class ReceiptService implements ReceiptInterface {
     public Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id, String token) {
         return Optional.of(receiptRepository.findById(id)
                 .map(receipt -> {
+                    Optional<TypeService> typeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(receiptDto.getTypeService()).getType());
+                    if (typeService.isEmpty()) {
+                        throw new AppException("Receipt Type not found", HttpStatus.NOT_FOUND);
+                    }
                     Optional<Receipt> optionalReceipt = receiptRepository.findById(id);
                     if (optionalReceipt.isEmpty()) {
                         throw new AppException("Receipt not found", HttpStatus.NOT_FOUND);
@@ -130,19 +131,15 @@ public class ReceiptService implements ReceiptInterface {
                     if (houseOptional.isEmpty()) {
                         throw new AppException("House not found", HttpStatus.NOT_FOUND);
                     }
-                    Optional<Receipt> receiptOptional = receiptRepository.findByHouseAndReceiptName(houseOptional.get(), receiptDto.getReceiptName());
+                    Optional<Receipt> receiptOptional = receiptRepository.findByHouseAndReceiptNameAndTypeService(houseOptional.get(), receiptDto.getReceiptName(), typeService.get());
                     if (receiptOptional.isPresent()) {
                         throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
-                    }
-                    Optional<TypeService> optionalTypeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(receiptDto.getTypeService()).getType());
-                    if (optionalTypeService.isEmpty()) {
-                        throw new AppException("Type service not found", HttpStatus.NOT_FOUND);
                     }
                     receipt.setReceiptName(receiptDto.getReceiptName());
                     receipt.setPrice(receiptDto.getPrice());
                     receipt.setAmount(receiptDto.getAmount());
                     receipt.setDate(receiptDto.getDate());
-                    receipt.setTypeService(optionalTypeService.get());
+                    receipt.setTypeService(typeService.get());
                     receipt.setHouseName(houseOptional.get().getName());
                     receipt.setHouse(houseOptional.get());
                     receiptRepository.save(receipt);

@@ -84,7 +84,7 @@ public class UserAuthenticationProvider {
         DecodedJWT decoded = verifier.verify(token);
 
         User user = userRepository.findByEmail(decoded.getIssuer())
-                .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         return user.getId();
     }
