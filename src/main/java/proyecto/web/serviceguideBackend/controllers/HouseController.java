@@ -43,6 +43,11 @@ public class HouseController {
         return ResponseEntity.ok(houseService.findByUserAndName(token, name));
     }
 
+    @GetMapping("/getHouseName/{token}")
+    public ResponseEntity<Collection<String>> getHouseName(@PathVariable String token) {
+        return ResponseEntity.ok(houseService.getHouseName(token));
+    }
+
     @PutMapping("/update/{idHouse}")
     @Transactional
     public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse){

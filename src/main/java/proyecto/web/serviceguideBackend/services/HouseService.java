@@ -83,6 +83,12 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
+    public Collection<String> getHouseName(String token) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        return houseRepository.getHouseName(id);
+    }
+
+    @Override
     public Optional<Message> updateHouse(HouseDto houseDto, Long id) {
         return Optional.of(houseRepository.findById(id)
                 .map(house -> {
