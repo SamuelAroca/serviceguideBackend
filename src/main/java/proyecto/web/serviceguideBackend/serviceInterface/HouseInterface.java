@@ -3,7 +3,6 @@ package proyecto.web.serviceguideBackend.serviceInterface;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
-import proyecto.web.serviceguideBackend.entities.User;
 
 import java.util.Collection;
 import java.util.Optional;

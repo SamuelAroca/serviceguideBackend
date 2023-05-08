@@ -11,7 +11,6 @@ import proyecto.web.serviceguideBackend.repositories.CityRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.CityInterface;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor

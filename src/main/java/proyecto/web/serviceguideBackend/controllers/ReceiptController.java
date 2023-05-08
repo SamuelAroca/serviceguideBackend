@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.ReceiptDto;
-import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.Receipt;
-import proyecto.web.serviceguideBackend.entities.TypeService;
 import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
 
