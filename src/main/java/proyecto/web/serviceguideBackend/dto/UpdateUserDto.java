@@ -8,16 +8,10 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Message {
+public class UpdateUserDto {
 
     private String message;
     private HttpStatus status;
+    private String token;
 
-    public Message(String message) {
-        this.message = message;
-    }
-
-    public Message(HttpStatus status) {
-        this.status = status;
-    }
 }

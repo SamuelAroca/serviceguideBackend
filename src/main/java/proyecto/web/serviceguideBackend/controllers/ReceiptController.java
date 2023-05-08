@@ -10,6 +10,7 @@ import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.TypeService;
+import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
 
 import java.net.URI;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class ReceiptController {
 
     private final ReceiptService receiptService;
+    private final ReceiptRepository receiptRepository;
 
     @PostMapping("/add/{token}")
     public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto, @PathVariable String token) {
@@ -49,13 +51,28 @@ public class ReceiptController {
         return ResponseEntity.ok(receiptService.allReceiptsByUserId(token));
     }
 
-    @PutMapping("/update/{idReceipt}/{token}")
-    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt, @PathVariable String token) {
-        return receiptService.updateReceipt(receiptDto, idReceipt, token);
+    @PutMapping("/update/{idReceipt}")
+    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt) {
+        return receiptService.updateReceipt(receiptDto, idReceipt);
     }
 
     @DeleteMapping("/delete/{idReceipt}")
     public Message deleteReceipt(@PathVariable Long idReceipt) {
         return receiptService.deleteReceipt(idReceipt);
+    }
+
+    @GetMapping("/findUserByReceiptId/{idReceipt}")
+    public Long findUserByReceiptId(@PathVariable Long idReceipt) {
+        return receiptRepository.findUserByReceiptId(idReceipt);
+    }
+
+    @GetMapping("/findById/{idReceipt}")
+    public Optional<Receipt> findById(@PathVariable Long idReceipt) {
+        return receiptRepository.findById(idReceipt);
+    }
+
+    @GetMapping("/getLastReceipt/{token}")
+    public Optional<Receipt> getLastReceipt(@PathVariable String token) {
+        return receiptService.getLastReceipt(token);
     }
 }

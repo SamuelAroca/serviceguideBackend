@@ -19,5 +19,11 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1")
     List<Receipt> getReceiptByUser(Long id);
+
+    @Query(value = "select u.id from User u inner join House h on h.user.id = u.id inner join Receipt r on r.house.id = h.id where r.id = ?1")
+    Long findUserByReceiptId(Long id);
+
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 order by r.id DESC LIMIT 1")
+    Optional<Receipt> getLastReceipt(Long id);
 }
 

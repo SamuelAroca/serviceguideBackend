@@ -23,26 +23,25 @@ public class Receipt {
     private Long id;
 
     @NotNull
+    @Column(length = 100)
     private String receiptName;
 
     @NotNull
+    @Column(length = 100)
     private Double price;
 
     @NotNull
+    @Column(length = 100)
     private Double amount;
 
     @Nullable
+    @Column(length = 100)
     private String houseName;
 
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
     private Date date;
-
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @Nullable
-    private Date creationDate;
 
     @OneToOne
     @JoinColumn(name = "FK_TYPE_SERVICE", nullable = false)
