@@ -18,4 +18,7 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     @Query(value = "select h.name from House h inner join User u on h.user.id = u.id where u.id = ?1")
     Collection<String> getHouseName(Long id);
 
+    @Query(value = "select u.id from User u inner join House h on h.user.id = u.id where h.id = ?1")
+    Long findUserByHouseId(Long id);
+
 }

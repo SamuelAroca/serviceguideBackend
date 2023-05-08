@@ -92,24 +92,24 @@ public class HouseService implements HouseInterface {
     public Optional<Message> updateHouse(HouseDto houseDto, Long id) {
         return Optional.of(houseRepository.findById(id)
                 .map(house -> {
-                    Optional<House> optionalHouse = houseRepository.findByUserAndName(houseDto.getUser(), houseDto.getName());
+                    Long idUser = houseRepository.findUserByHouseId(id);
+                    Optional<User> optionalUser = userRepository.findById(idUser);
+                    if (optionalUser.isEmpty()) {
+                        throw new AppException("User not found", HttpStatus.NOT_FOUND);
+                    }
+                    Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), houseDto.getName());
                     if (optionalHouse.isPresent()) {
                         throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
-                    }
-                    Optional<House> houseOptional = houseRepository.findById(id);
-                    if (houseOptional.isEmpty()) {
-                        throw new AppException("House not found", HttpStatus.NOT_FOUND);
                     }
                     Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
                     if (optionalColombianCities.isEmpty()) {
                         throw new AppException("City not found", HttpStatus.NOT_FOUND);
                     }
-
                     house.setName(houseDto.getName());
                     house.setStratum(houseDto.getStratum());
                     house.setNeighborhood(houseDto.getNeighborhood());
-                    house.setAddress(house.getAddress());
-                    house.setContract(house.getContract());
+                    house.setAddress(houseDto.getAddress());
+                    house.setContract(houseDto.getContract());
                     house.setCities(optionalColombianCities.get());
                     houseRepository.save(house);
                     return new Message("House Updated successfully", HttpStatus.OK);
