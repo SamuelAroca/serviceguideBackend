@@ -23,13 +23,20 @@ public class Receipt {
     private Long id;
 
     @NotNull
+    @Column(length = 100)
     private String receiptName;
 
     @NotNull
+    @Column(length = 100)
     private Double price;
 
     @NotNull
+    @Column(length = 100)
     private Double amount;
+
+    @Nullable
+    @Column(length = 100)
+    private String houseName;
 
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -41,12 +48,10 @@ public class Receipt {
     @NotNull
     private TypeService typeService;
 
-    @Nullable
-    private String houseName;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private House house;
+
 }

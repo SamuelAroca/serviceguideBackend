@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import proyecto.web.serviceguideBackend.entities.ColombianCities;
+import proyecto.web.serviceguideBackend.entities.City;
 import proyecto.web.serviceguideBackend.entities.User;
 
 @Data
@@ -34,7 +34,7 @@ public class HouseDto {
     private String contract;
 
     @NotNull
-    private ColombianCities cities;
+    private City cities;
 
     @Nullable
     private User user;

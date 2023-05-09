@@ -6,6 +6,7 @@ import lombok.*;
 import proyecto.web.serviceguideBackend.entities.House;
 import proyecto.web.serviceguideBackend.entities.TypeService;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -26,12 +27,16 @@ public class ReceiptDto {
     @NotNull
     private Double amount;
 
+    @Nullable
+    private String houseName;
+
     @NotNull
     private Date date;
 
-    @Nullable
+    @NotNull
     private TypeService typeService;
 
-    @Nullable
+    @NotNull
     private House house;
+
 }

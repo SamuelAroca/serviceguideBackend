@@ -23,23 +23,28 @@ public class House {
     private Long id;
 
     @NotNull
+    @Column(length = 100)
     private String name;
 
     @NotNull
+    @Column(length = 3)
     private Integer stratum;
 
     @NotNull
+    @Column(length = 100)
     private String neighborhood;
 
     @Nullable
+    @Column(length = 100)
     private String address;
 
     @NotNull
+    @Column(length = 100)
     private String contract;
 
     @OneToOne
-    @JoinColumn(name = "FK_COLOMBIAN_CITY", nullable = false)
-    private ColombianCities cities;
+    @JoinColumn(name = "FK_CITY", nullable = false)
+    private City cities;
 
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
     private List<Receipt> receipts = new ArrayList<>();

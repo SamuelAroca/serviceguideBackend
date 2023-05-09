@@ -9,7 +9,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.HouseDto;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.entities.House;
-import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.services.HouseService;
 
 import java.net.URI;
@@ -23,25 +22,30 @@ public class HouseController {
 
     private final HouseService houseService;
 
-    @PostMapping("/add")
+    @PostMapping("/add/{token}")
     @Transactional
-    public ResponseEntity<HouseDto> newHouse(@RequestBody @Valid HouseDto houseDto){
+    public ResponseEntity<HouseDto> newHouse(@RequestBody @Valid HouseDto houseDto, @PathVariable String token){
 
-        HouseDto createdHouse = houseService.newHouse(houseDto);
+        HouseDto createdHouse = houseService.newHouse(houseDto, token);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdHouse.getId()).toUri();
         return ResponseEntity.created(location).body(createdHouse);
     }
 
-    @GetMapping("/findAllByUserOrderById/{user}")
-    public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable User user){
-        return ResponseEntity.ok(houseService.findAllByUserOrderById(user));
+    @GetMapping("/findAllByUserOrderById/{token}")
+    public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable String token){
+        return ResponseEntity.ok(houseService.findAllByUserOrderById(token));
     }
 
-    @GetMapping("/findByUserAndName/{user}/{name}")
-    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable User user, @PathVariable String name){
-        return ResponseEntity.ok(houseService.findByUserAndName(user, name));
+    @GetMapping("/findByUserAndName/{token}/{name}")
+    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable String token, @PathVariable String name){
+        return ResponseEntity.ok(houseService.findByUserAndName(token, name));
+    }
+
+    @GetMapping("/getHouseName/{token}")
+    public ResponseEntity<Collection<String>> getHouseName(@PathVariable String token) {
+        return ResponseEntity.ok(houseService.getHouseName(token));
     }
 
     @PutMapping("/update/{idHouse}")

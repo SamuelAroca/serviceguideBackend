@@ -72,13 +72,13 @@ public class EmailController {
 
         Optional<User> optionalUser = userService.findByTokenPassword(dto.getTokenPassword());
         if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+            throw new AppException("Invalid Token", HttpStatus.NOT_FOUND);
         }
         User user = optionalUser.get();
         String newPassword = passwordEncoder.encode(dto.getPassword());
         user.setPassword(newPassword);
         user.setTokenPassword(null);
         userService.save(user);
-        return ResponseEntity.ok(new Message("Updated password"));
+        return ResponseEntity.ok(new Message("Updated password", HttpStatus.OK));
     }
 }

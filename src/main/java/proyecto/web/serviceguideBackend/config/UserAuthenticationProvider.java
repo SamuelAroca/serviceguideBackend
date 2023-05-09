@@ -15,7 +15,7 @@ import proyecto.web.serviceguideBackend.dto.UserDto;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
-import proyecto.web.serviceguideBackend.services.UserService;
+import proyecto.web.serviceguideBackend.services.AuthService;
 
 import java.util.Base64;
 import java.util.Collections;
@@ -28,7 +28,7 @@ public class UserAuthenticationProvider {
     @Value("${secret.key}")
     private String secretKey;
 
-    private final UserService userService;
+    private final AuthService authService;
     private final UserRepository userRepository;
 
     @PostConstruct
@@ -56,7 +56,7 @@ public class UserAuthenticationProvider {
 
         DecodedJWT decoded = verifier.verify(token);
 
-        UserDto user = userService.findByEmail(decoded.getIssuer());
+        UserDto user = authService.findByEmail(decoded.getIssuer());
 
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
@@ -84,7 +84,7 @@ public class UserAuthenticationProvider {
         DecodedJWT decoded = verifier.verify(token);
 
         User user = userRepository.findByEmail(decoded.getIssuer())
-                .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         return user.getId();
     }

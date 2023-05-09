@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ColombianCitiesDto {
+public class CityDto {
 
     @Nullable
     private Long id;
