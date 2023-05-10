@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -53,5 +54,10 @@ public class Receipt {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private House house;
+
+    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
+    private List<Statistic> statistics;
+
+
 
 }
