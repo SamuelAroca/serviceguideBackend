@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   serviceguide-backend:
-    image: serviceguide_backend
+    image: samuelaroca/serviceguide:latest
     ports:
       - "8080:8080"
-
