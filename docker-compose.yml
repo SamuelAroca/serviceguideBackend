@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  serviceguide-backend:
+    image: serviceguide_backend
+    ports:
+      - "8080:8080"
+
