@@ -1,7 +1,11 @@
 version: '3.8'
 
 services:
-  serviceguide-backend:
-    image: samuelaroca/serviceguide:latest
+  myapp:
+    build: .
     ports:
       - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    image: myapp:latest
+    command: java -jar /app/target/serviceguideBackend.jar

@@ -1,11 +1,10 @@
-FROM maven:amazoncorretto AS build
+FROM maven:3.9-amazoncorretto-20
 
-RUN mvn clean
-RUN mvn install
+COPY pom.xml /app/pom.xml
+RUN mvn -B -f /app/pom.xml dependency:resolve
 
+COPY src /app/src
+RUN mvn -B -f /app/pom.xml package
 
-FROM amazoncorretto:20.0.1
+CMD ["java", "-jar", "/app/target/serviceguideBackend.jar"]
 
-COPY target/serviceguideBackend.jar serviceguideBackend.jar
-
-ENTRYPOINT ["java", "-jar", "/serviceguideBackend.jar"]
