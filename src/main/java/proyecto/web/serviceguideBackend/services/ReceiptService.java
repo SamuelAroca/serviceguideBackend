@@ -157,6 +157,12 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
+    public Collection<Receipt> getAllReceiptsByType(String token, String type) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        return receiptRepository.getAllReceiptsByType(idUser, type);
+    }
+
+    @Override
     public Message deleteReceipt(Long id) {
         Optional<Receipt> optionalReceipt = receiptRepository.findById(id);
         if (optionalReceipt.isEmpty()) {

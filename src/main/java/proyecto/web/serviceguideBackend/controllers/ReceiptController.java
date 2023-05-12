@@ -73,4 +73,9 @@ public class ReceiptController {
     public Optional<Receipt> getLastReceipt(@PathVariable String token) {
         return receiptService.getLastReceipt(token);
     }
+
+    @GetMapping("/getAllReceiptByType/{token}/{type}")
+    public Collection<Receipt> getAllReceiptByType(@PathVariable String token, @PathVariable String type) {
+        return receiptService.getAllReceiptsByType(token, type);
+    }
 }
