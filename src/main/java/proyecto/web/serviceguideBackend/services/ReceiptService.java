@@ -171,4 +171,9 @@ public class ReceiptService implements ReceiptInterface {
         receiptRepository.delete(optionalReceipt.get());
         return new Message("Received deleted successfully", HttpStatus.OK);
     }
+
+    @Override
+    public Collection<Receipt> getTwoReceiptById(Long idReceipt1, Long idReceipt2) {
+        return receiptRepository.getTwoReceiptById(idReceipt1, idReceipt2);
+    }
 }

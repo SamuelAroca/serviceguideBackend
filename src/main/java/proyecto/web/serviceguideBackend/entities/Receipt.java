@@ -1,5 +1,8 @@
 package proyecto.web.serviceguideBackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -49,15 +52,17 @@ public class Receipt {
     @NotNull
     private TypeService typeService;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private House house;
 
-    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JoinTable(
+            name = "receipt_statistic", joinColumns = @JoinColumn(name = "FK_RECEIPT", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "FK_STATISTIC", referencedColumnName = "id")
+    )
     private List<Statistic> statistics;
-
-
-
 }

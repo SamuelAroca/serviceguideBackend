@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface StatisticInterface {
 
-    StatisticDto individualReceipt(Long idReceipt, String type);
+    StatisticDto individualReceipt(String type, Long idReceipt);
 
 }

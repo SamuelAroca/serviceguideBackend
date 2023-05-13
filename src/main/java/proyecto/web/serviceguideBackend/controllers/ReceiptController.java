@@ -78,4 +78,9 @@ public class ReceiptController {
     public Collection<Receipt> getAllReceiptByType(@PathVariable String token, @PathVariable String type) {
         return receiptService.getAllReceiptsByType(token, type);
     }
+
+    @GetMapping("/getTwoReceiptById/{idReceipt1}/{idReceipt2}")
+    public Collection<Receipt> getTwoReceiptById(@PathVariable Long idReceipt1, @PathVariable Long idReceipt2) {
+        return receiptService.getTwoReceiptById(idReceipt1, idReceipt2);
+    }
 }

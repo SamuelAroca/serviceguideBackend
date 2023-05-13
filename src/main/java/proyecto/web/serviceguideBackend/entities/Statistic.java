@@ -1,6 +1,6 @@
 package proyecto.web.serviceguideBackend.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,12 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "statistics")
+@Table(name = "statistic")
 public class Statistic {
 
     @Id
@@ -32,9 +34,7 @@ public class Statistic {
     @NotNull
     private StatisticType statisticsType;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "FK_RECEIPTS")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotNull
-    private Receipt receipt;
+    @ManyToMany(mappedBy = "statistics", fetch = FetchType.LAZY)
+    @JsonBackReference
+    private List<Receipt> receipts;
 }

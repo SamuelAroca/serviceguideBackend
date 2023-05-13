@@ -7,4 +7,3 @@ COPY src /app/src
 RUN mvn -B -f /app/pom.xml package
 
 CMD ["java", "-jar", "/app/target/serviceguideBackend.jar"]
-
