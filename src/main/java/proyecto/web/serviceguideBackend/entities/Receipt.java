@@ -59,7 +59,7 @@ public class Receipt {
     private House house;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     @JoinTable(
             name = "receipt_statistic", joinColumns = @JoinColumn(name = "FK_RECEIPT", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "FK_STATISTIC", referencedColumnName = "id")

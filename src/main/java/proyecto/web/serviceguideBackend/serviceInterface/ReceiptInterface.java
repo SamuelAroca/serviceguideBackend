@@ -20,6 +20,6 @@ public interface ReceiptInterface {
     Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
     Collection<Receipt> getAllReceiptsByType(String token, String type);
     Message deleteReceipt(Long id);
-    Collection<Receipt> getTwoReceiptById(Long idReceipt1, Long idReceipt2);
+    Long getTwoReceiptById(Long idReceipt);
 
 }

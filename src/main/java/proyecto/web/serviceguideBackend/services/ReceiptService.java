@@ -173,7 +173,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Collection<Receipt> getTwoReceiptById(Long idReceipt1, Long idReceipt2) {
-        return receiptRepository.getTwoReceiptById(idReceipt1, idReceipt2);
+    public Long getTwoReceiptById(Long idReceipt) {
+        return receiptRepository.findUserByReceiptId(idReceipt);
     }
 }

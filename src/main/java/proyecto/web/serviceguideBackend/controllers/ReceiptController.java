@@ -8,6 +8,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.entities.Receipt;
+import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
 
@@ -59,11 +60,6 @@ public class ReceiptController {
         return receiptService.deleteReceipt(idReceipt);
     }
 
-    @GetMapping("/findUserByReceiptId/{idReceipt}")
-    public Long findUserByReceiptId(@PathVariable Long idReceipt) {
-        return receiptRepository.findUserByReceiptId(idReceipt);
-    }
-
     @GetMapping("/findById/{idReceipt}")
     public Optional<Receipt> findById(@PathVariable Long idReceipt) {
         return receiptRepository.findById(idReceipt);
@@ -79,8 +75,8 @@ public class ReceiptController {
         return receiptService.getAllReceiptsByType(token, type);
     }
 
-    @GetMapping("/getTwoReceiptById/{idReceipt1}/{idReceipt2}")
-    public Collection<Receipt> getTwoReceiptById(@PathVariable Long idReceipt1, @PathVariable Long idReceipt2) {
-        return receiptService.getTwoReceiptById(idReceipt1, idReceipt2);
+    @GetMapping("/getTwoReceiptById/{idReceipt}")
+    public Long getTwoReceiptById(@PathVariable Long idReceipt) {
+        return receiptService.getTwoReceiptById(idReceipt);
     }
 }
