@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.ReceiptDto;
+import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
+import proyecto.web.serviceguideBackend.services.StatisticService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -24,11 +26,16 @@ public class ReceiptController {
 
     private final ReceiptService receiptService;
     private final ReceiptRepository receiptRepository;
+    private final StatisticService statisticService;
 
     @PostMapping("/add/{token}")
     public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto, @PathVariable String token) {
 
         ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto, token);
+
+        Long idReceipt = createdReceipt.getId();
+
+        statisticService.individualReceipt("Bar", idReceipt);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdReceipt.getId()).toUri();

@@ -26,8 +26,11 @@ public class Statistic {
     @Column(name = "label", columnDefinition = "TEXT[]")
     private String[] label;
 
-    @Column(name = "data", columnDefinition = "DOUBLE PRECISION[]")
-    private Double[] data;
+    @Column(name = "price", columnDefinition = "DOUBLE PRECISION[]")
+    private Double[] price;
+
+    @Column(name = "amount", columnDefinition = "DOUBLE PRECISION[]")
+    private Double[] amount;
 
     @OneToOne
     @JoinColumn(name = "FK_TYPE", nullable = false)

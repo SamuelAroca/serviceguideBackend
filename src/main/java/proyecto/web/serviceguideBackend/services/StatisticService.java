@@ -17,6 +17,8 @@ import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.StatisticInterface;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 
@@ -36,12 +38,15 @@ public class StatisticService implements StatisticInterface{
         if (!statistics.isEmpty()) {
             StatisticDto statisticDto = new StatisticDto();
             List<Double[]> prices = new ArrayList<>();
+            List<Double[]> amount = new ArrayList<>();
             List<String[]> label = new ArrayList<>();
             for (int i = 0; i < statistics.size(); i++) {
-                prices.add(statistics.get(i).getData());
+                prices.add(statistics.get(i).getPrice());
+                amount.add(statistics.get(i).getAmount());
                 label.add(statistics.get(i).getLabel());
 
-                statisticDto.setData(prices.get(i));
+                statisticDto.setPrice(prices.get(i));
+                statisticDto.setAmount(amount.get(i));
                 statisticDto.setLabel(label.get(i));
                 statisticDto.setId(statistics.get(i).getId());
                 statisticDto.setStatisticsType(statistics.get(i).getStatisticsType());
@@ -67,13 +72,19 @@ public class StatisticService implements StatisticInterface{
         for (int i = 0; i < 2 && i < collectionId.size(); i++) {
             idList.add(collectionId.get(i));
         }
+        /*Se verifica si la lista tiene solo un dato y si es verdadero lanza una excepcion*/
+        if (idList.size() == 1) {
+            throw new AppException("Recibo creado pero no se puede generar la estadistica", HttpStatus.OK);
+        }
         List<Receipt> receiptList = receiptRepository.getTwoReceiptsById(idList.get(0).longValue(), idList.get(1).longValue());
 
-        Double[] number = {receiptList.get(0).getPrice(), receiptList.get(1).getPrice()};
+        Double[] price = {receiptList.get(0).getPrice(), receiptList.get(1).getPrice()};
+        Double[] amount = {receiptList.get(0).getAmount(), receiptList.get(1).getAmount()};
 
         /*Se extrae el mes y se pone la primera letra en Mayuscula*/
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
         String dateStr1 = String.valueOf(receiptList.get(0).getDate());
-        LocalDate date1 = LocalDate.parse(dateStr1);
+        LocalDate date1 = LocalDate.parse(dateStr1, formatter);
         String monthName1 = date1.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES"));
         String monthCapitalize1 = monthName1.substring(0, 1).toUpperCase() + monthName1.substring(1);
 
@@ -87,7 +98,8 @@ public class StatisticService implements StatisticInterface{
         /*Se crea la nueva estadistica y se le pasan los datos generados*/
         Statistic statistic = new Statistic();
         statistic.setLabel(label);
-        statistic.setData(number);
+        statistic.setPrice(price);
+        statistic.setAmount(amount);
         statistic.setStatisticsType(optionalStatisticType.get());
         statisticRepository.save(statistic);
 

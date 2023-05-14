@@ -4,9 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.StatisticType;
-
 
 @Getter
 @Setter
@@ -20,15 +18,12 @@ public class StatisticDto {
     private String[] label;
 
     @NotNull
-    private Double[] data;
+    private Double[] price;
+
+    @NotNull
+    private Double[] amount;
 
     @NotNull
     private StatisticType statisticsType;
-
-    public StatisticDto(@NotNull String[] label, @NotNull Double[] data, StatisticType statisticsType) {
-        this.label = label;
-        this.data = data;
-        this.statisticsType = statisticsType;
-    }
 
 }
