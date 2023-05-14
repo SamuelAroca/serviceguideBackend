@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Statistic;
-import proyecto.web.serviceguideBackend.repositories.StatisticRepository;
 import proyecto.web.serviceguideBackend.services.StatisticService;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class StatisticController {
 
     private final StatisticService statisticService;
 
-    @GetMapping("/prueba/{type}/{idReceipt}")
+    @GetMapping("/individualReceipt/{type}/{idReceipt}")
     public ResponseEntity<StatisticDto> prueba(@PathVariable String type, @PathVariable Long idReceipt) {
         return ResponseEntity.ok(statisticService.individualReceipt(type, idReceipt));
     }
