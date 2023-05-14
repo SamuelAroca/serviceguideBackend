@@ -17,7 +17,6 @@ import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.StatisticInterface;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.*;
 
@@ -33,16 +32,22 @@ public class StatisticService implements StatisticInterface{
 
     @Override
     public StatisticDto individualReceipt(String type, Long idReceipt) {
-        /*Collection<Statistic> statistics = statisticRepository.getStatisticByTwoReceipt();
+        List<Statistic> statistics = statisticRepository.getStatisticByReceipt(idReceipt);
         if (!statistics.isEmpty()) {
             StatisticDto statisticDto = new StatisticDto();
             List<Double[]> prices = new ArrayList<>();
-            for (Statistic statistic : statistics) {
-                prices.add(statistic.getData());
+            List<String[]> label = new ArrayList<>();
+            for (int i = 0; i < statistics.size(); i++) {
+                prices.add(statistics.get(i).getData());
+                label.add(statistics.get(i).getLabel());
+
+                statisticDto.setData(prices.get(i));
+                statisticDto.setLabel(label.get(i));
+                statisticDto.setId(statistics.get(i).getId());
+                statisticDto.setStatisticsType(statistics.get(i).getStatisticsType());
             }
-            statisticDto.setData(prices.get(0));
             return statisticDto;
-        }*/
+        }
         Optional<StatisticType> optionalStatisticType = statisticTypeRepository.findByTypeIgnoreCase(type);
         if (optionalStatisticType.isEmpty()) {
             throw new AppException("Type not found", HttpStatus.NOT_FOUND);
@@ -72,7 +77,7 @@ public class StatisticService implements StatisticInterface{
         String monthName1 = date1.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES"));
         String monthCapitalize1 = monthName1.substring(0, 1).toUpperCase() + monthName1.substring(1);
 
-        String dateStr2 = String.valueOf(receiptList.get(0).getDate());
+        String dateStr2 = String.valueOf(receiptList.get(1).getDate());
         LocalDate date2 = LocalDate.parse(dateStr2);
         String monthName2 = date2.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES"));
         String monthCapitalize2 = monthName2.substring(0, 1).toUpperCase() + monthName2.substring(1);
@@ -93,5 +98,10 @@ public class StatisticService implements StatisticInterface{
         receipt.setStatistics(statisticList);
         receiptRepository.save(receipt);
         return statisticMapper.statisticDto(statistic);
+    }
+
+    @Override
+    public List<Statistic> getStatisticByReceipt(Long idReceipt) {
+        return statisticRepository.getStatisticByReceipt(idReceipt);
     }
 }
