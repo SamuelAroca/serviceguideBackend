@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface StatisticInterface {
 
-    StatisticDto individualReceipt(String type, Long idReceipt);
+    StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic);
     List<Statistic> getStatisticByReceipt(Long idReceipt);
 
 }

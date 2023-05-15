@@ -17,7 +17,6 @@ import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.StatisticInterface;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -33,7 +32,7 @@ public class StatisticService implements StatisticInterface{
     private final UserRepository userRepository;
 
     @Override
-    public StatisticDto individualReceipt(String type, Long idReceipt) {
+    public StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic) {
         List<Statistic> statistics = statisticRepository.getStatisticByReceipt(idReceipt);
         if (!statistics.isEmpty()) {
             StatisticDto statisticDto = new StatisticDto();
@@ -53,7 +52,7 @@ public class StatisticService implements StatisticInterface{
             }
             return statisticDto;
         }
-        Optional<StatisticType> optionalStatisticType = statisticTypeRepository.findByTypeIgnoreCase(type);
+        Optional<StatisticType> optionalStatisticType = statisticTypeRepository.findByTypeIgnoreCase(typeGraphic);
         if (optionalStatisticType.isEmpty()) {
             throw new AppException("Type not found", HttpStatus.NOT_FOUND);
         }
@@ -66,11 +65,11 @@ public class StatisticService implements StatisticInterface{
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        List<Double> collectionId = receiptRepository.getIdByUser(optionalUser.get().getId());
+        List<Long> collectionId = receiptRepository.getIdByUser(optionalUser.get().getId(), typeReceipt);
         /*Se declara el array y se extraen 2 id*/
         List<Double> idList = new ArrayList<>();
         for (int i = 0; i < 2 && i < collectionId.size(); i++) {
-            idList.add(collectionId.get(i));
+            idList.add(Double.valueOf(collectionId.get(i)));
         }
         /*Se verifica si la lista tiene solo un dato y si es verdadero lanza una excepcion*/
         if (idList.size() == 1) {

@@ -19,13 +19,13 @@ public class StatisticController {
 
     private final StatisticService statisticService;
 
-    @GetMapping("/individualReceipt/{type}/{idReceipt}")
-    public ResponseEntity<StatisticDto> prueba(@PathVariable String type, @PathVariable Long idReceipt) {
-        return ResponseEntity.ok(statisticService.individualReceipt(type, idReceipt));
+    @GetMapping("/individualReceipt/{typeGraphic}/{typeReceipt}/{idReceipt}")
+    public ResponseEntity<StatisticDto> individualReceipt(@PathVariable String typeReceipt, @PathVariable Long idReceipt, @PathVariable String typeGraphic) {
+        return ResponseEntity.ok(statisticService.individualReceipt(typeReceipt, idReceipt, typeGraphic));
     }
 
-    @GetMapping("/getStatisticByReceipt/{idReceipt}")
-    public List<Statistic> getStatisticByReceipt(@PathVariable Long idReceipt) {
+    @GetMapping("/prueba/{idReceipt}")
+    public List<Statistic> prueba(@PathVariable Long idReceipt) {
         return statisticService.getStatisticByReceipt(idReceipt);
     }
 }
