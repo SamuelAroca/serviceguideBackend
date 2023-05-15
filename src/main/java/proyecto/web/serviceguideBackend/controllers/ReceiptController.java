@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.ReceiptDto;
+import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Receipt;
+import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
 import proyecto.web.serviceguideBackend.services.ReceiptService;
+import proyecto.web.serviceguideBackend.services.StatisticService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -23,11 +26,17 @@ public class ReceiptController {
 
     private final ReceiptService receiptService;
     private final ReceiptRepository receiptRepository;
+    private final StatisticService statisticService;
 
     @PostMapping("/add/{token}")
     public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto, @PathVariable String token) {
 
         ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto, token);
+
+        Long idReceipt = createdReceipt.getId();
+        String typeReceipt = createdReceipt.getTypeService().getType();
+        System.out.println(typeReceipt);
+        statisticService.individualReceipt(typeReceipt, idReceipt, "Bar");
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdReceipt.getId()).toUri();
@@ -59,11 +68,6 @@ public class ReceiptController {
         return receiptService.deleteReceipt(idReceipt);
     }
 
-    @GetMapping("/findUserByReceiptId/{idReceipt}")
-    public Long findUserByReceiptId(@PathVariable Long idReceipt) {
-        return receiptRepository.findUserByReceiptId(idReceipt);
-    }
-
     @GetMapping("/findById/{idReceipt}")
     public Optional<Receipt> findById(@PathVariable Long idReceipt) {
         return receiptRepository.findById(idReceipt);
@@ -72,5 +76,15 @@ public class ReceiptController {
     @GetMapping("/getLastReceipt/{token}")
     public Optional<Receipt> getLastReceipt(@PathVariable String token) {
         return receiptService.getLastReceipt(token);
+    }
+
+    @GetMapping("/getAllReceiptByType/{token}/{type}")
+    public Collection<Receipt> getAllReceiptByType(@PathVariable String token, @PathVariable String type) {
+        return receiptService.getAllReceiptsByType(token, type);
+    }
+
+    @GetMapping("/getTwoReceiptById/{idReceipt}")
+    public Long getTwoReceiptById(@PathVariable Long idReceipt) {
+        return receiptService.getTwoReceiptById(idReceipt);
     }
 }

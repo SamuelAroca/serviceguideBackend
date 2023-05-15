@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,10 +50,17 @@ public class Receipt {
     @NotNull
     private TypeService typeService;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "FK_HOUSE")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private House house;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    @JoinTable(
+            name = "receipt_statistic", joinColumns = @JoinColumn(name = "FK_RECEIPT", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "FK_STATISTIC", referencedColumnName = "id")
+    )
+    private List<Statistic> statistics;
 }

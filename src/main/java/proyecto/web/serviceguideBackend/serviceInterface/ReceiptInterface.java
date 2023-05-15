@@ -18,6 +18,8 @@ public interface ReceiptInterface {
     Optional<Receipt> findById(Long id);
     Optional<Receipt> getLastReceipt(String token);
     Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
+    Collection<Receipt> getAllReceiptsByType(String token, String type);
     Message deleteReceipt(Long id);
+    Long getTwoReceiptById(Long idReceipt);
 
 }
