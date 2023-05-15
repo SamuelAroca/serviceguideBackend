@@ -88,4 +88,18 @@ public class UserAuthenticationProvider {
 
         return user.getId();
     }
+
+    public String myName(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+
+        JWTVerifier verifier = JWT.require(algorithm)
+                .build();
+
+        DecodedJWT decoded = verifier.verify(token);
+
+        User user = userRepository.findByEmail(decoded.getIssuer())
+                .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
+
+        return user.getFirstName() + " " +user.getLastName();
+    }
 }

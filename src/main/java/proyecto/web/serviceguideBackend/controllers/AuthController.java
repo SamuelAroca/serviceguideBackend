@@ -49,4 +49,9 @@ public class AuthController {
     public ResponseEntity<Long> whoIsMyId(@PathVariable String token) {
         return ResponseEntity.ok(userAuthenticationProvider.whoIsMyId(token));
     }
+
+    @GetMapping("/myName/{token}")
+    public ResponseEntity<String> myName(@PathVariable String token) {
+        return ResponseEntity.ok(userAuthenticationProvider.myName(token));
+    }
 }
