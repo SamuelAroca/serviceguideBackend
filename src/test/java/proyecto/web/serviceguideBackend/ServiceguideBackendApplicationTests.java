@@ -32,17 +32,17 @@ class ServiceguideBackendApplicationTests {
 	void contextLoads() {
 	}
 
-	/*@Test
+	@Test
 	void testLogin() {
 
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "$2a$10$MGvIKtsdX77nusYtHbV.pudS4ib0kHnlDo.1Nvoc0kHXQg2MWuH4y".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
 
 		UserDto userDto = userInterface.login(credentialsDto);
 
 		Assertions.assertNotNull(userDto);
 		Assertions.assertEquals("serviceguide23@gmail.com", userDto.getEmail());
 		Assertions.assertEquals(2L, userDto.getId());
-	}*/
+	}
 
 	@Test
 	void testListAll() {
@@ -70,7 +70,7 @@ class ServiceguideBackendApplicationTests {
 	@Test
 	void testFindById() {
 
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "$2a$10$MGvIKtsdX77nusYtHbV.pudS4ib0kHnlDo.1Nvoc0kHXQg2MWuH4y".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
 
 		String token = userInterface.login(credentialsDto).getToken();
 
