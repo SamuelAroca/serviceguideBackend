@@ -18,10 +18,7 @@ import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -231,7 +228,7 @@ class ServiceguideBackendApplicationTests {
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-		Long id = 14L;
+		Long id = 15L;
 
 		Message deleteMessage = houseInterface.deleteHouse(id);
 
@@ -244,7 +241,189 @@ class ServiceguideBackendApplicationTests {
 	//-------------------------------------------------------------------------------------
 	@Test
 	void testReceiptsNewReceipt() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
+		String token = userDto.getToken();
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2023, Calendar.FEBRUARY, 10);
+		Date date = calendar.getTime();
+
+		TypeService typeService = new TypeService();
+		typeService.setType("WATER");
+
+		String houseName = "Casa Laureles";
+		Optional<House> optionalHouse = houseInterface.findByUserAndName(token, houseName);
+		House house = optionalHouse.orElseThrow(() -> new RuntimeException("House not found"));
+
+		ReceiptDto receiptDto = new ReceiptDto();
+		receiptDto.setReceiptName("Recibo Prueba Test 2");
+		receiptDto.setPrice(20000D);
+		receiptDto.setAmount(100D);
+		receiptDto.setDate(date);
+		receiptDto.setTypeService(typeService);
+		receiptDto.setHouse(house);
+
+		ReceiptDto createdReceiptDto = receiptInterface.newReceipt(receiptDto, token);
+
+		Assertions.assertNotNull(createdReceiptDto);
+		Assertions.assertEquals(receiptDto.getReceiptName(), createdReceiptDto.getReceiptName());
+		Assertions.assertEquals(receiptDto.getAmount(), createdReceiptDto.getAmount());
+		Assertions.assertEquals(receiptDto.getPrice(), createdReceiptDto.getPrice());
+	}
+
+	@Test
+	void testReceiptFindByHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+		String houseName = "Casa Laureles";
+
+		Collection<Receipt> receiptCollection = receiptInterface.findByHouse(houseName, token);
+
+		boolean found = false;
+
+		for (Receipt houseNames : receiptCollection) {
+			if (houseNames.getHouseName() != null && houseNames.getHouseName().equals(houseName)) {
+				found = true;
+				break;
+			}
+		}
+
+		Assertions.assertNotNull(receiptCollection);
+		Assertions.assertTrue(found, "El nombre '" + houseName + "' no se encuentra en la colección de nombres de recibos.");
+	}
+
+	@Test
+	void testReceiptsFindByTypeServiceAndHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+		String typeService = "WATER";
+		String houseName = "Casa Laureles";
+		String receiptName = "Recibo Prueba Test";
+
+		Collection<Receipt> receiptCollection = receiptInterface.findByTypeServiceAndHouse(typeService, houseName, token);
+
+		boolean found = false;
+
+		for (Receipt receipts : receiptCollection) {
+			if (receipts.getReceiptName() != null && receipts.getReceiptName().equals(receiptName)){
+				found = true;
+				break;
+			}
+		}
+
+		Assertions.assertNotNull(receiptCollection);
+		Assertions.assertTrue(found, "El '" + receiptName + "' no se encuentra en la colección de recibos");
+	}
+
+	@Test
+	void testReceiptsAllReceiptsByUserId() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+
+		List<Receipt> receiptList = receiptInterface.allReceiptsByUserId(token);
+
+		Assertions.assertNotNull(receiptList);
+	}
+
+	@Test
+	void testReceiptsFindById() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		Long id = 63L;
+		String receiptName = "Recibo Prueba Test 2";
+		String houseName = "Casa Laureles";
+
+		Optional<Receipt> optionalReceipt = receiptInterface.findById(id);
+
+		Assertions.assertEquals(receiptName, optionalReceipt.get().getReceiptName());
+		Assertions.assertEquals(houseName, optionalReceipt.get().getHouseName());
+	}
+
+	@Test
+	void testReceiptsGetLastReceipt() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+		String lastReceiptName = "Recibo Prueba Test 2";
+
+		Optional<Receipt> optionalReceipt = receiptInterface.getLastReceipt(token);
+
+		Assertions.assertNotNull(optionalReceipt);
+		Assertions.assertEquals(lastReceiptName, optionalReceipt.get().getReceiptName());
+	}
+	/*
+	@Test
+	void testReceiptUpdateReceipt() {
+
+	}*/
+
+	@Test
+	void testReceiptgetAllReceiptsByType() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+		String type = "WATER";
+		String receiptName = "Recibo Prueba";
+		Double receiptPrice = 30000D;
+
+		Collection<Receipt> receiptCollection = receiptInterface.getAllReceiptsByType(token, type);
+
+		boolean found = false;
+
+		for (Receipt receipts : receiptCollection) {
+			if (receipts != null && receipts.getReceiptName().equals(receiptName) && receipts.getPrice().equals(receiptPrice)) {
+				found = true;
+				break;
+			}
+		}
+
+		Assertions.assertNotNull(receiptCollection);
+		Assertions.assertTrue(found, "El '" + receiptName + "' con precio '" + receiptPrice + "' no se encuentra en la colección de recibos");
+	}
+
+	@Test
+	void testReceiptGetTwoReceiptById() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		Long idReceipt = 63L;
+
+		Long receiptId = receiptInterface.getTwoReceiptById(idReceipt);
+
+		Assertions.assertNotNull(receiptId);
+	}
+
+	@Test
+	void testReceiptDeleteReceipt() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		Long id = 62L;
+
+		Message deletedReceipt = receiptInterface.deleteReceipt(id);
+
+		Assertions.assertNotNull(deletedReceipt);
+		Assertions.assertEquals("Received deleted successfully", deletedReceipt.getMessage());
 	}
 
 	//TESTS STATISTIC
@@ -426,7 +605,7 @@ class ServiceguideBackendApplicationTests {
 
 	@Test
 	void testUserDelete() {
-		CredentialsDto credentialsDto = new CredentialsDto("prueba5@gmail.com", "prueba123".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 		String token = userDto.getToken();
