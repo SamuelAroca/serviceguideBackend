@@ -8,11 +8,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.*;
 import proyecto.web.serviceguideBackend.entities.*;
+import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.*;
 
@@ -54,6 +56,8 @@ class ServiceguideBackendApplicationTests {
 	void contextLoads() {
 	}
 
+	//TESTS AUTHENTICATION
+	//-------------------------------------------------------------------------------------
 	@Test
 	void testAuthFindByEmail() {
 		String email = "serviceguide23@gmail.com";
@@ -64,12 +68,15 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(email, userDto.getEmail());
 	}
 
+	//TESTS CITY
+	//-------------------------------------------------------------------------------------
 	@Test
 	void testCityListAll() {
 		Collection<City> cityList = cityInterface.listAll();
 
 		Assertions.assertNotNull(cityList);
 	}
+
 
 	@Test
 	void testCityFindById() {
@@ -88,6 +95,160 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(city, optionalCity.get().getCity());
 	}
 
+	//TESTS HOUSE
+	//-------------------------------------------------------------------------------------
+	@Test
+	void testHouseNewHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+
+		Optional<User> optionalUser = userInterface.findById(token);
+		User user = optionalUser.orElseThrow(() -> new RuntimeException("User not found"));
+
+		City city = new City();
+		city.setId(1L);
+		city.setCity("Medellín");
+
+		HouseDto houseDto = new HouseDto();
+		houseDto.setName("Prueba Test");
+		houseDto.setStratum(6);
+		houseDto.setNeighborhood("La Castellana");
+		houseDto.setAddress("Carrera 34 AA");
+		houseDto.setContract("123456");
+		houseDto.setCities(city);
+		houseDto.setUser(user);
+
+		HouseDto createdHouseDto = houseInterface.newHouse(houseDto, token);
+
+		Assertions.assertNotNull(createdHouseDto);
+		Assertions.assertEquals(houseDto.getName(), createdHouseDto.getName());
+		Assertions.assertEquals(houseDto.getStratum(), createdHouseDto.getStratum());
+		Assertions.assertEquals(houseDto.getNeighborhood(), createdHouseDto.getNeighborhood());
+		Assertions.assertEquals(houseDto.getAddress(), createdHouseDto.getAddress());
+		Assertions.assertEquals(houseDto.getContract(), createdHouseDto.getContract());
+	}
+
+	@Test
+	void testHouseFindAllByUserOrderById() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+
+		Collection<House> houseCollection = houseInterface.findAllByUserOrderById(token);
+
+		Assertions.assertNotNull(houseCollection);
+	}
+
+	@Test
+	void testHouseFindByUserAndName() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+		String name = "Prueba Test";
+
+		Optional<House> optionalHouse = houseInterface.findByUserAndName(token, name);
+
+		Assertions.assertNotNull(optionalHouse);
+		Assertions.assertEquals(name, optionalHouse.get().getName());
+	}
+
+	@Test
+	void testHouseFindById() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		Long id = 14L;
+		String name = "Prueba Test";
+
+		Optional<House> optionalHouse = houseInterface.findById(id);
+
+		Assertions.assertNotNull(optionalHouse);
+		Assertions.assertEquals(id, optionalHouse.get().getId());
+		Assertions.assertEquals(name, optionalHouse.get().getName());
+	}
+
+	@Test
+	void testHouseGetHouseName() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		String token = userDto.getToken();
+
+		Collection<String> houseCollection = houseInterface.getHouseName(token);
+		String name = "Prueba Test";
+		boolean found = false;
+
+		for (String houseName : houseCollection) {
+			if (houseName.equals(name)) {
+				found = true;
+				break;
+			}
+		}
+
+		Assertions.assertNotNull(houseCollection);
+		Assertions.assertTrue(found, "El nombre '" + name + "' no se encuentra en la colección de nombres de casas.");
+	}
+
+	@Test
+	void testHouseUpdateHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		City city = new City();
+		city.setId(1L);
+		city.setCity("Medellín");
+
+		Long id = 14L;
+		HouseDto updateHouse = new HouseDto();
+		updateHouse.setName("Casa Prueba");
+		updateHouse.setStratum(6);
+		updateHouse.setNeighborhood("La Castellana");
+		updateHouse.setContract("123456");
+		updateHouse.setCities(city);
+
+		Optional<Message> updateResult = houseInterface.updateHouse(updateHouse, id);
+
+		Assertions.assertTrue(updateResult.isPresent(), "La actualización de la casa falló");
+		Message message = updateResult.get();
+		Assertions.assertEquals("House Updated successfully", message.getMessage(), "El mensaje de actualización de la casa es incorrecto");
+		Assertions.assertEquals(HttpStatus.OK, message.getStatus(), "El estado de la respuesta de actualización de la casa es incorrecto");
+
+	}
+
+	@Test
+	void testHouseDeleteHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+
+		Long id = 14L;
+
+		Message deleteMessage = houseInterface.deleteHouse(id);
+
+
+		Assertions.assertNotNull(deleteMessage);
+		Assertions.assertEquals("Delete success", deleteMessage.getMessage());
+	}
+
+	//TESTS RECEIPTS
+	//-------------------------------------------------------------------------------------
+	@Test
+	void testReceiptsNewReceipt() {
+
+	}
+
+	//TESTS STATISTIC
+	//-------------------------------------------------------------------------------------
 	@Test
 	void testStatisticIndividualReceipt() {
 		Long idReceipt = 46L;
@@ -107,6 +268,8 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(statistics);
 	}
 
+	//TESTS USER
+	//-------------------------------------------------------------------------------------
 	@Test
 	void testUserLogin() {
 
@@ -118,7 +281,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals("serviceguide23@gmail.com", userDto.getEmail());
 		Assertions.assertEquals(2L, userDto.getId());
 	}
-	/*
+
 	@Test
 	void testUserRegister() {
 		SignUpDto signUpDto = new SignUpDto();
@@ -133,7 +296,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(signUpDto.getEmail(), registeredUser.getEmail());
 		Assertions.assertEquals(signUpDto.getFirstName(), registeredUser.getFirstName());
 		Assertions.assertEquals(signUpDto.getLastName(), registeredUser.getLastName());
-	}*/
+	}
 
 	@Test
 	void testUserGetByEmail() {
@@ -153,7 +316,6 @@ class ServiceguideBackendApplicationTests {
 
 	@Test
 	void testFindById() {
-
 		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
