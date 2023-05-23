@@ -64,7 +64,16 @@ public class UserService implements UserInterface {
                 .map(user -> {
                     Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
                     if (optionalUser.isPresent()) {
-                        throw new AppException("Email already exist", HttpStatus.BAD_REQUEST);
+                        if (optionalUser.get().getEmail().equals(updateUser.getEmail())) {
+                            user.setFirstName(updateUser.getFirstName());
+                            user.setLastName(updateUser.getLastName());
+                            user.setEmail(updateUser.getEmail());
+                            user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
+                            userRepository.save(user);
+                            String newToken = authenticationProvider.createToken(updateUser.getEmail());
+                            return new UpdateUserDto("User updated", HttpStatus.OK, newToken);
+                        }
+                        throw new AppException("Email already exist", HttpStatus.INTERNAL_SERVER_ERROR);
                     }
                     user.setFirstName(updateUser.getFirstName());
                     user.setLastName(updateUser.getLastName());
