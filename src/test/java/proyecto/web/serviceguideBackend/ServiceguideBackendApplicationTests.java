@@ -53,8 +53,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void contextLoads() {
     }
-}
-/*
+
 	//TESTS AUTHENTICATION
 	//-------------------------------------------------------------------------------------
 	@Test
@@ -590,4 +589,4 @@ class ServiceguideBackendApplicationTests {
 	}
 
 }
-*/
+
