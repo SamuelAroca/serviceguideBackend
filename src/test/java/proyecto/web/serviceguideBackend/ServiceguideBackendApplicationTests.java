@@ -1,19 +1,14 @@
 package proyecto.web.serviceguideBackend;
 
-import org.checkerframework.checker.nullness.Opt;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.*;
 import proyecto.web.serviceguideBackend.entities.*;
-import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.*;
 
@@ -48,6 +43,7 @@ class ServiceguideBackendApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+
 	@Order(2)
 	@Test
 	void testUserRegister() {
@@ -64,6 +60,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(signUpDto.getFirstName(), registeredUser.getFirstName());
 		Assertions.assertEquals(signUpDto.getLastName(), registeredUser.getLastName());
 	}
+
 	@Order(3)
 	@Test
 	void testUserLogin() {
@@ -75,6 +72,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(userDto);
 		Assertions.assertEquals("prueba@gmail.com", userDto.getEmail());
 	}
+
 	@Order(4)
 	@Test
 	void testAuthFindByEmail() {
@@ -85,6 +83,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(userDto);
 		Assertions.assertEquals(email, userDto.getEmail());
 	}
+
 	@Order(5)
 	@Test
 	void testUserUpdateUser() {
@@ -107,6 +106,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(updateUserDto.getFirstName(), updatedUser.getFirstName());
 		Assertions.assertEquals(updateUserDto.getLastName(), updatedUser.getLastName());
 	}
+
 	@Order(6)
 	@Test
 	void testHouseNewHouse() {
@@ -141,6 +141,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(houseDto.getAddress(), createdHouseDto.getAddress());
 		Assertions.assertEquals(houseDto.getContract(), createdHouseDto.getContract());
 	}
+
 	@Order(7)
 	@Test
 	void testHouseFindByUserAndName() {
@@ -156,6 +157,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(optionalHouse);
 		Assertions.assertEquals(name, optionalHouse.get().getName());
 	}
+
 	@Order(8)
 	@Test
 	void testHouseUpdateHouse() {
@@ -188,6 +190,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(HttpStatus.OK, message.getStatus(), "El estado de la respuesta de actualización de la casa es incorrecto");
 
 	}
+
 	@Order(9)
 	@Test
 	void testHouseGetHouseName() {
@@ -211,6 +214,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(houseCollection);
 		Assertions.assertTrue(found, "El nombre '" + name + "' no se encuentra en la colección de nombres de casas.");
 	}
+
 	@Order(10)
 	@Test
 	void testReceiptsNewReceipt() {
@@ -246,6 +250,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(receiptDto.getAmount(), createdReceiptDto.getAmount());
 		Assertions.assertEquals(receiptDto.getPrice(), createdReceiptDto.getPrice());
 	}
+
 	@Order(11)
 	@Test
 	void testReceiptsAllReceiptsByUserId() {
@@ -259,6 +264,7 @@ class ServiceguideBackendApplicationTests {
 
 		Assertions.assertNotNull(receiptList);
 	}
+
 	@Order(12)
 	@Test
 	void testReceiptsGetLastReceipt() {
@@ -274,6 +280,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(optionalReceipt);
 		Assertions.assertEquals(lastReceiptName, optionalReceipt.get().getReceiptName());
 	}
+
 	@Order(13)
 	@Test
 	void testReceiptUpdateReceipt() {
@@ -311,6 +318,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals("Receipt Updated successfully", message.getMessage(), "El mensaje de actualización del recibo es incorrecto");
 		Assertions.assertEquals(HttpStatus.OK, message.getStatus(), "El estado de la respuesta de actualización de la casa es incorrecto");
 	}
+
 	@Order(14)
 	@Test
 	void testReceiptGetAllReceiptsByType() {
@@ -319,15 +327,17 @@ class ServiceguideBackendApplicationTests {
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
 		String token = userDto.getToken();
-		String type = "WATER";
+		String type = "ENERGY";
 		String receiptName = "Recibo Test Update ._@";
-		Double receiptPrice = 200000D;
+		Double receiptPrice = 20000D;
 
 		Collection<Receipt> receiptCollection = receiptInterface.getAllReceiptsByType(token, type);
 
 		boolean found = false;
 
 		for (Receipt receipts : receiptCollection) {
+			Double price = receipts.getPrice();
+			System.out.println(price);
 			if (receipts != null && receipts.getReceiptName().equals(receiptName) && receipts.getPrice().equals(receiptPrice)) {
 				found = true;
 				break;
@@ -337,14 +347,17 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(receiptCollection);
 		Assertions.assertTrue(found, "El '" + receiptName + "' con precio '" + receiptPrice + "' no se encuentra en la colección de recibos");
 	}
+
 	@Order(15)
 	@Test
 	void testStatisticGetStatisticByReceipt() {
-		Long id = 45L;
+		String receiptName = "Recibo Test Update ._@";
+		Long id = receiptInterface.findIdByName(receiptName);
 		List<Statistic> statistics = statisticInterface.getStatisticByReceipt(id);
 
 		Assertions.assertNotNull(statistics);
 	}
+
 	@Order(16)
 	@Test
 	void testReceiptDeleteReceipt() {
@@ -359,6 +372,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(deletedReceipt);
 		Assertions.assertEquals("Received deleted successfully", deletedReceipt.getMessage());
 	}
+
 	@Order(17)
 	@Test
 	void testHouseDeleteHouse() {
@@ -366,7 +380,7 @@ class ServiceguideBackendApplicationTests {
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-		Long idHouse = houseInterface.findIdByName("Recibo Test Update ._@");
+		Long idHouse = houseInterface.findIdByName("Casa Prueba Update @._");
 
 		Message deleteMessage = houseInterface.deleteHouse(idHouse);
 
@@ -374,6 +388,7 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(deleteMessage);
 		Assertions.assertEquals("Delete success", deleteMessage.getMessage());
 	}
+
 	@Order(18)
 	@Test
 	void testUserDelete() {
