@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.dto.UpdateUserDto;
+import proyecto.web.serviceguideBackend.dto.UserLoadDto;
 import proyecto.web.serviceguideBackend.entities.User;
 import proyecto.web.serviceguideBackend.services.UserService;
 
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/findById/{token}")
-    public ResponseEntity<Optional<User>> userById(@PathVariable String token) {
+    public ResponseEntity<UserLoadDto> userById(@PathVariable String token) {
         return ResponseEntity.ok(userService.findById(token));
     }
 
