@@ -34,7 +34,7 @@ public class UserController {
 
     @GetMapping("/findById/{token}")
     public ResponseEntity<UserLoadDto> userById(@PathVariable String token) {
-        return ResponseEntity.ok(userService.findById(token));
+        return ResponseEntity.ok(userService.loadById(token));
     }
 
     @DeleteMapping("/delete/{token}")
