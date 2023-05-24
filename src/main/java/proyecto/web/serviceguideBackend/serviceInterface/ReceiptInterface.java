@@ -21,5 +21,6 @@ public interface ReceiptInterface {
     Collection<Receipt> getAllReceiptsByType(String token, String type);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
+    Long findIdByName(String name);
 
 }

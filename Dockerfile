@@ -6,4 +6,6 @@ RUN mvn -B -f /app/pom.xml dependency:resolve
 COPY src /app/src
 RUN mvn -B -f /app/pom.xml package
 
-CMD ["java", "-jar", "/app/target/serviceguideBackend.jar"]
+EXPOSE 5001
+
+CMD ["java", "-jar", "/app/target/servceguideBackend.jar"]
