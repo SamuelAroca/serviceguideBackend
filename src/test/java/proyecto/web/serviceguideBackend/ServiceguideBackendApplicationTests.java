@@ -1,4 +1,4 @@
-/*
+
 package proyecto.web.serviceguideBackend;
 
 import org.checkerframework.checker.nullness.Opt;
@@ -25,35 +25,36 @@ import java.util.*;
 @SpringBootTest
 class ServiceguideBackendApplicationTests {
 
-	@Autowired
-	private AuthInterface authInterface;
+    @Autowired
+    private AuthInterface authInterface;
 
-	@Autowired
-	private CityInterface cityInterface;
+    @Autowired
+    private CityInterface cityInterface;
 
-	@Autowired
-	private HouseInterface houseInterface;
+    @Autowired
+    private HouseInterface houseInterface;
 
-	@Autowired
-	private ReceiptInterface receiptInterface;
+    @Autowired
+    private ReceiptInterface receiptInterface;
 
-	@Autowired
-	private StatisticInterface statisticInterface;
+    @Autowired
+    private StatisticInterface statisticInterface;
 
-	@Autowired
-	private UserInterface userInterface;
+    @Autowired
+    private UserInterface userInterface;
 
-	@Autowired
-	private UserAuthenticationProvider userAuthenticationProvider;
+    @Autowired
+    private UserAuthenticationProvider userAuthenticationProvider;
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
+}
+/*
 	//TESTS AUTHENTICATION
 	//-------------------------------------------------------------------------------------
 	@Test
