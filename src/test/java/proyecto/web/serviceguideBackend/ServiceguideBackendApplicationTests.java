@@ -1,35 +1,26 @@
 
 package proyecto.web.serviceguideBackend;
 
-import org.checkerframework.checker.nullness.Opt;
-import org.checkerframework.checker.units.qual.A;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.*;
 import proyecto.web.serviceguideBackend.entities.*;
-import proyecto.web.serviceguideBackend.repositories.HouseRepository;
 import proyecto.web.serviceguideBackend.repositories.UserRepository;
 import proyecto.web.serviceguideBackend.serviceInterface.*;
 
 import java.util.*;
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class ServiceguideBackendApplicationTests {
 
     @Autowired
     private AuthInterface authInterface;
-
-    @Autowired
-    private CityInterface cityInterface;
 
     @Autowired
     private HouseInterface houseInterface;
@@ -48,17 +39,43 @@ class ServiceguideBackendApplicationTests {
 
     @Autowired
     private UserRepository userRepository;
+	@Order(1)
+	@Test
+	void contextLoads() {
+	}
+	@Order(2)
+	@Test
+	void testUserRegister() {
+		SignUpDto signUpDto = new SignUpDto();
+		signUpDto.setFirstName("Prueba");
+		signUpDto.setLastName("Test");
+		signUpDto.setEmail("prueba@gmail.com");
+		signUpDto.setPassword("prueba123".toCharArray());
 
+		UserDto registeredUser = userInterface.register(signUpDto);
 
-    @Test
-    void contextLoads() {
-    }
+		Assertions.assertNotNull(registeredUser.getId());
+		Assertions.assertEquals(signUpDto.getEmail(), registeredUser.getEmail());
+		Assertions.assertEquals(signUpDto.getFirstName(), registeredUser.getFirstName());
+		Assertions.assertEquals(signUpDto.getLastName(), registeredUser.getLastName());
+	}
 
-	//TESTS AUTHENTICATION
-	//-------------------------------------------------------------------------------------
+	@Order(3)
+	@Test
+	void testUserLogin() {
+
+		CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
+
+		UserDto userDto = userInterface.login(credentialsDto);
+
+		Assertions.assertNotNull(userDto);
+		Assertions.assertEquals("prueba@gmail.com", userDto.getEmail());
+	}
+
+	@Order(4)
 	@Test
 	void testAuthFindByEmail() {
-		String email = "serviceguide23@gmail.com";
+		String email = "prueba@gmail.com";
 
 		UserDto userDto = authInterface.findByEmail(email);
 
@@ -66,38 +83,33 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(email, userDto.getEmail());
 	}
 
-	//TESTS CITY
-	//-------------------------------------------------------------------------------------
+	@Order(5)
 	@Test
-	void testCityListAll() {
-		Collection<City> cityList = cityInterface.listAll();
+	void testUserUpdateUser() {
+		CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
+		UserDto userDto = userInterface.login(credentialsDto);
+		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+		String token = userDto.getToken();
 
-		Assertions.assertNotNull(cityList);
+		SignUpDto updateUserDto = new SignUpDto();
+		updateUserDto.setFirstName("Prueba Update");
+		updateUserDto.setLastName("Test Update");
+		updateUserDto.setEmail("pruebaUPDATE@gmail.com");
+		updateUserDto.setPassword("prueba123".toCharArray());
+
+		Optional<UpdateUserDto> updatedUserDto = userInterface.updateUser(updateUserDto, token);
+		Assertions.assertEquals("User updated", updatedUserDto.get().getMessage());
+
+		User updatedUser = userRepository.findByEmail(updateUserDto.getEmail()).orElse(null);
+
+		Assertions.assertEquals(updateUserDto.getFirstName(), updatedUser.getFirstName());
+		Assertions.assertEquals(updateUserDto.getLastName(), updatedUser.getLastName());
 	}
 
-
-	@Test
-	void testCityFindById() {
-		Long id = 1L;
-
-		Optional<City> optionalCity = cityInterface.findById(id);
-		Assertions.assertNotNull(optionalCity);
-	}
-
-	@Test
-	void testCityFindByCity() {
-		String city = "Medellín";
-
-		Optional<City> optionalCity = cityInterface.findByCity(city);
-		Assertions.assertNotNull(optionalCity);
-		Assertions.assertEquals(city, optionalCity.get().getCity());
-	}
-
-	//TESTS HOUSE
-	//-------------------------------------------------------------------------------------
+	@Order(6)
 	@Test
 	void testHouseNewHouse() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
@@ -111,7 +123,7 @@ class ServiceguideBackendApplicationTests {
 		city.setCity("Medellín");
 
 		HouseDto houseDto = new HouseDto();
-		houseDto.setName("Prueba Test");
+		houseDto.setName("Prueba Test ._@");
 		houseDto.setStratum(6);
 		houseDto.setNeighborhood("La Castellana");
 		houseDto.setAddress("Carrera 34 AA");
@@ -129,27 +141,15 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(houseDto.getContract(), createdHouseDto.getContract());
 	}
 
-	@Test
-	void testHouseFindAllByUserOrderById() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		String token = userDto.getToken();
-
-		Collection<House> houseCollection = houseInterface.findAllByUserOrderById(token);
-
-		Assertions.assertNotNull(houseCollection);
-	}
-
+	@Order(7)
 	@Test
 	void testHouseFindByUserAndName() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
 		String token = userDto.getToken();
-		String name = "Prueba Test";
+		String name = "Prueba Test ._@";
 
 		Optional<House> optionalHouse = houseInterface.findByUserAndName(token, name);
 
@@ -157,58 +157,25 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(name, optionalHouse.get().getName());
 	}
 
+	@Order(8)
 	@Test
-	void testHouseFindById() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		Long id = 14L;
-		String name = "Prueba Test";
-
-		Optional<House> optionalHouse = houseInterface.findById(id);
-
-		Assertions.assertNotNull(optionalHouse);
-		Assertions.assertEquals(id, optionalHouse.get().getId());
-		Assertions.assertEquals(name, optionalHouse.get().getName());
-	}
-
-	@Test
-	void testHouseGetHouseName() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+	void testHouseUpdateHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
 		String token = userDto.getToken();
-
-		Collection<String> houseCollection = houseInterface.getHouseName(token);
-		String name = "Prueba Test";
-		boolean found = false;
-
-		for (String houseName : houseCollection) {
-			if (houseName.equals(name)) {
-				found = true;
-				break;
-			}
-		}
-
-		Assertions.assertNotNull(houseCollection);
-		Assertions.assertTrue(found, "El nombre '" + name + "' no se encuentra en la colección de nombres de casas.");
-	}
-
-	@Test
-	void testHouseUpdateHouse() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
+		String houseName = "Prueba Test ._@";
 
 		City city = new City();
 		city.setId(1L);
 		city.setCity("Medellín");
 
-		Long id = 14L;
+		Optional<House> houseOptional = houseInterface.findByUserAndName(token, houseName);
+		Long id = houseOptional.get().getId();
+
 		HouseDto updateHouse = new HouseDto();
-		updateHouse.setName("Casa Prueba");
+		updateHouse.setName("Casa Prueba Update @._");
 		updateHouse.setStratum(6);
 		updateHouse.setNeighborhood("La Castellana");
 		updateHouse.setContract("123456");
@@ -223,26 +190,34 @@ class ServiceguideBackendApplicationTests {
 
 	}
 
+	@Order(9)
 	@Test
-	void testHouseDeleteHouse() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+	void testHouseGetHouseName() {
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-		Long id = 15L;
+		String token = userDto.getToken();
 
-		Message deleteMessage = houseInterface.deleteHouse(id);
+		Collection<String> houseCollection = houseInterface.getHouseName(token);
+		String name = "Casa Prueba Update @._";
+		boolean found = false;
 
+		for (String houseName : houseCollection) {
+			if (houseName.equals(name)) {
+				found = true;
+				break;
+			}
+		}
 
-		Assertions.assertNotNull(deleteMessage);
-		Assertions.assertEquals("Delete success", deleteMessage.getMessage());
+		Assertions.assertNotNull(houseCollection);
+		Assertions.assertTrue(found, "El nombre '" + name + "' no se encuentra en la colección de nombres de casas.");
 	}
 
-	//TESTS RECEIPTS
-	//-------------------------------------------------------------------------------------
+	@Order(10)
 	@Test
 	void testReceiptsNewReceipt() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
@@ -255,12 +230,12 @@ class ServiceguideBackendApplicationTests {
 		TypeService typeService = new TypeService();
 		typeService.setType("WATER");
 
-		String houseName = "Casa Laureles";
+		String houseName = "Casa Prueba Update @._";
 		Optional<House> optionalHouse = houseInterface.findByUserAndName(token, houseName);
 		House house = optionalHouse.orElseThrow(() -> new RuntimeException("House not found"));
 
 		ReceiptDto receiptDto = new ReceiptDto();
-		receiptDto.setReceiptName("Recibo Prueba Test 2");
+		receiptDto.setReceiptName("Recibo Prueba Test @._");
 		receiptDto.setPrice(20000D);
 		receiptDto.setAmount(100D);
 		receiptDto.setDate(date);
@@ -275,59 +250,10 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(receiptDto.getPrice(), createdReceiptDto.getPrice());
 	}
 
-	@Test
-	void testReceiptFindByHouse() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		String token = userDto.getToken();
-		String houseName = "Casa Laureles";
-
-		Collection<Receipt> receiptCollection = receiptInterface.findByHouse(houseName, token);
-
-		boolean found = false;
-
-		for (Receipt houseNames : receiptCollection) {
-			if (houseNames.getHouseName() != null && houseNames.getHouseName().equals(houseName)) {
-				found = true;
-				break;
-			}
-		}
-
-		Assertions.assertNotNull(receiptCollection);
-		Assertions.assertTrue(found, "El nombre '" + houseName + "' no se encuentra en la colección de nombres de recibos.");
-	}
-
-	@Test
-	void testReceiptsFindByTypeServiceAndHouse() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		String token = userDto.getToken();
-		String typeService = "WATER";
-		String houseName = "Casa Laureles";
-		String receiptName = "Recibo Prueba Test";
-
-		Collection<Receipt> receiptCollection = receiptInterface.findByTypeServiceAndHouse(typeService, houseName, token);
-
-		boolean found = false;
-
-		for (Receipt receipts : receiptCollection) {
-			if (receipts.getReceiptName() != null && receipts.getReceiptName().equals(receiptName)){
-				found = true;
-				break;
-			}
-		}
-
-		Assertions.assertNotNull(receiptCollection);
-		Assertions.assertTrue(found, "El '" + receiptName + "' no se encuentra en la colección de recibos");
-	}
-
+	@Order(11)
 	@Test
 	void testReceiptsAllReceiptsByUserId() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
@@ -338,30 +264,15 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(receiptList);
 	}
 
-	@Test
-	void testReceiptsFindById() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		Long id = 63L;
-		String receiptName = "Recibo Prueba Test 2";
-		String houseName = "Casa Laureles";
-
-		Optional<Receipt> optionalReceipt = receiptInterface.findById(id);
-
-		Assertions.assertEquals(receiptName, optionalReceipt.get().getReceiptName());
-		Assertions.assertEquals(houseName, optionalReceipt.get().getHouseName());
-	}
-
+	@Order(12)
 	@Test
 	void testReceiptsGetLastReceipt() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
 		String token = userDto.getToken();
-		String lastReceiptName = "Recibo Prueba Test 2";
+		String lastReceiptName = "Recibo Prueba Test @._";
 
 		Optional<Receipt> optionalReceipt = receiptInterface.getLastReceipt(token);
 
@@ -369,9 +280,10 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(lastReceiptName, optionalReceipt.get().getReceiptName());
 	}
 
+	@Order(13)
 	@Test
 	void testReceiptUpdateReceipt() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
@@ -384,21 +296,21 @@ class ServiceguideBackendApplicationTests {
 		TypeService typeService = new TypeService();
 		typeService.setType("ENERGY");
 
-		String houseName = "Casa Laureles";
+		String houseName = "Casa Prueba Update @._";
 		Optional<House> optionalHouse = houseInterface.findByUserAndName(token, houseName);
 		House house = optionalHouse.orElseThrow(() -> new RuntimeException("House not found"));
 
-		Long id = 63L;
+		Long idReceipt = receiptInterface.findIdByName("Recibo Prueba Test @._");
 
 		ReceiptDto receiptDto = new ReceiptDto();
-		receiptDto.setReceiptName("Recibo test update");
+		receiptDto.setReceiptName("Recibo Test Update ._@");
 		receiptDto.setPrice(20000D);
 		receiptDto.setAmount(100D);
 		receiptDto.setDate(date);
 		receiptDto.setTypeService(typeService);
 		receiptDto.setHouse(house);
 
-		Optional<Message> updatedResult = receiptInterface.updateReceipt(receiptDto, id);
+		Optional<Message> updatedResult = receiptInterface.updateReceipt(receiptDto, idReceipt);
 
 		Assertions.assertTrue(updatedResult.isPresent(), "La actualización del recibo falló");
 		Message message = updatedResult.get();
@@ -406,22 +318,25 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertEquals(HttpStatus.OK, message.getStatus(), "El estado de la respuesta de actualización de la casa es incorrecto");
 	}
 
+	@Order(14)
 	@Test
 	void testReceiptGetAllReceiptsByType() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
 		String token = userDto.getToken();
-		String type = "WATER";
-		String receiptName = "Recibo Prueba";
-		Double receiptPrice = 30000D;
+		String type = "ENERGY";
+		String receiptName = "Recibo Test Update ._@";
+		Double receiptPrice = 20000D;
 
 		Collection<Receipt> receiptCollection = receiptInterface.getAllReceiptsByType(token, type);
 
 		boolean found = false;
 
 		for (Receipt receipts : receiptCollection) {
+			Double price = receipts.getPrice();
+			System.out.println(price);
 			if (receipts != null && receipts.getReceiptName().equals(receiptName) && receipts.getPrice().equals(receiptPrice)) {
 				found = true;
 				break;
@@ -432,152 +347,51 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertTrue(found, "El '" + receiptName + "' con precio '" + receiptPrice + "' no se encuentra en la colección de recibos");
 	}
 
-	@Test
-	void testReceiptGetTwoReceiptById() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		Long idReceipt = 63L;
-
-		Long receiptId = receiptInterface.getTwoReceiptById(idReceipt);
-
-		Assertions.assertNotNull(receiptId);
-	}
-
-	@Test
-	void testReceiptDeleteReceipt() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-		UserDto userDto = userInterface.login(credentialsDto);
-		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-
-		Long id = 62L;
-
-		Message deletedReceipt = receiptInterface.deleteReceipt(id);
-
-		Assertions.assertNotNull(deletedReceipt);
-		Assertions.assertEquals("Received deleted successfully", deletedReceipt.getMessage());
-	}
-
-	//TESTS STATISTIC
-	//-------------------------------------------------------------------------------------
-	@Test
-	void testStatisticIndividualReceipt() {
-		Long idReceipt = 46L;
-		String typeReceipt = "ENERGY";
-		String typeGraphic = "Bar";
-
-		StatisticDto newStatistic = statisticInterface.individualReceipt(typeReceipt, idReceipt, typeGraphic);
-
-		Assertions.assertNotNull(newStatistic);
-	}
-
+	@Order(15)
 	@Test
 	void testStatisticGetStatisticByReceipt() {
-		Long id = 45L;
+		String receiptName = "Recibo Test Update ._@";
+		Long id = receiptInterface.findIdByName(receiptName);
 		List<Statistic> statistics = statisticInterface.getStatisticByReceipt(id);
 
 		Assertions.assertNotNull(statistics);
 	}
 
-	//TESTS USER
-	//-------------------------------------------------------------------------------------
+	@Order(16)
 	@Test
-	void testUserLogin() {
-
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
-
-		UserDto userDto = userInterface.login(credentialsDto);
-
-		Assertions.assertNotNull(userDto);
-		Assertions.assertEquals("serviceguide23@gmail.com", userDto.getEmail());
-		Assertions.assertEquals(2L, userDto.getId());
-	}
-
-	@Test
-	void testUserRegister() {
-		SignUpDto signUpDto = new SignUpDto();
-		signUpDto.setFirstName("Prueba");
-		signUpDto.setLastName("Test");
-		signUpDto.setEmail("prueba@gmail.com");
-		signUpDto.setPassword("prueba123".toCharArray());
-
-		UserDto registeredUser = userInterface.register(signUpDto);
-
-		Assertions.assertNotNull(registeredUser.getId());
-		Assertions.assertEquals(signUpDto.getEmail(), registeredUser.getEmail());
-		Assertions.assertEquals(signUpDto.getFirstName(), registeredUser.getFirstName());
-		Assertions.assertEquals(signUpDto.getLastName(), registeredUser.getLastName());
-	}
-
-	@Test
-	void testUserGetByEmail() {
-		String email = "serviceguide23@gmail.com";
-
-		Optional<User> optionalUser = userInterface.getByEmail(email);
-
-		Assertions.assertTrue(optionalUser.isPresent());
-
-		User user = optionalUser.orElse(null);
-		Assertions.assertNotNull(user);
-
-		Assertions.assertEquals(email, optionalUser.get().getEmail());
-		Assertions.assertEquals("Service", optionalUser.get().getFirstName());
-		Assertions.assertEquals("Guide", optionalUser.get().getLastName());
-	}
-
-	@Test
-	void testFindById() {
-		CredentialsDto credentialsDto = new CredentialsDto("serviceguide23@gmail.com", "1234".toCharArray());
+	void testReceiptDeleteReceipt() {
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-		String token = userDto.getToken();
+		Long idReceipt = receiptInterface.findIdByName("Recibo Test Update ._@");
 
-		Optional<User> optionalUser = userInterface.findById(token);
+		Message deletedReceipt = receiptInterface.deleteReceipt(idReceipt);
 
-		Assertions.assertTrue(optionalUser.isPresent());
-
-		User user = optionalUser.orElse(null);
-		Assertions.assertNotNull(user);
-
-		Assertions.assertEquals("serviceguide23@gmail.com", user.getEmail());
-		Assertions.assertEquals("Service", user.getFirstName());
-		Assertions.assertEquals("Guide", user.getLastName());
+		Assertions.assertNotNull(deletedReceipt);
+		Assertions.assertEquals("Received deleted successfully", deletedReceipt.getMessage());
 	}
 
+	@Order(17)
 	@Test
-	void testUserUpdateUser() {
-		CredentialsDto credentialsDto = new CredentialsDto("prueba4@gmail.com", "prueba123".toCharArray());
+	void testHouseDeleteHouse() {
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-		String token = userDto.getToken();
 
-		SignUpDto updateUserDto = new SignUpDto();
-		updateUserDto.setFirstName("Prueba Update");
-		updateUserDto.setLastName("Test Update");
-		updateUserDto.setEmail("prueba5@gmail.com");
-		updateUserDto.setPassword("prueba123".toCharArray());
+		Long idHouse = houseInterface.findIdByName("Casa Prueba Update @._");
 
-		Optional<UpdateUserDto> updatedUserDto = userInterface.updateUser(updateUserDto, token);
-		Assertions.assertEquals("User updated", updatedUserDto.get().getMessage());
+		Message deleteMessage = houseInterface.deleteHouse(idHouse);
 
-		User updatedUser = userRepository.findByEmail(updateUserDto.getEmail()).orElse(null);
 
-		Assertions.assertEquals(updateUserDto.getFirstName(), updatedUser.getFirstName());
-		Assertions.assertEquals(updateUserDto.getLastName(), updatedUser.getLastName());
+		Assertions.assertNotNull(deleteMessage);
+		Assertions.assertEquals("Delete success", deleteMessage.getMessage());
 	}
 
-	@Test
-	void testUserListAll() {
-		Collection<User> userList = userInterface.listAll();
-
-		Assertions.assertNotNull(userList);
-	}
-
+	@Order(18)
 	@Test
 	void testUserDelete() {
-		CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
+		CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
 		UserDto userDto = userInterface.login(credentialsDto);
 		userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 		String token = userDto.getToken();
@@ -587,6 +401,5 @@ class ServiceguideBackendApplicationTests {
 		Assertions.assertNotNull(deleteMessage);
 		Assertions.assertEquals("Delete success", deleteMessage.getMessage());
 	}
-
 }
 

@@ -176,4 +176,9 @@ public class ReceiptService implements ReceiptInterface {
     public Long getTwoReceiptById(Long idReceipt) {
         return receiptRepository.findUserByReceiptId(idReceipt);
     }
+
+    @Override
+    public Long findIdByName(String name) {
+        return receiptRepository.findIdByName(name);
+    }
 }

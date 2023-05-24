@@ -125,4 +125,9 @@ public class HouseService implements HouseInterface {
         houseRepository.delete(optionalHouse.get());
         return new Message("Delete success", HttpStatus.OK);
     }
+
+    @Override
+    public Long findIdByName(String name) {
+        return houseRepository.findIdByName(name);
+    }
 }

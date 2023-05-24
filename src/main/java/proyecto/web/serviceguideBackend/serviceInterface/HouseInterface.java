@@ -16,5 +16,6 @@ public interface HouseInterface {
     Collection<String> getHouseName(String token);
     Optional<Message> updateHouse(HouseDto houseDto, Long id);
     Message deleteHouse(Long id);
+    Long findIdByName(String name);
 
 }
