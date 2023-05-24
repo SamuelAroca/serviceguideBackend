@@ -4,7 +4,7 @@ services:
   myapp:
     build: .
     ports:
-      - "3000:3000"
+      - "5001:5001"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
     image: myapp:latest
