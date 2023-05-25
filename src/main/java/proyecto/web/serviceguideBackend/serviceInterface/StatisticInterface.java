@@ -9,5 +9,6 @@ public interface StatisticInterface {
 
     StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic);
     List<Statistic> getStatisticByReceipt(Long idReceipt);
+    StatisticDto getStatisticByType(String typeReceipt, Long idUser, String typeGraphic);
 
 }

@@ -28,4 +28,9 @@ public class StatisticController {
     public List<Statistic> prueba(@PathVariable Long idReceipt) {
         return statisticService.getStatisticByReceipt(idReceipt);
     }
+
+    @GetMapping("/getStatisticByType/{typeGraphic}/{typeReceipt}/{idUser}")
+    public ResponseEntity<StatisticDto> getStatisticByType(@PathVariable String typeReceipt, @PathVariable Long idUser, @PathVariable String typeGraphic) {
+        return ResponseEntity.ok(statisticService.getStatisticByType(typeReceipt, idUser, typeGraphic));
+    }
 }

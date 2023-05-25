@@ -2,6 +2,7 @@ package proyecto.web.serviceguideBackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Statistic;
 
 import java.util.List;

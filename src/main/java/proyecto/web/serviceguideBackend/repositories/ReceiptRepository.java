@@ -37,5 +37,6 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     @Query(value = "select r from Receipt r where r.id = ?1 or r.id = ?2 order by r.id DESC")
     List<Receipt> getTwoReceiptsById(Long idReceipt1, Long idReceipt2);
+
 }
 
