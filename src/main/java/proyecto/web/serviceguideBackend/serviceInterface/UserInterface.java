@@ -13,6 +13,7 @@ public interface UserInterface {
     Optional<User> getByEmail(String email);
     Optional<UpdateUserDto> updateUser(SignUpDto updateUserDto, String token);
     Collection<User> listAll();
+    UserLoadDto loadById(String token);
     Optional<User> findById(String token);
     Optional<User> findByTokenPassword(String tokenPassword);
     void save(User user);
