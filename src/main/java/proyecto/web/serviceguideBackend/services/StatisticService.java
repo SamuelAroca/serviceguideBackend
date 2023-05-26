@@ -3,17 +3,13 @@ package proyecto.web.serviceguideBackend.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
+import proyecto.web.serviceguideBackend.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.dto.StatisticDto;
-import proyecto.web.serviceguideBackend.entities.Receipt;
-import proyecto.web.serviceguideBackend.entities.Statistic;
-import proyecto.web.serviceguideBackend.entities.StatisticType;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.entities.*;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.mappers.StatisticMapper;
-import proyecto.web.serviceguideBackend.repositories.ReceiptRepository;
-import proyecto.web.serviceguideBackend.repositories.StatisticRepository;
-import proyecto.web.serviceguideBackend.repositories.StatisticTypeRepository;
-import proyecto.web.serviceguideBackend.repositories.UserRepository;
+import proyecto.web.serviceguideBackend.repositories.*;
 import proyecto.web.serviceguideBackend.serviceInterface.StatisticInterface;
 
 import java.time.LocalDate;
@@ -30,6 +26,8 @@ public class StatisticService implements StatisticInterface{
     private final StatisticMapper statisticMapper;
     private final StatisticTypeRepository statisticTypeRepository;
     private final UserRepository userRepository;
+    private final UserAuthenticationProvider authenticationProvider;
+    private final HouseRepository houseRepository;
 
     @Override
     public StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic) {
@@ -115,4 +113,57 @@ public class StatisticService implements StatisticInterface{
     public List<Statistic> getStatisticByReceipt(Long idReceipt) {
         return statisticRepository.getStatisticByReceipt(idReceipt);
     }
+
+    @Override
+    public StatisticAverageDto getStatisticByTypeAndHouse(String typeReceipt, String token, String house) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getAllReceiptsByTypeAndHouse(idUser, typeReceipt, house);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), house);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+
+        String houseName =optionalHouse.get().getName();
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setHouseName(houseName);
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+
+        /*
+        AverageStatistic averageStatistic = new AverageStatistic();
+        averageStatistic.setHouseName(houseName);
+        averageStatistic.setAmount(totalAmounts);
+        averageStatistic.setPrice(totalPrices);
+        averageStatistic.setAveragePrice(averagePrice);
+        averageStatistic.setAverageAmount(averageAmount);
+        averageStatisticRepository.save(averageStatistic);*/
+
+        return statisticAverageDto;
+
+    }
+
 }
