@@ -17,6 +17,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users/auth")
+@CrossOrigin("http://89.116.25.43:5002")
 public class AuthController {
 
     private final UserService userService;

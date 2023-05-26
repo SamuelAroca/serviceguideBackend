@@ -18,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/house")
+@CrossOrigin("http://89.116.25.43:5002")
 public class HouseController {
 
     private final HouseService houseService;

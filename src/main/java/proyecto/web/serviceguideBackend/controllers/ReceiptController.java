@@ -22,6 +22,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/receipt")
 @RequiredArgsConstructor
+@CrossOrigin("http://89.116.25.43:5002")
 public class ReceiptController {
 
     private final ReceiptService receiptService;

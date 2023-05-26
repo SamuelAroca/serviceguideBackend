@@ -2,10 +2,7 @@ package proyecto.web.serviceguideBackend.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import proyecto.web.serviceguideBackend.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Statistic;
@@ -16,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/statistic")
 @RequiredArgsConstructor
+@CrossOrigin("http://89.116.25.43:5002")
 public class StatisticController {
 
     private final StatisticService statisticService;
