@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.serviceInterface;
 
+import proyecto.web.serviceguideBackend.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Statistic;
 
@@ -9,6 +10,6 @@ public interface StatisticInterface {
 
     StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic);
     List<Statistic> getStatisticByReceipt(Long idReceipt);
-    StatisticDto getStatisticByType(String typeReceipt, Long idUser, String typeGraphic);
+    StatisticAverageDto getStatisticByTypeAndHouse(String typeReceipt, String token, String house);
 
 }

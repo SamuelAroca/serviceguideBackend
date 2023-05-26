@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import proyecto.web.serviceguideBackend.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Statistic;
 import proyecto.web.serviceguideBackend.services.StatisticService;
@@ -29,8 +30,8 @@ public class StatisticController {
         return statisticService.getStatisticByReceipt(idReceipt);
     }
 
-    @GetMapping("/getStatisticByType/{typeGraphic}/{typeReceipt}/{idUser}")
-    public ResponseEntity<StatisticDto> getStatisticByType(@PathVariable String typeReceipt, @PathVariable Long idUser, @PathVariable String typeGraphic) {
-        return ResponseEntity.ok(statisticService.getStatisticByType(typeReceipt, idUser, typeGraphic));
+    @GetMapping("/getStatisticByType/{typeGraphic}/{house}/{token}")
+    public ResponseEntity<StatisticAverageDto> getStatisticByTypeAndHouse(@PathVariable String house, @PathVariable String token, @PathVariable String typeGraphic) {
+        return ResponseEntity.ok(statisticService.getStatisticByTypeAndHouse(house, token, typeGraphic));
     }
 }
