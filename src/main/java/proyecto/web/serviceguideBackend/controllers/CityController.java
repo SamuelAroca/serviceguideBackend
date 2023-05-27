@@ -16,7 +16,6 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cities")
-@CrossOrigin("http://89.116.25.43:5002")
 public class CityController {
 
     private final CityService cityService;

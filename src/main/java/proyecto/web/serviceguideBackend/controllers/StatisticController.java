@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/statistic")
 @RequiredArgsConstructor
-@CrossOrigin("http://89.116.25.43:5002")
 public class StatisticController {
 
     private final StatisticService statisticService;
