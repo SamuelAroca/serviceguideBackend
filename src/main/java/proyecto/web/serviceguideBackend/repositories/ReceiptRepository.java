@@ -8,6 +8,7 @@ import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.TypeService;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +41,12 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and r.houseName = ?3")
     Collection<Receipt> getAllReceiptsByTypeAndHouse(Long idUser, String type, String house);
+
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and YEAR(r.date) = ?3")
+    Collection<Receipt> getAllReceiptByTypeAndYear(Long idUser, String type, int year);
+
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and extract(quarter from r.date) = ?3 and YEAR(r.date) = ?4")
+    Collection<Receipt> getReceiptsByQuarter(Long idUser, String type, int quarter, int receiptYear);
 
 }
 

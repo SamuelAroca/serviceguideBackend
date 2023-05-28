@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,8 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StatisticAverageDto {
 
-    @NotNull
+    @Nullable
     private String houseName;
+
+    @Nullable
+    private String year;
 
     @NotNull
     private Double amount;
