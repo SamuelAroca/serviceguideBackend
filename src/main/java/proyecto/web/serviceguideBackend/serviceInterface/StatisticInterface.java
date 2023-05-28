@@ -13,6 +13,7 @@ public interface StatisticInterface {
     List<Statistic> getStatisticByReceipt(Long idReceipt);
     StatisticAverageDto getStatisticByTypeAndHouse(String typeReceipt, String token, String house);
     StatisticAverageDto getStatisticByTypeAndYear(String typeReceipt, String token, int year);
-    StatisticAverageDto getReceiptsByQuarter(String token, String type, int quarter, int year);
-
+    StatisticAverageDto getStatisticByQuarter(String token, String type, int quarter, int year);
+    StatisticAverageDto getStatisticBySemester(String token, String typeReceipt, int semester, int receiptYear);
+    StatisticAverageDto getStatisticByMonth(String token, String typeReceipt, int startMonth, int endMonth, int receiptYear);
 }

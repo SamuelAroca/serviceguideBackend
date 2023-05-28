@@ -182,9 +182,4 @@ public class ReceiptService implements ReceiptInterface {
         return receiptRepository.findIdByName(name);
     }
 
-    @Override
-    public Collection<Receipt> getAllReceiptsByTypeAndHouse(String token, String type, String house) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
-        return receiptRepository.getAllReceiptsByTypeAndHouse(idUser, type, house);
-    }
 }

@@ -153,14 +153,7 @@ public class StatisticService implements StatisticInterface{
         statisticAverageDto.setAveragePrice(averagePrice);
         statisticAverageDto.setAverageAmount(averageAmount);
 
-        /*
-        AverageStatistic averageStatistic = new AverageStatistic();
-        averageStatistic.setHouseName(houseName);
-        averageStatistic.setAmount(totalAmounts);
-        averageStatistic.setPrice(totalPrices);
-        averageStatistic.setAveragePrice(averagePrice);
-        averageStatistic.setAverageAmount(averageAmount);
-        averageStatisticRepository.save(averageStatistic);*/
+
 
         return statisticAverageDto;
 
@@ -173,11 +166,6 @@ public class StatisticService implements StatisticInterface{
 
         if (receipts.isEmpty()) {
             throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
-        }
-
-        Optional<User> optionalUser = userRepository.findById(idUser);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
 
         double totalPrices = 0;
@@ -204,28 +192,91 @@ public class StatisticService implements StatisticInterface{
     }
 
     @Override
-    public StatisticAverageDto getReceiptsByQuarter(String token, String typeReceipt, int quarter, int year) {
-        System.out.println(typeReceipt);
-        System.out.println(quarter);
-        System.out.println(year);
+    public StatisticAverageDto getStatisticByQuarter(String token, String typeReceipt, int quarter, int year) {
         Long idUser = authenticationProvider.whoIsMyId(token);
-        System.out.println(idUser);
         Collection<Receipt> receipts = receiptRepository.getReceiptsByQuarter(idUser, typeReceipt, quarter, year);
 
-        System.out.println(receipts);
         if (receipts.isEmpty()) {
             throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
-        }
-
-        Optional<User> optionalUser = userRepository.findById(idUser);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
 
         double totalPrices = 0;
         double totalAmounts = 0;
 
         String yearString =String.valueOf(year);
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+        statisticAverageDto.setYear(yearString);
+
+        return statisticAverageDto;
+    }
+
+    @Override
+    public StatisticAverageDto getStatisticBySemester(String token, String typeReceipt, int semester, int receiptYear) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+
+        List<Integer> months;
+        if (semester == 1) {
+            months = Arrays.asList(1, 2, 3, 4, 5, 6);
+        } else if (semester == 2) {
+            months = Arrays.asList(7, 8, 9, 10, 11, 12);
+        } else {
+            throw new IllegalArgumentException("El número de semestre debe ser 1 o 2");
+        }
+        Collection<Receipt> receipts = receiptRepository.getReceiptsBySemester(idUser, typeReceipt, months, receiptYear);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        String yearString =String.valueOf(receiptYear);
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+        statisticAverageDto.setYear(yearString);
+
+        return statisticAverageDto;
+    }
+
+    @Override
+    public StatisticAverageDto getStatisticByMonth(String token, String typeReceipt, int startMonth, int endMonth, int receiptYear) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getReceiptsByMonth(idUser, typeReceipt, startMonth, endMonth, receiptYear);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        String yearString =String.valueOf(receiptYear);
 
         for (Receipt receipt : receipts) {
             totalPrices += receipt.getPrice();
