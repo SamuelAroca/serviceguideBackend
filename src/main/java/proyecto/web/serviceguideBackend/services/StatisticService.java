@@ -12,6 +12,8 @@ import proyecto.web.serviceguideBackend.mappers.StatisticMapper;
 import proyecto.web.serviceguideBackend.repositories.*;
 import proyecto.web.serviceguideBackend.serviceInterface.StatisticInterface;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -28,6 +30,7 @@ public class StatisticService implements StatisticInterface{
     private final UserRepository userRepository;
     private final UserAuthenticationProvider authenticationProvider;
     private final HouseRepository houseRepository;
+    private final AverageStatisticRepository averageStatisticRepository;
 
     @Override
     public StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic) {
@@ -153,7 +156,34 @@ public class StatisticService implements StatisticInterface{
         statisticAverageDto.setAveragePrice(averagePrice);
         statisticAverageDto.setAverageAmount(averageAmount);
 
+        AverageStatistic averageStatistic = new AverageStatistic();
+        averageStatistic.setHouseName(statisticAverageDto.getHouseName());
+        averageStatistic.setAmount(statisticAverageDto.getAmount());
+        averageStatistic.setPrice(statisticAverageDto.getPrice());
+        averageStatistic.setAveragePrice(statisticAverageDto.getAveragePrice());
+        averageStatistic.setAverageAmount(statisticAverageDto.getAverageAmount());
+        averageStatistic.setTimestamp(Timestamp.from(Instant.now())); // Asigna la marca de tiempo actual
 
+        averageStatisticRepository.save(averageStatistic);
+
+        AverageStatistic lastEntry = averageStatisticRepository.findTopByHouseNameOrderByTimestampDesc(houseName);
+        if (lastEntry != null) {
+            double lastAveragePrice = lastEntry.getAveragePrice();
+            double lastAverageAmount = lastEntry.getAverageAmount();
+
+            // Comparar con los datos actuales
+            if (averagePrice > lastAveragePrice) {
+                System.out.println("El promedio del precio ha subido");
+            } else if (averagePrice < lastAveragePrice) {
+                System.out.println("El promedio del precio ha disminuido");
+            }
+
+            if (averageAmount > lastAverageAmount) {
+                System.out.println("El promedio de la cantidad ha subido");
+            } else if (averageAmount < lastAverageAmount) {
+                System.out.println("El promedio de la cantidad ha disminuido");
+            }
+        }
 
         return statisticAverageDto;
 
