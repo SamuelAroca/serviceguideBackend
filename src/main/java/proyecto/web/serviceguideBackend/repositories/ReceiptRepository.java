@@ -8,6 +8,7 @@ import proyecto.web.serviceguideBackend.entities.Receipt;
 import proyecto.web.serviceguideBackend.entities.TypeService;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,8 +42,17 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and r.houseName = ?3")
     Collection<Receipt> getAllReceiptsByTypeAndHouse(Long idUser, String type, String house);
 
-    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and h.name = ?2")
-    Collection<Receipt> getAllReceiptsByHouse(Long idUser, String houseName);
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and year(r.date) = ?3")
+    Collection<Receipt> getAllReceiptByTypeAndYear(Long idUser, String type, int year);
+
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and extract(quarter from r.date) = ?3 and year(r.date) = ?4")
+    Collection<Receipt> getReceiptsByQuarter(Long idUser, String type, int quarter, int receiptYear);
+
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and r.typeService.type = ?2 and extract(month from r.date) in ?3 and year(r.date) = ?4")
+    Collection<Receipt> getReceiptsBySemester(Long idUser, String type, List<Integer> months, int receiptYear);
+
+    @Query(value = "SELECT r FROM Receipt r INNER JOIN House h ON h.id = r.house.id INNER JOIN User u ON u.id = h.user.id WHERE u.id = ?1 AND r.typeService.type = ?2 AND EXTRACT(MONTH FROM r.date) BETWEEN ?3 AND ?4 AND EXTRACT(YEAR FROM r.date) = ?5")
+    Collection<Receipt> getReceiptsByMonth(Long idUser, String type, int startMonth, int endMonth, int receiptYear);
 
 }
 
