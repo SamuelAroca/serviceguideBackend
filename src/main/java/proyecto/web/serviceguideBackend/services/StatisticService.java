@@ -12,6 +12,8 @@ import proyecto.web.serviceguideBackend.mappers.StatisticMapper;
 import proyecto.web.serviceguideBackend.repositories.*;
 import proyecto.web.serviceguideBackend.serviceInterface.StatisticInterface;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -28,6 +30,7 @@ public class StatisticService implements StatisticInterface{
     private final UserRepository userRepository;
     private final UserAuthenticationProvider authenticationProvider;
     private final HouseRepository houseRepository;
+    private final AverageStatisticRepository averageStatisticRepository;
 
     @Override
     public StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic) {
@@ -153,17 +156,173 @@ public class StatisticService implements StatisticInterface{
         statisticAverageDto.setAveragePrice(averagePrice);
         statisticAverageDto.setAverageAmount(averageAmount);
 
-        /*
         AverageStatistic averageStatistic = new AverageStatistic();
-        averageStatistic.setHouseName(houseName);
-        averageStatistic.setAmount(totalAmounts);
-        averageStatistic.setPrice(totalPrices);
-        averageStatistic.setAveragePrice(averagePrice);
-        averageStatistic.setAverageAmount(averageAmount);
-        averageStatisticRepository.save(averageStatistic);*/
+        averageStatistic.setHouseName(statisticAverageDto.getHouseName());
+        averageStatistic.setAmount(statisticAverageDto.getAmount());
+        averageStatistic.setPrice(statisticAverageDto.getPrice());
+        averageStatistic.setAveragePrice(statisticAverageDto.getAveragePrice());
+        averageStatistic.setAverageAmount(statisticAverageDto.getAverageAmount());
+        averageStatistic.setTimestamp(Timestamp.from(Instant.now())); // Asigna la marca de tiempo actual
+
+        averageStatisticRepository.save(averageStatistic);
+
+        AverageStatistic lastEntry = averageStatisticRepository.findTopByHouseNameOrderByTimestampDesc(houseName);
+        if (lastEntry != null) {
+            double lastAveragePrice = lastEntry.getAveragePrice();
+            double lastAverageAmount = lastEntry.getAverageAmount();
+
+            if (averagePrice > lastAveragePrice) {
+                System.out.println("El promedio del precio ha subido");
+            } else if (averagePrice < lastAveragePrice) {
+                System.out.println("El promedio del precio ha disminuido");
+            }
+
+            if (averageAmount > lastAverageAmount) {
+                System.out.println("El promedio de la cantidad ha subido");
+            } else if (averageAmount < lastAverageAmount) {
+                System.out.println("El promedio de la cantidad ha disminuido");
+            }
+        }
 
         return statisticAverageDto;
 
+    }
+
+    @Override
+    public StatisticAverageDto getStatisticByTypeAndYear(String typeReceipt, String token, int year) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getAllReceiptByTypeAndYear(idUser, typeReceipt, year);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        String yearString =String.valueOf(year);
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+        statisticAverageDto.setYear(yearString);
+
+        return statisticAverageDto;
+    }
+
+    @Override
+    public StatisticAverageDto getStatisticByQuarter(String token, String typeReceipt, int quarter, int year) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getReceiptsByQuarter(idUser, typeReceipt, quarter, year);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        String yearString =String.valueOf(year);
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+        statisticAverageDto.setYear(yearString);
+
+        return statisticAverageDto;
+    }
+
+    @Override
+    public StatisticAverageDto getStatisticBySemester(String token, String typeReceipt, int semester, int receiptYear) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+
+        List<Integer> months;
+        if (semester == 1) {
+            months = Arrays.asList(1, 2, 3, 4, 5, 6);
+        } else if (semester == 2) {
+            months = Arrays.asList(7, 8, 9, 10, 11, 12);
+        } else {
+            throw new IllegalArgumentException("El número de semestre debe ser 1 o 2");
+        }
+        Collection<Receipt> receipts = receiptRepository.getReceiptsBySemester(idUser, typeReceipt, months, receiptYear);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        String yearString =String.valueOf(receiptYear);
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+        statisticAverageDto.setYear(yearString);
+
+        return statisticAverageDto;
+    }
+
+    @Override
+    public StatisticAverageDto getStatisticByMonth(String token, String typeReceipt, int startMonth, int endMonth, int receiptYear) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getReceiptsByMonth(idUser, typeReceipt, startMonth, endMonth, receiptYear);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        double totalPrices = 0;
+        double totalAmounts = 0;
+
+        String yearString =String.valueOf(receiptYear);
+
+        for (Receipt receipt : receipts) {
+            totalPrices += receipt.getPrice();
+            totalAmounts += receipt.getAmount();
+        }
+
+        double averagePrice = totalPrices / receipts.size();
+        double averageAmount = totalAmounts / receipts.size();
+
+        StatisticAverageDto statisticAverageDto = new StatisticAverageDto();
+        statisticAverageDto.setAmount(totalAmounts);
+        statisticAverageDto.setPrice(totalPrices);
+        statisticAverageDto.setAveragePrice(averagePrice);
+        statisticAverageDto.setAverageAmount(averageAmount);
+        statisticAverageDto.setYear(yearString);
+
+        return statisticAverageDto;
     }
 
 }

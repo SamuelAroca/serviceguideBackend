@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -41,5 +42,9 @@ public class AverageStatistic {
     @Column(name = "averageAmount")
     @NotNull
     private Double averageAmount;
+
+    @Column(name = "timestamp")
+    @NotNull
+    private Timestamp timestamp;
 
 }

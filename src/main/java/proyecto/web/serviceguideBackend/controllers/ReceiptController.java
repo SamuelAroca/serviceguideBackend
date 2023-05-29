@@ -87,4 +87,9 @@ public class ReceiptController {
     public Long getTwoReceiptById(@PathVariable Long idReceipt) {
         return receiptService.getTwoReceiptById(idReceipt);
     }
+
+    @GetMapping("/getAllReceiptsByHouse/{house}/{token}")
+    public Collection<Receipt> getAllReceiptsByHouse(@PathVariable String house, @PathVariable String token) {
+        return receiptService.getAllReceiptsByHouse(token, house);
+    }
 }
