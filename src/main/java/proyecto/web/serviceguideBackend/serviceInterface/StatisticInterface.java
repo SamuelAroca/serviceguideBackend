@@ -4,7 +4,6 @@ import proyecto.web.serviceguideBackend.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.entities.Statistic;
 
-import java.util.Date;
 import java.util.List;
 
 public interface StatisticInterface {

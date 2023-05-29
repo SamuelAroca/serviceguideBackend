@@ -171,7 +171,6 @@ public class StatisticService implements StatisticInterface{
             double lastAveragePrice = lastEntry.getAveragePrice();
             double lastAverageAmount = lastEntry.getAverageAmount();
 
-            // Comparar con los datos actuales
             if (averagePrice > lastAveragePrice) {
                 System.out.println("El promedio del precio ha subido");
             } else if (averagePrice < lastAveragePrice) {
