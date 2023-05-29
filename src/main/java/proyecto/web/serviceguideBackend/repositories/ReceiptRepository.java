@@ -54,5 +54,8 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     @Query(value = "SELECT r FROM Receipt r INNER JOIN House h ON h.id = r.house.id INNER JOIN User u ON u.id = h.user.id WHERE u.id = ?1 AND r.typeService.type = ?2 AND EXTRACT(MONTH FROM r.date) BETWEEN ?3 AND ?4 AND EXTRACT(YEAR FROM r.date) = ?5")
     Collection<Receipt> getReceiptsByMonth(Long idUser, String type, int startMonth, int endMonth, int receiptYear);
 
+    @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 and h.name = ?2")
+    Collection<Receipt> getAllReceiptsByHouse(Long idUser, String houseName);
+
 }
 
