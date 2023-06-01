@@ -92,4 +92,9 @@ public class ReceiptController {
     public Collection<Receipt> getAllReceiptsByHouse(@PathVariable String house, @PathVariable String token) {
         return receiptService.getAllReceiptsByHouse(token, house);
     }
+
+    @GetMapping("/getReceiptByHouse/{houseName}")
+    public Collection<Receipt> getReceiptByHouse(@PathVariable String houseName) {
+        return receiptService.getReceiptByHouse(houseName);
+    }
 }
