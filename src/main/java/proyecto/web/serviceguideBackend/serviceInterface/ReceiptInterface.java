@@ -24,4 +24,6 @@ public interface ReceiptInterface {
     Long findIdByName(String name);
     Collection<Receipt> getAllReceiptsByHouse(String token, String houseName);
 
+    Collection<Receipt> getReceiptByHouse(String houseName);
+
 }
