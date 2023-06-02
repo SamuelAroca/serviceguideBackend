@@ -34,6 +34,7 @@ public class ReceiptService implements ReceiptInterface {
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, String token) {
+
         Optional<House> optionalHouse = houseService.findByUserAndName(token, Objects.requireNonNull(receiptDto.getHouse()).getName());
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
@@ -42,6 +43,17 @@ public class ReceiptService implements ReceiptInterface {
         if (typeService.isEmpty()) {
             throw new AppException("Receipt Type not found", HttpStatus.NOT_FOUND);
         }
+
+        Calendar newReceiptCalendar = Calendar.getInstance();
+        newReceiptCalendar.setTime(receiptDto.getDate());
+        int receiptMonth = newReceiptCalendar.get(Calendar.MONTH) + 1;
+        int receiptYear = newReceiptCalendar.get(Calendar.YEAR);
+
+        List<Receipt> existingReceipts = receiptRepository.findByHouseAndTypeServiceAndMonthAndYear(optionalHouse.get(), typeService.get(), receiptMonth, receiptYear);
+        if (!existingReceipts.isEmpty()) {
+            throw new AppException("Receipt already exists for the given month and year", HttpStatus.BAD_REQUEST);
+        }
+
         Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(),typeService.get());
         if (optionalReceipt.isPresent()) {
             throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
