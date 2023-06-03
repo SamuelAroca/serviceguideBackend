@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import proyecto.web.serviceguideBackend.token.TokenRepository;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -20,6 +21,7 @@ import proyecto.web.serviceguideBackend.auth.AuthService;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -30,6 +32,7 @@ public class UserAuthenticationProvider {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
     @PostConstruct
     protected void init() {
@@ -53,7 +56,6 @@ public class UserAuthenticationProvider {
 
         JWTVerifier verifier = JWT.require(algorithm)
                 .build();
-
         DecodedJWT decoded = verifier.verify(token);
 
         UserDto user = authService.findByEmail(decoded.getIssuer());
@@ -101,5 +103,22 @@ public class UserAuthenticationProvider {
                 .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
 
         return user.getFirstName() + " " +user.getLastName();
+    }
+
+    public Optional<User> user(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secretKey);
+
+        JWTVerifier verifier = JWT.require(algorithm)
+                .build();
+
+        DecodedJWT decoded = verifier.verify(token);
+
+        return userRepository.findByEmail(decoded.getIssuer());
+    }
+
+    public Boolean isTokenValid(String token) {
+        return tokenRepository.findByToken(token)
+                .map(t -> !t.isExpired() && !t.isRevoked())
+                .orElse(false);
     }
 }

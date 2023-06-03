@@ -33,7 +33,7 @@ public class HouseService implements HouseInterface {
         if (optionalUser.isEmpty()){
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        Optional<House> optionalHouse = houseRepository.findByUserAndName(houseDto.getUser(), houseDto.getName());
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), houseDto.getName());
         if (optionalHouse.isPresent()) {
             throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
         }

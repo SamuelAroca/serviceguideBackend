@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.auth.interfaces.AuthInterface;
+import proyecto.web.serviceguideBackend.token.Token;
+import proyecto.web.serviceguideBackend.token.TokenRepository;
+import proyecto.web.serviceguideBackend.token.TokenType;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -21,12 +24,12 @@ public class AuthService implements AuthInterface {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final TokenRepository tokenRepository;
 
     @Override
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByEmail(credentialsDto.getEmail())
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
-
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
@@ -54,5 +57,29 @@ public class AuthService implements AuthInterface {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("Wrong email or password", HttpStatus.NOT_FOUND));
         return userMapper.toUserDto(user);
+    }
+
+    @Override
+    public void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    @Override
+    public void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
     }
 }
