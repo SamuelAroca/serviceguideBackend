@@ -3,7 +3,7 @@ package proyecto.web.serviceguideBackend.house.interfaces;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import proyecto.web.serviceguideBackend.house.House;
-import proyecto.web.serviceguideBackend.house.HouseDto;
+import proyecto.web.serviceguideBackend.house.dto.HouseDto;
 
 @Mapper(componentModel = "spring")
 public interface HouseMapper {

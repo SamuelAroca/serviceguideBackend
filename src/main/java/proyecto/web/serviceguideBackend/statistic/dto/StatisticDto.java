@@ -1,4 +1,4 @@
-package proyecto.web.serviceguideBackend.statistic;
+package proyecto.web.serviceguideBackend.statistic.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

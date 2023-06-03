@@ -2,7 +2,7 @@ package proyecto.web.serviceguideBackend.city.interfaces;
 
 import org.mapstruct.Mapper;
 import proyecto.web.serviceguideBackend.city.City;
-import proyecto.web.serviceguideBackend.city.CityDto;
+import proyecto.web.serviceguideBackend.city.dto.CityDto;
 
 @Mapper(componentModel = "spring")
 public interface CityMapper {

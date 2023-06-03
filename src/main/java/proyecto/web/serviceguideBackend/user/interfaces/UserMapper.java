@@ -2,7 +2,7 @@ package proyecto.web.serviceguideBackend.user.interfaces;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import proyecto.web.serviceguideBackend.auth.SignUpDto;
+import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
 

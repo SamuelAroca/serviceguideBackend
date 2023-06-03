@@ -1,4 +1,4 @@
-package proyecto.web.serviceguideBackend.house;
+package proyecto.web.serviceguideBackend.house.dto;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;

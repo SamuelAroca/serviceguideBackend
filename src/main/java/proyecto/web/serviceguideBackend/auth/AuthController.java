@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
+import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
 

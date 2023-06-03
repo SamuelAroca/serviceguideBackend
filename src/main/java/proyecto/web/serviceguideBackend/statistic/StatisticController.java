@@ -3,7 +3,9 @@ package proyecto.web.serviceguideBackend.statistic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import proyecto.web.serviceguideBackend.averageStatistic.StatisticAverageDto;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
+import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 
 import java.util.List;
 
@@ -47,6 +49,11 @@ public class StatisticController {
     @GetMapping("/getStatisticByMonth/{typeReceipt}/{startMonth}/{endMonth}/{receiptYear}/{token}")
     public ResponseEntity<StatisticAverageDto> getStatisticByMonth(@PathVariable String token, @PathVariable String typeReceipt, @PathVariable int startMonth, @PathVariable int endMonth, @PathVariable int receiptYear) {
         return ResponseEntity.ok(statisticService.getStatisticByMonth(token, typeReceipt, startMonth, endMonth, receiptYear));
+    }
+
+    @GetMapping("/getPercentage/{houseName}/{token}")
+    public ResponseEntity<PercentageStatisticDto> getPercentage(@PathVariable String token, @PathVariable String houseName){
+        return ResponseEntity.ok(statisticService.getPercentage(token, houseName));
     }
 
 }

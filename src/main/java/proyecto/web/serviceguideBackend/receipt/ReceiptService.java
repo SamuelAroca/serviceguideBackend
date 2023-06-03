@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.House;
+import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.house.HouseService;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;

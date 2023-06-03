@@ -1,5 +1,6 @@
-package proyecto.web.serviceguideBackend.auth;
+package proyecto.web.serviceguideBackend.city.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CredentialsDto {
+public class CityDto {
+
+    @Nullable
+    private Long id;
 
     @NotNull
-    private String email;
-
-    @NotNull
-    private char[] password;
+    private String city;
 
 }
