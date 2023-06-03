@@ -15,9 +15,9 @@ import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.emailpassword.dto.ChangePasswordDto;
 import proyecto.web.serviceguideBackend.emailpassword.dto.EmailValuesDto;
 import proyecto.web.serviceguideBackend.emailpassword.service.EmailService;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
-import proyecto.web.serviceguideBackend.services.UserService;
+import proyecto.web.serviceguideBackend.user.UserService;
 
 import java.util.Optional;
 import java.util.UUID;

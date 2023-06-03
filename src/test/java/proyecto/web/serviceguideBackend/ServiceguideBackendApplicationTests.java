@@ -6,11 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
+import proyecto.web.serviceguideBackend.auth.interfaces.AuthInterface;
+import proyecto.web.serviceguideBackend.auth.CredentialsDto;
+import proyecto.web.serviceguideBackend.auth.SignUpDto;
+import proyecto.web.serviceguideBackend.city.City;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.*;
-import proyecto.web.serviceguideBackend.entities.*;
-import proyecto.web.serviceguideBackend.repositories.UserRepository;
-import proyecto.web.serviceguideBackend.serviceInterface.*;
+import proyecto.web.serviceguideBackend.house.House;
+import proyecto.web.serviceguideBackend.house.HouseDto;
+import proyecto.web.serviceguideBackend.house.interfaces.HouseInterface;
+import proyecto.web.serviceguideBackend.receipt.Receipt;
+import proyecto.web.serviceguideBackend.receipt.ReceiptDto;
+import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
+import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
+import proyecto.web.serviceguideBackend.statistic.Statistic;
+import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
+import proyecto.web.serviceguideBackend.user.dto.UpdateUserDto;
+import proyecto.web.serviceguideBackend.user.User;
+import proyecto.web.serviceguideBackend.user.dto.UserDto;
+import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
+import proyecto.web.serviceguideBackend.user.interfaces.UserInterface;
 
 import java.util.*;
 
@@ -54,7 +69,7 @@ class ServiceguideBackendApplicationTests {
         signUpDto.setEmail("prueba@gmail.com");
         signUpDto.setPassword("prueba123".toCharArray());
 
-        UserDto registeredUser = userInterface.register(signUpDto);
+        UserDto registeredUser = authInterface.register(signUpDto);
 
         Assertions.assertNotNull(registeredUser.getId());
         Assertions.assertEquals(signUpDto.getEmail(), registeredUser.getEmail());
@@ -68,7 +83,7 @@ class ServiceguideBackendApplicationTests {
 
         CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
 
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
 
         Assertions.assertNotNull(userDto);
         Assertions.assertEquals("prueba@gmail.com", userDto.getEmail());
@@ -89,7 +104,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testUserUpdateUser() {
         CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
         String token = userDto.getToken();
 
@@ -112,7 +127,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testHouseNewHouse() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -147,7 +162,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testHouseFindByUserAndName() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -163,7 +178,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testHouseUpdateHouse() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -196,7 +211,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testHouseGetHouseName() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -220,7 +235,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testReceiptsNewReceipt() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -256,7 +271,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testReceiptsAllReceiptsByUserId() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -270,7 +285,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testReceiptsGetLastReceipt() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -286,7 +301,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testReceiptUpdateReceipt() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -324,7 +339,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testReceiptGetAllReceiptsByType() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         String token = userDto.getToken();
@@ -363,7 +378,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testReceiptDeleteReceipt() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         Long idReceipt = receiptInterface.findIdByName("Recibo Test Update ._@");
@@ -378,7 +393,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testHouseDeleteHouse() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
         Long idHouse = houseInterface.findIdByName("Casa Prueba Update @._");
@@ -394,7 +409,7 @@ class ServiceguideBackendApplicationTests {
     @Test
     void testUserDelete() {
         CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        UserDto userDto = userInterface.login(credentialsDto);
+        UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
         String token = userDto.getToken();
 

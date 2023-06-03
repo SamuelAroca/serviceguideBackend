@@ -11,11 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import proyecto.web.serviceguideBackend.dto.UserDto;
-import proyecto.web.serviceguideBackend.entities.User;
+import proyecto.web.serviceguideBackend.user.dto.UserDto;
+import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
-import proyecto.web.serviceguideBackend.repositories.UserRepository;
-import proyecto.web.serviceguideBackend.services.AuthService;
+import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
+import proyecto.web.serviceguideBackend.auth.AuthService;
 
 import java.util.Base64;
 import java.util.Collections;
