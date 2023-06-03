@@ -1,6 +1,6 @@
 package proyecto.web.serviceguideBackend.city.interfaces;
 
-import proyecto.web.serviceguideBackend.city.CityDto;
+import proyecto.web.serviceguideBackend.city.dto.CityDto;
 import proyecto.web.serviceguideBackend.city.City;
 
 import java.util.Collection;

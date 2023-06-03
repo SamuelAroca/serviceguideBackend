@@ -1,4 +1,4 @@
-package proyecto.web.serviceguideBackend.averageStatistic;
+package proyecto.web.serviceguideBackend.averageStatistic.dto;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;

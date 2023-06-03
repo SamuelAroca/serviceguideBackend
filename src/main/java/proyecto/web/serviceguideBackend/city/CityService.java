@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.city;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import proyecto.web.serviceguideBackend.city.dto.CityDto;
 import proyecto.web.serviceguideBackend.city.interfaces.CityInterface;
 import proyecto.web.serviceguideBackend.city.interfaces.CityMapper;
 import proyecto.web.serviceguideBackend.city.interfaces.CityRepository;

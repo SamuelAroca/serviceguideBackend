@@ -2,7 +2,7 @@ package proyecto.web.serviceguideBackend.receipt.interfaces;
 
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
-import proyecto.web.serviceguideBackend.receipt.ReceiptDto;
+import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +23,6 @@ public interface ReceiptInterface {
     Long getTwoReceiptById(Long idReceipt);
     Long findIdByName(String name);
     Collection<Receipt> getAllReceiptsByHouse(String token, String houseName);
-
     Collection<Receipt> getReceiptByHouse(String houseName);
 
 }

@@ -1,4 +1,4 @@
-package proyecto.web.serviceguideBackend.receipt;
+package proyecto.web.serviceguideBackend.receipt.dto;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;

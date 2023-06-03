@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
+import proyecto.web.serviceguideBackend.house.dto.HouseDto;
 
 import java.net.URI;
 import java.util.Collection;

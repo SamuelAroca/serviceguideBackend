@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.city.City;
+import proyecto.web.serviceguideBackend.house.dto.HouseDto;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseInterface;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseMapper;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;

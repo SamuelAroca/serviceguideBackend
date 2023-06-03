@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import proyecto.web.serviceguideBackend.dto.Message;
-import proyecto.web.serviceguideBackend.auth.SignUpDto;
+import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.user.dto.UpdateUserDto;
 import proyecto.web.serviceguideBackend.user.dto.UserLoadDto;
 

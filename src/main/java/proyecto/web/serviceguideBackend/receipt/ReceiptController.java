@@ -6,10 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
-import proyecto.web.serviceguideBackend.receipt.ReceiptDto;
-import proyecto.web.serviceguideBackend.receipt.Receipt;
+import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
-import proyecto.web.serviceguideBackend.receipt.ReceiptService;
 import proyecto.web.serviceguideBackend.statistic.StatisticService;
 
 import java.net.URI;

@@ -1,8 +1,9 @@
 package proyecto.web.serviceguideBackend.statistic.interfaces;
 
-import proyecto.web.serviceguideBackend.averageStatistic.StatisticAverageDto;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.statistic.Statistic;
-import proyecto.web.serviceguideBackend.statistic.StatisticDto;
+import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 
 import java.util.List;
 
@@ -15,4 +16,5 @@ public interface StatisticInterface {
     StatisticAverageDto getStatisticByQuarter(String token, String type, int quarter, int year);
     StatisticAverageDto getStatisticBySemester(String token, String typeReceipt, int semester, int receiptYear);
     StatisticAverageDto getStatisticByMonth(String token, String typeReceipt, int startMonth, int endMonth, int receiptYear);
+    PercentageStatisticDto getPercentage(String token, String houseName);
 }

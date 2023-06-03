@@ -1,4 +1,4 @@
-package proyecto.web.serviceguideBackend.auth;
+package proyecto.web.serviceguideBackend.auth.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;

@@ -5,13 +5,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.averageStatistic.AverageStatistic;
 import proyecto.web.serviceguideBackend.averageStatistic.AverageStatisticRepository;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
-import proyecto.web.serviceguideBackend.averageStatistic.StatisticAverageDto;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
+import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticMapper;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticRepository;
@@ -20,9 +22,11 @@ import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticTypeRep
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -331,6 +335,73 @@ public class StatisticService implements StatisticInterface {
         statisticAverageDto.setYear(yearString);
 
         return statisticAverageDto;
+    }
+
+    private boolean isSameMonth(Calendar calendar1, Date date2) {
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+
+        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
+                calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH);
+    }
+
+    @Override
+    public PercentageStatisticDto getPercentage(String token, String houseName) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getAllReceiptsByHouse(idUser, houseName);
+
+        // Obtener la fecha del último mes ingresado en la base de datos
+        Date lastMonth = new Date(Long.MIN_VALUE);
+        for (Receipt receipt : receipts) {
+            Date receiptDate = receipt.getDate();
+            if (receiptDate.after(lastMonth)) {
+                lastMonth = receiptDate;
+            }
+        }
+
+        // Calcular el mes anterior al último mes
+        Calendar previousMonthCalendar = Calendar.getInstance();
+        previousMonthCalendar.setTime(lastMonth);
+        previousMonthCalendar.add(Calendar.MONTH, -1);
+        Date previousMonth = previousMonthCalendar.getTime();
+
+        // Calcular la suma de los precios del último mes y el mes anterior
+        Double sumLastMonth = 0D;
+        Double sumPreviousMonth = 0D;
+
+        for (Receipt receipt : receipts) {
+            Date receiptDate = receipt.getDate();
+            Calendar receiptCalendar = Calendar.getInstance();
+            receiptCalendar.setTime(receiptDate);
+
+            if (isSameMonth(receiptCalendar, lastMonth)) {
+                sumLastMonth += receipt.getPrice();
+            } else if (isSameMonth(receiptCalendar, previousMonth)) {
+                sumPreviousMonth += receipt.getPrice();
+            }
+        }
+
+        Double difference;
+        if (sumLastMonth == 0D || sumPreviousMonth == 0D) {
+            difference = 0D;
+        } else {
+            difference = sumPreviousMonth - sumLastMonth;
+        }
+
+        Double percentage;
+        if (sumPreviousMonth == 0.0) {
+            percentage = 0.0;
+        } else {
+            percentage = Math.abs((difference / sumPreviousMonth) * 100);
+        }
+
+        PercentageStatisticDto percentageStatisticDto = new PercentageStatisticDto();
+        percentageStatisticDto.setSumLastMonth(sumPreviousMonth);
+        percentageStatisticDto.setSumCurrentMonth(sumLastMonth);
+        percentageStatisticDto.setDifference(difference);
+        percentageStatisticDto.setPercentage(percentage);
+
+        return percentageStatisticDto;
     }
 
 }

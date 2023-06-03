@@ -2,7 +2,7 @@ package proyecto.web.serviceguideBackend.house.interfaces;
 
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.House;
-import proyecto.web.serviceguideBackend.house.HouseDto;
+import proyecto.web.serviceguideBackend.house.dto.HouseDto;
 
 import java.util.Collection;
 import java.util.Optional;
