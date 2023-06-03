@@ -2,11 +2,9 @@ package proyecto.web.serviceguideBackend.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import proyecto.web.serviceguideBackend.house.House;
+import proyecto.web.serviceguideBackend.token.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User {
@@ -44,34 +43,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<House> house = new ArrayList<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Token> tokens;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setTokenPassword(String tokenPassword) {
-        this.tokenPassword = tokenPassword;
-    }
-
-    public void setHouse(List<House> houses) {
-        this.house = houses;
-        for (House house : houses) {
-            house.setUser(this);
-        }
-    }
 }
