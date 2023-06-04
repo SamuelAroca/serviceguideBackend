@@ -1,17 +1,27 @@
 package proyecto.web.serviceguideBackend.user.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class UpdateUserDto {
 
-    private String message;
-    private HttpStatus status;
-    private String token;
+    @NotEmpty
+    private String firstName;
+
+    @NotEmpty
+    private String lastName;
+
+    @NotEmpty
+    private String email;
+
+    private char[] password;
 
 }
