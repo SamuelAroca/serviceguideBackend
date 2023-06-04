@@ -20,8 +20,6 @@ public class SecurityConfig {
 
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
     private final UserAuthenticationProvider userAuthenticationProvider;
-    private final LogoutHandler logoutHandler;
-    private final LogoutService logoutService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,13 +34,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register", "/api/email/send-email", "/api/email/change-password").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/email/send-email").permitAll()
                         .anyRequest().authenticated())
-                .logout()
-                .logoutUrl("/api/users/auth/logout")
-                .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler(((request, response, authentication) -> {
-                    logoutService.logout(request, response, authentication); // Llamamos al método logout del servicio
-                    SecurityContextHolder.clearContext();
-                }))
         ;
         return http.build();
     }
