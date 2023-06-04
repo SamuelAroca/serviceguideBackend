@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import proyecto.web.serviceguideBackend.token.TokenRepository;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -32,7 +31,6 @@ public class UserAuthenticationProvider {
 
     private final AuthService authService;
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
 
     @PostConstruct
     protected void init() {
@@ -114,11 +112,5 @@ public class UserAuthenticationProvider {
         DecodedJWT decoded = verifier.verify(token);
 
         return userRepository.findByEmail(decoded.getIssuer());
-    }
-
-    public Boolean isTokenValid(String token) {
-        return tokenRepository.findByToken(token)
-                .map(t -> !t.isExpired() && !t.isRevoked())
-                .orElse(false);
     }
 }

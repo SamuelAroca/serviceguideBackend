@@ -10,7 +10,5 @@ public interface AuthInterface {
     UserDto login(CredentialsDto credentialsDto);
     UserDto register(SignUpDto userDto);
     UserDto findByEmail(String email);
-    void saveUserToken(User user, String jwtToken);
-    void revokeAllUserTokens(User user);
 
 }
