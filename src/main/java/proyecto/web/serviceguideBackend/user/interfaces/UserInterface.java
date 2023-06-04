@@ -1,6 +1,5 @@
 package proyecto.web.serviceguideBackend.user.interfaces;
 
-import proyecto.web.serviceguideBackend.auth.SignUpDto;
 import proyecto.web.serviceguideBackend.dto.*;
 import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;
 import proyecto.web.serviceguideBackend.user.User;
