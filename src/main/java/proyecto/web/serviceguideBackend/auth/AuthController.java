@@ -73,4 +73,9 @@ public class AuthController {
     public ResponseEntity<String> myName(@PathVariable String token) {
         return ResponseEntity.ok(userAuthenticationProvider.myName(token));
     }
+
+    @GetMapping("/logout")
+    public String logout() {
+        return "Logout";
+    }
 }

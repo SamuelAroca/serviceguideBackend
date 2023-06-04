@@ -8,6 +8,7 @@ import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.*;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
+import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;
 import proyecto.web.serviceguideBackend.user.dto.UpdateUserDto;
 import proyecto.web.serviceguideBackend.user.dto.UserLoadDto;
 import proyecto.web.serviceguideBackend.user.interfaces.UserInterface;
@@ -30,7 +31,7 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Optional<UpdateUserDto> updateUser(SignUpDto updateUser, String token) {
+    public Optional<UpdateResponse> updateUser(UpdateUserDto updateUser, String token) {
         Long id = authenticationProvider.whoIsMyId(token);
         return Optional.ofNullable(userRepository.findById(id)
                 .map(user -> {
@@ -43,7 +44,7 @@ public class UserService implements UserInterface {
                             user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
                             userRepository.save(user);
                             String newToken = authenticationProvider.createToken(updateUser.getEmail());
-                            return new UpdateUserDto("User updated", HttpStatus.OK, newToken);
+                            return new UpdateResponse("User updated", HttpStatus.OK, newToken);
                         }
                         throw new AppException("Email already exist", HttpStatus.INTERNAL_SERVER_ERROR);
                     }
@@ -53,7 +54,7 @@ public class UserService implements UserInterface {
                     user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
                     userRepository.save(user);
                     String newToken = authenticationProvider.createToken(updateUser.getEmail());
-                    return new UpdateUserDto("User updated", HttpStatus.OK, newToken);
+                    return new UpdateResponse("User updated", HttpStatus.OK, newToken);
                 }).orElseThrow(() -> new AppException("Username does not exist", HttpStatus.NOT_FOUND)));
     }
 

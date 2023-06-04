@@ -21,6 +21,7 @@ import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.statistic.Statistic;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
+import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;
 import proyecto.web.serviceguideBackend.user.dto.UpdateUserDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
@@ -108,13 +109,13 @@ class ServiceguideBackendApplicationTests {
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
         String token = userDto.getToken();
 
-        SignUpDto updateUserDto = new SignUpDto();
+        UpdateUserDto updateUserDto = new UpdateUserDto();
         updateUserDto.setFirstName("Prueba Update");
         updateUserDto.setLastName("Test Update");
         updateUserDto.setEmail("pruebaUPDATE@gmail.com");
         updateUserDto.setPassword("prueba123".toCharArray());
 
-        Optional<UpdateUserDto> updatedUserDto = userInterface.updateUser(updateUserDto, token);
+        Optional<UpdateResponse> updatedUserDto = userInterface.updateUser(updateUserDto, token);
         Assertions.assertEquals("User updated", updatedUserDto.get().getMessage());
 
         User updatedUser = userRepository.findByEmail(updateUserDto.getEmail()).orElse(null);
