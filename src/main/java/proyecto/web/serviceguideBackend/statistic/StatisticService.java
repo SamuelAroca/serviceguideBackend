@@ -337,55 +337,66 @@ public class StatisticService implements StatisticInterface {
         return statisticAverageDto;
     }
 
-    private boolean isSameMonth(Calendar calendar1, Date date2) {
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.setTime(date2);
-
-        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
-                calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH);
-    }
-
     @Override
     public PercentageStatisticDto getPercentage(String token, String houseName) {
         Long idUser = authenticationProvider.whoIsMyId(token);
         Collection<Receipt> receipts = receiptRepository.getAllReceiptsByHouse(idUser, houseName);
 
+        // Obtener la fecha actual
+        Calendar currentMonthCalendar = Calendar.getInstance();
+        currentMonthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+        currentMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        currentMonthCalendar.set(Calendar.MINUTE, 0);
+        currentMonthCalendar.set(Calendar.SECOND, 0);
+        currentMonthCalendar.set(Calendar.MILLISECOND, 0);
+
         // Obtener la fecha del último mes ingresado en la base de datos
-        Date lastMonth = new Date(Long.MIN_VALUE);
-        for (Receipt receipt : receipts) {
-            Date receiptDate = receipt.getDate();
-            if (receiptDate.after(lastMonth)) {
-                lastMonth = receiptDate;
-            }
-        }
+        Calendar lastMonthCalendar = (Calendar) currentMonthCalendar.clone();
+        lastMonthCalendar.add(Calendar.MONTH, -1);
 
-        // Calcular el mes anterior al último mes
-        Calendar previousMonthCalendar = Calendar.getInstance();
-        previousMonthCalendar.setTime(lastMonth);
-        previousMonthCalendar.add(Calendar.MONTH, -1);
-        Date previousMonth = previousMonthCalendar.getTime();
+        // Crear listas para almacenar los recibos del último mes y el mes anterior
+        List<Receipt> lastMonthReceipts = new ArrayList<>();
+        List<Receipt> previousMonthReceipts = new ArrayList<>();
 
-        // Calcular la suma de los precios del último mes y el mes anterior
-        Double sumLastMonth = 0D;
-        Double sumPreviousMonth = 0D;
-
+        // Clasificar los recibos según su fecha en las listas correspondientes
         for (Receipt receipt : receipts) {
             Date receiptDate = receipt.getDate();
             Calendar receiptCalendar = Calendar.getInstance();
             receiptCalendar.setTime(receiptDate);
 
-            if (isSameMonth(receiptCalendar, lastMonth)) {
-                sumLastMonth += receipt.getPrice();
-            } else if (isSameMonth(receiptCalendar, previousMonth)) {
-                sumPreviousMonth += receipt.getPrice();
+            // Establecer la hora, minuto, segundo y milisegundo en cero
+            receiptCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            receiptCalendar.set(Calendar.MINUTE, 0);
+            receiptCalendar.set(Calendar.SECOND, 0);
+            receiptCalendar.set(Calendar.MILLISECOND, 0);
+
+            // Comparar la fecha del recibo con la fecha del último mes
+            if (receiptCalendar.get(Calendar.YEAR) == lastMonthCalendar.get(Calendar.YEAR)
+                    && receiptCalendar.get(Calendar.MONTH) == lastMonthCalendar.get(Calendar.MONTH)) {
+                lastMonthReceipts.add(receipt);
+            } else if (receiptCalendar.get(Calendar.YEAR) == lastMonthCalendar.get(Calendar.YEAR)
+                    && receiptCalendar.get(Calendar.MONTH) == lastMonthCalendar.get(Calendar.MONTH) - 1) {
+                previousMonthReceipts.add(receipt);
             }
         }
 
+        // Calcular la suma de los precios del último mes y el mes anterior
+        Double sumLastMonth = 0D;
+        for (Receipt receipt : lastMonthReceipts) {
+            sumLastMonth += receipt.getPrice();
+        }
+
+        Double sumPreviousMonth = 0D;
+        for (Receipt receipt : previousMonthReceipts) {
+            sumPreviousMonth += receipt.getPrice();
+        }
+
+        // Calcular la diferencia y el porcentaje
         Double difference;
         if (sumLastMonth == 0D || sumPreviousMonth == 0D) {
             difference = 0D;
         } else {
-            difference = sumPreviousMonth - sumLastMonth;
+            difference = sumLastMonth - sumPreviousMonth;
         }
 
         Double percentage;
@@ -396,8 +407,8 @@ public class StatisticService implements StatisticInterface {
         }
 
         PercentageStatisticDto percentageStatisticDto = new PercentageStatisticDto();
-        percentageStatisticDto.setSumLastMonth(sumPreviousMonth);
-        percentageStatisticDto.setSumCurrentMonth(sumLastMonth);
+        percentageStatisticDto.setSumLastMonth(sumLastMonth);
+        percentageStatisticDto.setSumCurrentMonth(sumPreviousMonth);
         percentageStatisticDto.setDifference(difference);
         percentageStatisticDto.setPercentage(percentage);
 
