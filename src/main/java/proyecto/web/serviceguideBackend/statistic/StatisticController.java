@@ -56,4 +56,10 @@ public class StatisticController {
         return ResponseEntity.ok(statisticService.getPercentage(token, houseName));
     }
 
+    @GetMapping("/sumStatisticByType/{houseName}/{token}")
+    public ResponseEntity<double[]> sumStatisticByType(@PathVariable String token, @PathVariable String houseName){
+        double[] sums = statisticService.sumStatisticByType(token, houseName);
+        return ResponseEntity.ok(sums);
+    }
+
 }

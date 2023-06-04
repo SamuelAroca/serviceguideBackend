@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.averageStatistic.AverageStatistic;
 import proyecto.web.serviceguideBackend.averageStatistic.AverageStatisticRepository;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
+import proyecto.web.serviceguideBackend.averageStatistic.dto.SumStatisticDto;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -336,6 +337,52 @@ public class StatisticService implements StatisticInterface {
 
         return statisticAverageDto;
     }
+
+    @Override
+    public double[] sumStatisticByType(String token, String house) {
+        Long idUser = authenticationProvider.whoIsMyId(token);
+        Collection<Receipt> receipts = receiptRepository.getAllReceiptsByHouse(idUser, house);
+
+        if (receipts.isEmpty()) {
+            throw new AppException("No se encontraron recibos", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), house);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+
+        double waterSum = 0;
+        double energySum = 0;
+        double gasSum = 0;
+        double sewerageSum = 0;
+
+        for (Receipt receipt : receipts) {
+            double receiptAmount = receipt.getAmount().doubleValue();
+            String typeServiceName = receipt.getTypeService().getType();
+
+            if (typeServiceName.equals("WATER")) {
+                waterSum += receiptAmount;
+            } else if (typeServiceName.equals("ENERGY")) {
+                energySum += receiptAmount;
+            } else if (typeServiceName.equals("GAS")) {
+                gasSum += receiptAmount;
+            } else if (typeServiceName.equals("SEWERAGE")) {
+                sewerageSum += receiptAmount;
+            }
+        }
+
+        // Crear un array de double y almacenar las sumas por tipo
+        double[] sumStatistics = { waterSum, energySum, gasSum, sewerageSum };
+
+        return sumStatistics;
+    }
+
 
     @Override
     public PercentageStatisticDto getPercentage(String token, String houseName) {
