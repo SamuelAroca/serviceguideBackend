@@ -34,8 +34,6 @@ public class AuthController {
         if (optionalUser.isEmpty()) {
             throw new AppException("Algo salió mal", HttpStatus.BAD_REQUEST);
         }
-        authService.revokeAllUserTokens(optionalUser.get());
-        authService.saveUserToken(optionalUser.get(), token);
         return ResponseEntity.ok(userDto);
     }
 
@@ -50,7 +48,6 @@ public class AuthController {
         if (findUSer.isEmpty()) {
             throw new AppException("Algo salió mal", HttpStatus.BAD_REQUEST);
         }
-        authService.saveUserToken(findUSer.get(), token);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdUser.getId()).toUri();

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import proyecto.web.serviceguideBackend.house.House;
-import proyecto.web.serviceguideBackend.token.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +41,5 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<House> house = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Token> tokens;
 
 }
