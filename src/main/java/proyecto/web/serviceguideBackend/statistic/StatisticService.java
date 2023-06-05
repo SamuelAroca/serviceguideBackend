@@ -480,13 +480,14 @@ public class StatisticService implements StatisticInterface {
         Set<Integer> uniqueNumbers = new HashSet<>(months);
         List<Integer> numbersWithoutDuplicates = new ArrayList<>(uniqueNumbers);
         numbersWithoutDuplicates.sort(Collections.reverseOrder());
+        System.out.println(numbersWithoutDuplicates);
         double sumPriceLatest = 0D;
         double sumPriceLast = 0D;
         double percentage;
         double difference;
-        for (int i = 0; i < months.size() && i < 2; i++) {
-            System.out.println(months.get(i));
-            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, months.get(i));
+        for (int i = 0; i < numbersWithoutDuplicates.size() && i < 2; i++) {
+            System.out.println(numbersWithoutDuplicates.get(i));
+            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, numbersWithoutDuplicates.get(i));
             for (Receipt receipt : list) {
                 if (i == 0) {
                     sumPriceLatest += receipt.getPrice();
