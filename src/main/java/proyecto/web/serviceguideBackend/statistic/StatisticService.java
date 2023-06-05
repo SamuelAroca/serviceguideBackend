@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.statistic;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
 import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
+import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticMapper;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticRepository;
@@ -23,11 +25,8 @@ import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticTypeRep
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -462,4 +461,45 @@ public class StatisticService implements StatisticInterface {
         return percentageStatisticDto;
     }
 
+    @Override
+    public SumOfReceiptDto sumOfReceiptDto(Long idHouse) {
+        Optional<House> optionalHouse = houseRepository.findById(idHouse);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("Casa no encontrada", HttpStatus.NOT_FOUND);
+        }
+        Collection<Receipt> receiptList = receiptRepository.findByHouse(optionalHouse.get());
+        List<Integer> months = new ArrayList<>();
+        for (Receipt receipt : receiptList) {
+            Date receiptDate = receipt.getDate();
+            java.util.Date utilDate = new java.util.Date(receiptDate.getTime());
+            Instant instant = utilDate.toInstant();
+            LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+            int latestMonth = localDate.getMonthValue();
+            months.add(latestMonth);
+        }
+        months.sort(Collections.reverseOrder());
+        double sumPriceLatest = 0D;
+        double sumPriceLast = 0D;
+        double percentage;
+        double difference;
+        for (int i = 0; i < months.size() && i < 2; i++) {
+            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, months.get(i));
+            for (Receipt receipt : list) {
+                if (i == 0) {
+                    sumPriceLatest += receipt.getPrice();
+                } else {
+                    sumPriceLast += receipt.getPrice();
+                }
+            }
+        }
+        difference = sumPriceLatest - sumPriceLast;
+        percentage = (difference/sumPriceLast) * 100;
+        SumOfReceiptDto sumOfReceiptDto = new SumOfReceiptDto();
+        sumOfReceiptDto.setSumMonth((float) sumPriceLatest);
+        sumOfReceiptDto.setDifference((float) difference);
+        sumOfReceiptDto.setLastSumMonth((float) sumPriceLast);
+        sumOfReceiptDto.setPercentage((float) percentage);
+
+        return sumOfReceiptDto;
+    }
 }

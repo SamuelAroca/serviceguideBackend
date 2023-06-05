@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
+import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
 
 import java.util.List;
 
@@ -62,4 +63,8 @@ public class StatisticController {
         return ResponseEntity.ok(sums);
     }
 
+    @GetMapping("/informationReceipt/{idHouse}")
+    public ResponseEntity<SumOfReceiptDto> informationReceipt(@PathVariable Long idHouse) {
+        return ResponseEntity.ok(statisticService.sumOfReceiptDto(idHouse));
+    }
 }

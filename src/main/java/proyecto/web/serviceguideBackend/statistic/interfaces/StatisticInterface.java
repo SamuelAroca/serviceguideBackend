@@ -5,6 +5,7 @@ import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto
 import proyecto.web.serviceguideBackend.averageStatistic.dto.SumStatisticDto;
 import proyecto.web.serviceguideBackend.statistic.Statistic;
 import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
+import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
 
 import java.util.List;
 
@@ -19,4 +20,5 @@ public interface StatisticInterface {
     StatisticAverageDto getStatisticByMonth(String token, String typeReceipt, int startMonth, int endMonth, int receiptYear);
     double[] sumStatisticByType(String token, String house);
     PercentageStatisticDto getPercentage(String token, String houseName);
+    SumOfReceiptDto sumOfReceiptDto(Long idHouse);
 }
