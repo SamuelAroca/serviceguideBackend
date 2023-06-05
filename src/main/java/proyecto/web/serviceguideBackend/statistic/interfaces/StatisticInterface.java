@@ -2,7 +2,6 @@ package proyecto.web.serviceguideBackend.statistic.interfaces;
 
 import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
-import proyecto.web.serviceguideBackend.averageStatistic.dto.SumStatisticDto;
 import proyecto.web.serviceguideBackend.statistic.Statistic;
 import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
@@ -21,4 +20,5 @@ public interface StatisticInterface {
     double[] sumStatisticByType(String token, String house);
     PercentageStatisticDto getPercentage(String token, String houseName);
     SumOfReceiptDto sumOfReceiptDto(Long idHouse);
+
 }

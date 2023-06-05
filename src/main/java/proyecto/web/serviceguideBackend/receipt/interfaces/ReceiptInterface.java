@@ -13,7 +13,6 @@ public interface ReceiptInterface {
     ReceiptDto newReceipt(ReceiptDto receiptDto, String token);
     Collection<Receipt> findByHouse(String house, String token);
     Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, String token);
-    List<List<Receipt>> findAllByUserId(String token);
     List<Receipt> allReceiptsByUserId(String token);
     Optional<Receipt> findById(Long id);
     Optional<Receipt> getLastReceipt(String token);

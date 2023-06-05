@@ -38,4 +38,5 @@ public class HouseDto {
 
     @Nullable
     private User user;
+
 }

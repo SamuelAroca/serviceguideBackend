@@ -1,13 +1,11 @@
 package proyecto.web.serviceguideBackend.statistic;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.averageStatistic.AverageStatistic;
 import proyecto.web.serviceguideBackend.averageStatistic.AverageStatisticRepository;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.PercentageStatisticDto;
-import proyecto.web.serviceguideBackend.averageStatistic.dto.SumStatisticDto;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.averageStatistic.dto.StatisticAverageDto;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -195,9 +193,7 @@ public class StatisticService implements StatisticInterface {
                 System.out.println("El promedio de la cantidad ha disminuido");
             }
         }
-
         return statisticAverageDto;
-
     }
 
     @Override
@@ -381,7 +377,6 @@ public class StatisticService implements StatisticInterface {
 
         return sumStatistics;
     }
-
 
     @Override
     public PercentageStatisticDto getPercentage(String token, String houseName) {

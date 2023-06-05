@@ -14,4 +14,5 @@ public interface HouseMapper {
 
     @Mapping(target = "receipts", ignore = true)
     House newHouse(HouseDto houseDto);
+
 }

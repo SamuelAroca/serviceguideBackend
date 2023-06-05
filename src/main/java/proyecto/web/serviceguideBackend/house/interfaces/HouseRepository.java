@@ -13,8 +13,6 @@ public interface HouseRepository extends JpaRepository<House, Long> {
 
     Collection<House> findAllByUserOrderById(@NotNull User user);
     Optional<House> findByUserAndName(@NotNull User user, @NotNull String name);
-    Collection<House> findByUser(@NotNull User user);
-
     @Query(value = "select h.name from House h inner join User u on h.user.id = u.id where u.id = ?1")
     Collection<String> getHouseName(Long id);
     @Query(value = "select h.id from House h where h.name = ?1")

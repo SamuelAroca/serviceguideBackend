@@ -21,4 +21,5 @@ public class StatisticType {
 
     @Column(name = "type")
     private String type;
+
 }

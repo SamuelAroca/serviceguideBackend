@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface StatisticTypeRepository extends JpaRepository<StatisticType, Long> {
 
     Optional<StatisticType> findByTypeIgnoreCase(String type);
+
 }

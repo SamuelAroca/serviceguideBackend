@@ -21,4 +21,5 @@ public class SumStatisticDto {
 
     @NotNull
     private Double sewerageSum;
+
 }

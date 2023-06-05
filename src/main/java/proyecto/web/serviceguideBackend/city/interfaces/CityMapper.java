@@ -12,4 +12,5 @@ public interface CityMapper {
     CityDto colombianCitiesDto(City city);
 
     City colombianCities(CityDto cityDto);
+
 }

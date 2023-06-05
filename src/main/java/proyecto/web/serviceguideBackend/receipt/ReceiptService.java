@@ -101,21 +101,6 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public List<List<Receipt>> findAllByUserId(String token) {
-        Long user = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(user);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        Collection<House> optionalHouse = houseRepository.findByUser(optionalUser.get());
-        List<List<Receipt>> receipts = new ArrayList<>();
-        for(House house: optionalHouse) {
-            receipts.add(house.getReceipts());
-        }
-        return receipts;
-    }
-
-    @Override
     public List<Receipt> allReceiptsByUserId(String token) {
         Long id = authenticationProvider.whoIsMyId(token);
         return receiptRepository.getReceiptByUser(id);
