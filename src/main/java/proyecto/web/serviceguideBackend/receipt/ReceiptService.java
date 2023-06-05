@@ -140,6 +140,17 @@ public class ReceiptService implements ReceiptInterface {
                     }
                     Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(), optionalTypeService.get());
                     if (optionalReceipt.isPresent()) {
+                        if (optionalReceipt.get().getReceiptName().equals(receiptDto.getReceiptName())) {
+                            receipt.setReceiptName(receiptDto.getReceiptName());
+                            receipt.setPrice(receiptDto.getPrice());
+                            receipt.setAmount(receiptDto.getAmount());
+                            receipt.setDate(receiptDto.getDate());
+                            receipt.setTypeService(optionalTypeService.get());
+                            receipt.setHouse(optionalHouse.get());
+                            receipt.setHouseName(optionalHouse.get().getName());
+                            receiptRepository.save(receipt);
+                            return new Message("Receipt Updated successfully", HttpStatus.OK);
+                        }
                         throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
                     }
                     receipt.setReceiptName(receiptDto.getReceiptName());
@@ -148,6 +159,7 @@ public class ReceiptService implements ReceiptInterface {
                     receipt.setDate(receiptDto.getDate());
                     receipt.setTypeService(optionalTypeService.get());
                     receipt.setHouse(optionalHouse.get());
+                    receipt.setHouseName(optionalHouse.get().getName());
                     receiptRepository.save(receipt);
                     return new Message("Receipt Updated successfully", HttpStatus.OK);
                 }).orElseThrow(() -> new AppException("Receipt not found", HttpStatus.NOT_FOUND)));

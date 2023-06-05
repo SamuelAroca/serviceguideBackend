@@ -98,6 +98,20 @@ public class HouseService implements HouseInterface {
                     }
                     Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), houseDto.getName());
                     if (optionalHouse.isPresent()) {
+                        if (optionalHouse.get().getName().equals(houseDto.getName())) {
+                            Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
+                            if (optionalColombianCities.isEmpty()) {
+                                throw new AppException("City not found", HttpStatus.NOT_FOUND);
+                            }
+                            house.setName(houseDto.getName());
+                            house.setStratum(houseDto.getStratum());
+                            house.setNeighborhood(houseDto.getNeighborhood());
+                            house.setAddress(houseDto.getAddress());
+                            house.setContract(houseDto.getContract());
+                            house.setCities(optionalColombianCities.get());
+                            houseRepository.save(house);
+                            return new Message("House Updated successfully", HttpStatus.OK);
+                        }
                         throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
                     }
                     Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
