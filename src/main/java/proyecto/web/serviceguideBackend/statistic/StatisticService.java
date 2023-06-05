@@ -496,12 +496,13 @@ public class StatisticService implements StatisticInterface {
                 }
             }
         }
-        difference = sumPriceLatest - sumPriceLast;
+        difference = sumPriceLast - sumPriceLatest;
+        System.out.println(difference);
         percentage = (difference/sumPriceLast) * 100;
         SumOfReceiptDto sumOfReceiptDto = new SumOfReceiptDto();
-        sumOfReceiptDto.setSumMonth((float) sumPriceLast);
+        sumOfReceiptDto.setSumMonth((float) sumPriceLatest);
         sumOfReceiptDto.setDifference((float) difference);
-        sumOfReceiptDto.setLastSumMonth((float) sumPriceLatest);
+        sumOfReceiptDto.setLastSumMonth((float) sumPriceLast);
         sumOfReceiptDto.setPercentage((float) percentage);
 
         return sumOfReceiptDto;
