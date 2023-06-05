@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.user.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class UpdateUserDto {
     @NotEmpty
     private String email;
 
+    @Nullable
     private char[] password;
 
 }

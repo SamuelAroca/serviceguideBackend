@@ -40,7 +40,9 @@ public class UserService implements UserInterface {
                             user.setFirstName(updateUser.getFirstName());
                             user.setLastName(updateUser.getLastName());
                             user.setEmail(updateUser.getEmail());
-                            user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
+                            if (updateUser.getPassword() != null) {
+                                user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
+                            }
                             userRepository.save(user);
                             String newToken = authenticationProvider.createToken(updateUser.getEmail());
                             return new UpdateResponse("User updated", HttpStatus.OK, newToken);
@@ -50,7 +52,9 @@ public class UserService implements UserInterface {
                     user.setFirstName(updateUser.getFirstName());
                     user.setLastName(updateUser.getLastName());
                     user.setEmail(updateUser.getEmail());
-                    user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
+                    if (updateUser.getPassword() != null) {
+                        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
+                    }
                     userRepository.save(user);
                     String newToken = authenticationProvider.createToken(updateUser.getEmail());
                     return new UpdateResponse("User updated", HttpStatus.OK, newToken);
