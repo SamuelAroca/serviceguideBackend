@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   myapp:
+    container_name: ServiceGuideBack
     build: .
     ports:
       - "5001:5001"
