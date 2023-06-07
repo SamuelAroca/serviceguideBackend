@@ -33,9 +33,8 @@ public class ReceiptService implements ReceiptInterface {
     private final UserAuthenticationProvider authenticationProvider;
 
     @Override
-    public ReceiptDto newReceipt(ReceiptDto receiptDto, String token) {
-
-        Optional<House> optionalHouse = houseService.findByUserAndName(token, Objects.requireNonNull(receiptDto.getHouse()).getName());
+    public ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser) {
+        Optional<House> optionalHouse = houseService.findByUserAndName(idUser, Objects.requireNonNull(receiptDto.getHouse()).getName());
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
@@ -69,9 +68,8 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Collection<Receipt> findByHouse(String house, String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
+    public Collection<Receipt> findByHouse(String house, Long idUser) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -83,9 +81,8 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
+    public Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, Long idUser) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -101,14 +98,13 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public List<Receipt> allReceiptsByUserId(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        return receiptRepository.getReceiptByUser(id);
+    public List<Receipt> allReceiptsByUserId(Long idUser) {
+        return receiptRepository.getReceiptByUser(idUser);
     }
 
     @Override
-    public Optional<Receipt> findById(Long id) {
-        Optional<Receipt> optionalReceipt = receiptRepository.findById(id);
+    public Optional<Receipt> findById(Long idReceipt) {
+        Optional<Receipt> optionalReceipt = receiptRepository.findById(idReceipt);
         if (optionalReceipt.isEmpty()) {
             throw new AppException("Receipt not found", HttpStatus.NOT_FOUND);
         }
@@ -116,8 +112,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Optional<Receipt> getLastReceipt(String token) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public Optional<Receipt> getLastReceipt(Long idUser) {
         return receiptRepository.getLastReceipt(idUser);
     }
 
@@ -166,8 +161,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Collection<Receipt> getAllReceiptsByType(String token, String type) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public Collection<Receipt> getAllReceiptsByType(Long idUser, String type) {
         return receiptRepository.getAllReceiptsByType(idUser, type);
     }
 
@@ -192,8 +186,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Collection<Receipt> getAllReceiptsByHouse(String token, String houseName) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public Collection<Receipt> getAllReceiptsByHouse(Long idUser, String houseName) {
         return receiptRepository.getAllReceiptsByHouse(idUser, houseName);
     }
 

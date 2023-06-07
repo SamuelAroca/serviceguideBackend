@@ -28,8 +28,7 @@ public class HouseService implements HouseInterface {
     private final UserAuthenticationProvider authenticationProvider;
 
     @Override
-    public HouseDto newHouse(HouseDto houseDto, String token){
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public HouseDto newHouse(HouseDto houseDto, Long idUser){
         Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()){
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
@@ -53,9 +52,8 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Collection<House> findAllByUserOrderById(String token){
-        Long user = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(user);
+    public Collection<House> findAllByUserOrderById(Long idUser){
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -63,9 +61,8 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Optional<House> findByUserAndName(String token, String name) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
+    public Optional<House> findByUserAndName(Long idUser, String name) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -82,9 +79,8 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Collection<String> getHouseName(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        return houseRepository.getHouseName(id);
+    public Collection<String> getHouseName(Long idUser) {
+        return houseRepository.getHouseName(idUser);
     }
 
     @Override

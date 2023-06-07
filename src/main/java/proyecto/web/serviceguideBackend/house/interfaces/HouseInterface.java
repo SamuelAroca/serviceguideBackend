@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface HouseInterface {
 
-    HouseDto newHouse(HouseDto houseDto, String token);
-    Collection<House> findAllByUserOrderById(String token);
-    Optional<House> findByUserAndName(String token, String name);
+    HouseDto newHouse(HouseDto houseDto, Long idUser);
+    Collection<House> findAllByUserOrderById(Long idUser);
+    Optional<House> findByUserAndName(Long idUser, String name);
     Optional<House> findById(Long id);
-    Collection<String> getHouseName(String token);
+    Collection<String> getHouseName(Long idUser);
     Optional<Message> updateHouse(HouseDto houseDto, Long id);
     Message deleteHouse(Long id);
     Long findIdByName(String name);

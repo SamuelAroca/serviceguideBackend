@@ -27,39 +27,39 @@ public class StatisticController {
         return statisticService.getStatisticByReceipt(idReceipt);
     }
 
-    @GetMapping("/getStatisticByType/{typeReceipt}/{house}/{token}")
-    public ResponseEntity<StatisticAverageDto> getStatisticByTypeAndHouse(@PathVariable String house, @PathVariable String token, @PathVariable String typeReceipt) {
-        return ResponseEntity.ok(statisticService.getStatisticByTypeAndHouse(house, token, typeReceipt));
+    @GetMapping("/getStatisticByType/{typeReceipt}/{house}/{idUser}")
+    public ResponseEntity<StatisticAverageDto> getStatisticByTypeAndHouse(@PathVariable String house, @PathVariable Long idUser, @PathVariable String typeReceipt) {
+        return ResponseEntity.ok(statisticService.getStatisticByTypeAndHouse(house, idUser, typeReceipt));
     }
 
-    @GetMapping("/getStatisticByYear/{typeReceipt}/{year}/{token}")
-    public ResponseEntity<StatisticAverageDto> getStatisticByTypeAndYear(@PathVariable String typeReceipt, @PathVariable int year, @PathVariable String token) {
-        return ResponseEntity.ok(statisticService.getStatisticByTypeAndYear(typeReceipt, token, year));
+    @GetMapping("/getStatisticByYear/{typeReceipt}/{year}/{idUser}")
+    public ResponseEntity<StatisticAverageDto> getStatisticByTypeAndYear(@PathVariable String typeReceipt, @PathVariable int year, @PathVariable Long idUser) {
+        return ResponseEntity.ok(statisticService.getStatisticByTypeAndYear(typeReceipt, idUser, year));
     }
 
-    @GetMapping("/getStatisticByQuarter/{typeReceipt}/{quarter}/{year}/{token}")
-    public ResponseEntity<StatisticAverageDto> getStatisticByQuarter(@PathVariable String typeReceipt, @PathVariable int quarter, @PathVariable int year, @PathVariable String token) {
-        return ResponseEntity.ok(statisticService.getStatisticByQuarter(token, typeReceipt, quarter, year));
+    @GetMapping("/getStatisticByQuarter/{typeReceipt}/{quarter}/{year}/{idUser}")
+    public ResponseEntity<StatisticAverageDto> getStatisticByQuarter(@PathVariable String typeReceipt, @PathVariable int quarter, @PathVariable int year, @PathVariable Long idUser) {
+        return ResponseEntity.ok(statisticService.getStatisticByQuarter(idUser, typeReceipt, quarter, year));
     }
 
-    @GetMapping("/getStatisticBySemester/{typeReceipt}/{semester}/{year}/{token}")
-    public ResponseEntity<StatisticAverageDto> getStatisticBySemester(@PathVariable String typeReceipt, @PathVariable int semester, @PathVariable int year, @PathVariable String token) {
-        return ResponseEntity.ok(statisticService.getStatisticBySemester(token, typeReceipt, semester, year));
+    @GetMapping("/getStatisticBySemester/{typeReceipt}/{semester}/{year}/{idUser}")
+    public ResponseEntity<StatisticAverageDto> getStatisticBySemester(@PathVariable String typeReceipt, @PathVariable int semester, @PathVariable int year, @PathVariable Long idUser) {
+        return ResponseEntity.ok(statisticService.getStatisticBySemester(idUser, typeReceipt, semester, year));
     }
 
-    @GetMapping("/getStatisticByMonth/{typeReceipt}/{startMonth}/{endMonth}/{receiptYear}/{token}")
-    public ResponseEntity<StatisticAverageDto> getStatisticByMonth(@PathVariable String token, @PathVariable String typeReceipt, @PathVariable int startMonth, @PathVariable int endMonth, @PathVariable int receiptYear) {
-        return ResponseEntity.ok(statisticService.getStatisticByMonth(token, typeReceipt, startMonth, endMonth, receiptYear));
+    @GetMapping("/getStatisticByMonth/{typeReceipt}/{startMonth}/{endMonth}/{receiptYear}/{idUser}")
+    public ResponseEntity<StatisticAverageDto> getStatisticByMonth(@PathVariable Long idUser, @PathVariable String typeReceipt, @PathVariable int startMonth, @PathVariable int endMonth, @PathVariable int receiptYear) {
+        return ResponseEntity.ok(statisticService.getStatisticByMonth(idUser, typeReceipt, startMonth, endMonth, receiptYear));
     }
 
-    @GetMapping("/getPercentage/{houseName}/{token}")
-    public ResponseEntity<PercentageStatisticDto> getPercentage(@PathVariable String token, @PathVariable String houseName){
-        return ResponseEntity.ok(statisticService.getPercentage(token, houseName));
+    @GetMapping("/getPercentage/{houseName}/{idUser}")
+    public ResponseEntity<PercentageStatisticDto> getPercentage(@PathVariable Long idUser, @PathVariable String houseName){
+        return ResponseEntity.ok(statisticService.getPercentage(idUser, houseName));
     }
 
-    @GetMapping("/sumStatisticByType/{houseName}/{token}")
-    public ResponseEntity<double[]> sumStatisticByType(@PathVariable String token, @PathVariable String houseName){
-        double[] sums = statisticService.sumStatisticByType(token, houseName);
+    @GetMapping("/sumStatisticByType/{houseName}/{idUser}")
+    public ResponseEntity<double[]> sumStatisticByType(@PathVariable Long idUser, @PathVariable String houseName){
+        double[] sums = statisticService.sumStatisticByType(idUser, houseName);
         return ResponseEntity.ok(sums);
     }
 

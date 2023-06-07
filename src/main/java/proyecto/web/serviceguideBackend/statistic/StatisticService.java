@@ -128,8 +128,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public StatisticAverageDto getStatisticByTypeAndHouse(String typeReceipt, String token, String house) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public StatisticAverageDto getStatisticByTypeAndHouse(String typeReceipt, Long idUser, String house) {
         Collection<Receipt> receipts = receiptRepository.getAllReceiptsByTypeAndHouse(idUser, typeReceipt, house);
 
         if (receipts.isEmpty()) {
@@ -197,8 +196,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public StatisticAverageDto getStatisticByTypeAndYear(String typeReceipt, String token, int year) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public StatisticAverageDto getStatisticByTypeAndYear(String typeReceipt, Long idUser, int year) {
         Collection<Receipt> receipts = receiptRepository.getAllReceiptByTypeAndYear(idUser, typeReceipt, year);
 
         if (receipts.isEmpty()) {
@@ -229,8 +227,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public StatisticAverageDto getStatisticByQuarter(String token, String typeReceipt, int quarter, int year) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public StatisticAverageDto getStatisticByQuarter(Long idUser, String typeReceipt, int quarter, int year) {
         Collection<Receipt> receipts = receiptRepository.getReceiptsByQuarter(idUser, typeReceipt, quarter, year);
 
         if (receipts.isEmpty()) {
@@ -261,9 +258,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public StatisticAverageDto getStatisticBySemester(String token, String typeReceipt, int semester, int receiptYear) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
-
+    public StatisticAverageDto getStatisticBySemester(Long idUser, String typeReceipt, int semester, int receiptYear) {
         List<Integer> months;
         if (semester == 1) {
             months = Arrays.asList(1, 2, 3, 4, 5, 6);
@@ -302,8 +297,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public StatisticAverageDto getStatisticByMonth(String token, String typeReceipt, int startMonth, int endMonth, int receiptYear) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public StatisticAverageDto getStatisticByMonth(Long idUser, String typeReceipt, int startMonth, int endMonth, int receiptYear) {
         Collection<Receipt> receipts = receiptRepository.getReceiptsByMonth(idUser, typeReceipt, startMonth, endMonth, receiptYear);
 
         if (receipts.isEmpty()) {
@@ -334,8 +328,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public double[] sumStatisticByType(String token, String house) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public double[] sumStatisticByType(Long idUser, String house) {
         Collection<Receipt> receipts = receiptRepository.getAllReceiptsByHouse(idUser, house);
 
         if (receipts.isEmpty()) {
@@ -379,8 +372,7 @@ public class StatisticService implements StatisticInterface {
     }
 
     @Override
-    public PercentageStatisticDto getPercentage(String token, String houseName) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public PercentageStatisticDto getPercentage(Long idUser, String houseName) {
         Collection<Receipt> receipts = receiptRepository.getAllReceiptsByHouse(idUser, houseName);
 
         // Obtener la fecha actual

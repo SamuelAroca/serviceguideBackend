@@ -24,10 +24,10 @@ public class ReceiptController {
     private final ReceiptRepository receiptRepository;
     private final StatisticService statisticService;
 
-    @PostMapping("/add/{token}")
-    public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto, @PathVariable String token) {
+    @PostMapping("/add/{idUser}")
+    public ResponseEntity<ReceiptDto> newReceipt(@Valid @RequestBody ReceiptDto receiptDto, @PathVariable Long idUser) {
 
-        ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto, token);
+        ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto, idUser);
 
         Long idReceipt = createdReceipt.getId();
         String typeReceipt = createdReceipt.getTypeService().getType();
@@ -39,19 +39,19 @@ public class ReceiptController {
         return ResponseEntity.created(location).body(createdReceipt);
     }
 
-    @GetMapping("/findByHouse/{StringHouse}/{token}")
-    public ResponseEntity<Collection<Receipt>> findByHouse(@PathVariable String StringHouse, @PathVariable String token) {
-        return ResponseEntity.ok(receiptService.findByHouse(StringHouse, token));
+    @GetMapping("/findByHouse/{StringHouse}/{idUser}")
+    public ResponseEntity<Collection<Receipt>> findByHouse(@PathVariable String StringHouse, @PathVariable Long idUser) {
+        return ResponseEntity.ok(receiptService.findByHouse(StringHouse, idUser));
     }
 
-    @GetMapping("/findByTypeServiceAndHouse/{StringTypeService}/{StringHouse}/{token}")
-    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable String StringTypeService, @PathVariable String StringHouse, @PathVariable String token) {
-        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(StringTypeService, StringHouse, token));
+    @GetMapping("/findByTypeServiceAndHouse/{StringTypeService}/{StringHouse}/{idUser}")
+    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable String StringTypeService, @PathVariable String StringHouse, @PathVariable Long idUser) {
+        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(StringTypeService, StringHouse, idUser));
     }
 
-    @GetMapping("/allReceiptsByUserId/{token}")
-    public ResponseEntity<List<Receipt>> allReceiptsByUserId(@PathVariable String token) {
-        return ResponseEntity.ok(receiptService.allReceiptsByUserId(token));
+    @GetMapping("/allReceiptsByUserId/{idUser}")
+    public ResponseEntity<List<Receipt>> allReceiptsByUserId(@PathVariable Long idUser) {
+        return ResponseEntity.ok(receiptService.allReceiptsByUserId(idUser));
     }
 
     @PutMapping("/update/{idReceipt}")
@@ -69,14 +69,14 @@ public class ReceiptController {
         return receiptRepository.findById(idReceipt);
     }
 
-    @GetMapping("/getLastReceipt/{token}")
-    public Optional<Receipt> getLastReceipt(@PathVariable String token) {
-        return receiptService.getLastReceipt(token);
+    @GetMapping("/getLastReceipt/{idUser}")
+    public Optional<Receipt> getLastReceipt(@PathVariable Long idUser) {
+        return receiptService.getLastReceipt(idUser);
     }
 
-    @GetMapping("/getAllReceiptByType/{token}/{type}")
-    public Collection<Receipt> getAllReceiptByType(@PathVariable String token, @PathVariable String type) {
-        return receiptService.getAllReceiptsByType(token, type);
+    @GetMapping("/getAllReceiptByType/{idUser}/{type}")
+    public Collection<Receipt> getAllReceiptByType(@PathVariable Long idUser, @PathVariable String type) {
+        return receiptService.getAllReceiptsByType(idUser, type);
     }
 
     @GetMapping("/getTwoReceiptById/{idReceipt}")
@@ -84,9 +84,9 @@ public class ReceiptController {
         return receiptService.getTwoReceiptById(idReceipt);
     }
 
-    @GetMapping("/getAllReceiptsByHouse/{house}/{token}")
-    public Collection<Receipt> getAllReceiptsByHouse(@PathVariable String house, @PathVariable String token) {
-        return receiptService.getAllReceiptsByHouse(token, house);
+    @GetMapping("/getAllReceiptsByHouse/{house}/{idUser}")
+    public Collection<Receipt> getAllReceiptsByHouse(@PathVariable String house, @PathVariable Long idUser) {
+        return receiptService.getAllReceiptsByHouse(idUser, house);
     }
 
     @GetMapping("/getReceiptByHouse/{houseName}")

@@ -11,10 +11,11 @@ import java.util.Optional;
 public interface UserInterface {
 
     Optional<User> getByEmail(String email);
-    Optional<UpdateResponse> updateUser(UpdateUserDto updateUserDto, String token);
-    UserLoadDto loadById(String token);
-    Optional<User> findById(String token);
+    Optional<UpdateResponse> updateUser(UpdateUserDto updateUserDto, Long idUser);
+    UserLoadDto loadById(Long idUser);
+    Optional<User> findById(Long idUser);
     Optional<User> findByTokenPassword(String tokenPassword);
     void save(User user);
-    Message delete(String token);
+    Message delete(Long idUser);
+
 }

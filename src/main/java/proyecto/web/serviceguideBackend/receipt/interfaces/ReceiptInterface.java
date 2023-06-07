@@ -10,18 +10,18 @@ import java.util.Optional;
 
 public interface ReceiptInterface {
 
-    ReceiptDto newReceipt(ReceiptDto receiptDto, String token);
-    Collection<Receipt> findByHouse(String house, String token);
-    Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, String token);
-    List<Receipt> allReceiptsByUserId(String token);
+    ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser);
+    Collection<Receipt> findByHouse(String house, Long idUser);
+    Collection<Receipt> findByTypeServiceAndHouse(String typeService, String house, Long idUser);
+    List<Receipt> allReceiptsByUserId(Long idUser);
     Optional<Receipt> findById(Long id);
-    Optional<Receipt> getLastReceipt(String token);
+    Optional<Receipt> getLastReceipt(Long idUser);
     Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
-    Collection<Receipt> getAllReceiptsByType(String token, String type);
+    Collection<Receipt> getAllReceiptsByType(Long idUser, String type);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
     Long findIdByName(String name);
-    Collection<Receipt> getAllReceiptsByHouse(String token, String houseName);
+    Collection<Receipt> getAllReceiptsByHouse(Long idUser, String houseName);
     Collection<Receipt> getReceiptByHouse(String houseName);
 
 }

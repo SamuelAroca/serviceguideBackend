@@ -30,9 +30,8 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Optional<UpdateResponse> updateUser(UpdateUserDto updateUser, String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        return Optional.ofNullable(userRepository.findById(id)
+    public Optional<UpdateResponse> updateUser(UpdateUserDto updateUser, Long idUser) {
+        return Optional.ofNullable(userRepository.findById(idUser)
                 .map(user -> {
                     Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
                     if (optionalUser.isPresent()) {
@@ -62,9 +61,8 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public UserLoadDto loadById(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
+    public UserLoadDto loadById(Long idUser) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -77,9 +75,8 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Optional<User> findById(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
+    public Optional<User> findById(Long idUser) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -97,8 +94,7 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Message delete(String token) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public Message delete(Long idUser) {
         Optional<User> userOptional = userRepository.findById(idUser);
 
         if (userOptional.isEmpty()) {

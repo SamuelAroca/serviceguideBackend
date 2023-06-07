@@ -107,7 +107,7 @@ class ServiceguideBackendApplicationTests {
         CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
         UpdateUserDto updateUserDto = new UpdateUserDto();
         updateUserDto.setFirstName("Prueba Update");
@@ -115,7 +115,7 @@ class ServiceguideBackendApplicationTests {
         updateUserDto.setEmail("pruebaUPDATE@gmail.com");
         updateUserDto.setPassword("prueba123".toCharArray());
 
-        Optional<UpdateResponse> updatedUserDto = userInterface.updateUser(updateUserDto, token);
+        Optional<UpdateResponse> updatedUserDto = userInterface.updateUser(updateUserDto, idUser);
         Assertions.assertEquals("User updated", updatedUserDto.get().getMessage());
 
         User updatedUser = userRepository.findByEmail(updateUserDto.getEmail()).orElse(null);
@@ -131,9 +131,9 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
-        Optional<User> optionalUser = userInterface.findById(token);
+        Optional<User> optionalUser = userInterface.findById(idUser);
         User user = optionalUser.orElseThrow(() -> new RuntimeException("User not found"));
 
         City city = new City();
@@ -149,7 +149,7 @@ class ServiceguideBackendApplicationTests {
         houseDto.setCities(city);
         houseDto.setUser(user);
 
-        HouseDto createdHouseDto = houseInterface.newHouse(houseDto, token);
+        HouseDto createdHouseDto = houseInterface.newHouse(houseDto, idUser);
 
         Assertions.assertNotNull(createdHouseDto);
         Assertions.assertEquals(houseDto.getName(), createdHouseDto.getName());
@@ -166,10 +166,10 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
         String name = "Prueba Test ._@";
 
-        Optional<House> optionalHouse = houseInterface.findByUserAndName(token, name);
+        Optional<House> optionalHouse = houseInterface.findByUserAndName(idUser, name);
 
         Assertions.assertNotNull(optionalHouse);
         Assertions.assertEquals(name, optionalHouse.get().getName());
@@ -182,14 +182,14 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
         String houseName = "Prueba Test ._@";
 
         City city = new City();
         city.setId(1L);
         city.setCity("Medellín");
 
-        Optional<House> houseOptional = houseInterface.findByUserAndName(token, houseName);
+        Optional<House> houseOptional = houseInterface.findByUserAndName(idUser, houseName);
         Long id = houseOptional.get().getId();
 
         HouseDto updateHouse = new HouseDto();
@@ -215,9 +215,9 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
-        Collection<String> houseCollection = houseInterface.getHouseName(token);
+        Collection<String> houseCollection = houseInterface.getHouseName(idUser);
         String name = "Casa Prueba Update @._";
         boolean found = false;
 
@@ -239,7 +239,7 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2023, Calendar.FEBRUARY, 10);
@@ -249,7 +249,7 @@ class ServiceguideBackendApplicationTests {
         typeService.setType("WATER");
 
         String houseName = "Casa Prueba Update @._";
-        Optional<House> optionalHouse = houseInterface.findByUserAndName(token, houseName);
+        Optional<House> optionalHouse = houseInterface.findByUserAndName(idUser, houseName);
         House house = optionalHouse.orElseThrow(() -> new RuntimeException("House not found"));
 
         ReceiptDto receiptDto = new ReceiptDto();
@@ -260,7 +260,7 @@ class ServiceguideBackendApplicationTests {
         receiptDto.setTypeService(typeService);
         receiptDto.setHouse(house);
 
-        ReceiptDto createdReceiptDto = receiptInterface.newReceipt(receiptDto, token);
+        ReceiptDto createdReceiptDto = receiptInterface.newReceipt(receiptDto, idUser);
 
         Assertions.assertNotNull(createdReceiptDto);
         Assertions.assertEquals(receiptDto.getReceiptName(), createdReceiptDto.getReceiptName());
@@ -275,9 +275,9 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
-        List<Receipt> receiptList = receiptInterface.allReceiptsByUserId(token);
+        List<Receipt> receiptList = receiptInterface.allReceiptsByUserId(idUser);
 
         Assertions.assertNotNull(receiptList);
     }
@@ -289,10 +289,10 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
         String lastReceiptName = "Recibo Prueba Test @._";
 
-        Optional<Receipt> optionalReceipt = receiptInterface.getLastReceipt(token);
+        Optional<Receipt> optionalReceipt = receiptInterface.getLastReceipt(idUser);
 
         Assertions.assertNotNull(optionalReceipt);
         Assertions.assertEquals(lastReceiptName, optionalReceipt.get().getReceiptName());
@@ -305,7 +305,7 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2023, Calendar.FEBRUARY, 10);
@@ -315,7 +315,7 @@ class ServiceguideBackendApplicationTests {
         typeService.setType("ENERGY");
 
         String houseName = "Casa Prueba Update @._";
-        Optional<House> optionalHouse = houseInterface.findByUserAndName(token, houseName);
+        Optional<House> optionalHouse = houseInterface.findByUserAndName(idUser, houseName);
         House house = optionalHouse.orElseThrow(() -> new RuntimeException("House not found"));
 
         Long idReceipt = receiptInterface.findIdByName("Recibo Prueba Test @._");
@@ -343,12 +343,12 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
 
-        String token = userDto.getToken();
+        Long idUser = userDto.getId();
         String type = "ENERGY";
         String receiptName = "Recibo Test Update ._@";
         Double receiptPrice = 20000D;
 
-        Collection<Receipt> receiptCollection = receiptInterface.getAllReceiptsByType(token, type);
+        Collection<Receipt> receiptCollection = receiptInterface.getAllReceiptsByType(idUser, type);
 
         boolean found = false;
 
@@ -413,8 +413,9 @@ class ServiceguideBackendApplicationTests {
         UserDto userDto = authInterface.login(credentialsDto);
         userDto.setToken(userAuthenticationProvider.createToken(userDto.getEmail()));
         String token = userDto.getToken();
+        Long idUser = userDto.getId();
 
-        Message deleteMessage = userInterface.delete(token);
+        Message deleteMessage = userInterface.delete(idUser);
 
         Assertions.assertNotNull(deleteMessage);
         Assertions.assertEquals("Delete success", deleteMessage.getMessage());
