@@ -12,8 +12,7 @@ public interface UserInterface {
 
     Optional<User> getByEmail(String email);
     Optional<UpdateResponse> updateUser(UpdateUserDto updateUserDto, Long idUser);
-    UserLoadDto loadById(Long idUser);
-    Optional<User> findById(Long idUser);
+    UserLoadDto loadById(String token);
     Optional<User> findByTokenPassword(String tokenPassword);
     void save(User user);
     Message delete(Long idUser);

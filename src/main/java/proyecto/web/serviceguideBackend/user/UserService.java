@@ -61,8 +61,9 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public UserLoadDto loadById(Long idUser) {
-        Optional<User> optionalUser = userRepository.findById(idUser);
+    public UserLoadDto loadById(String token) {
+        Long id = authenticationProvider.whoIsMyId(token);
+        Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
@@ -72,15 +73,6 @@ public class UserService implements UserInterface {
         userLoadDto.setLastName(optionalUser.get().getLastName());
         userLoadDto.setEmail(optionalUser.get().getEmail());
         return userLoadDto;
-    }
-
-    @Override
-    public Optional<User> findById(Long idUser) {
-        Optional<User> optionalUser = userRepository.findById(idUser);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        return optionalUser;
     }
 
     @Override

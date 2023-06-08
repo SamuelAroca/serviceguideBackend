@@ -24,9 +24,9 @@ public class UserController {
         return userService.updateUser(updateUser, idUser);
     }
 
-    @GetMapping("/findById/{idUser}")
-    public ResponseEntity<UserLoadDto> userById(@PathVariable Long idUser) {
-        return ResponseEntity.ok(userService.loadById(idUser));
+    @GetMapping("/findById/{token}")
+    public ResponseEntity<UserLoadDto> userById(@PathVariable String token) {
+        return ResponseEntity.ok(userService.loadById(token));
     }
 
     @DeleteMapping("/delete/{idUser}")
