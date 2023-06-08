@@ -14,16 +14,12 @@ public class UserDto {
 
     private Long id;
 
-    @NotNull
     private String firstName;
 
-    @NotNull
     private String lastName;
 
-    @NotNull
     private String email;
 
-    @NotNull
     private String token;
 
 }

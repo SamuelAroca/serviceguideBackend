@@ -25,16 +25,6 @@ public class AuthService implements AuthInterface {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByEmail(credentialsDto.getEmail())
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
-        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
-            return userMapper.toUserDto(user);
-        }
-        throw new AppException("Wrong email or password", HttpStatus.BAD_REQUEST);
-    }
-
-    @Override
     public UserDto register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
 
