@@ -36,16 +36,6 @@ public class HouseController {
         return ResponseEntity.ok(houseService.findAllByUserOrderById(idUser));
     }
 
-    @GetMapping("/findByUserAndName/{idUser}/{name}")
-    public ResponseEntity<Optional<House>> findByUserAndName(@PathVariable Long idUser, @PathVariable String name){
-        return ResponseEntity.ok(houseService.findByUserAndName(idUser, name));
-    }
-
-    @GetMapping("/getHouseName/{idUser}")
-    public ResponseEntity<Collection<String>> getHouseName(@PathVariable Long idUser) {
-        return ResponseEntity.ok(houseService.getHouseName(idUser));
-    }
-
     @PutMapping("/update/{idHouse}")
     @Transactional
     public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse){

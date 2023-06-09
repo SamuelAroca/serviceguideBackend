@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface CityRepository extends JpaRepository<City, Long> {
 
     Optional<City> findByCity(@NotNull String city);
-    Optional<City> findAllByCityIgnoreCase(@NotNull String city);
 
 }

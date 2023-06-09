@@ -3,7 +3,6 @@ package proyecto.web.serviceguideBackend.house;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.city.City;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
@@ -25,7 +24,6 @@ public class HouseService implements HouseInterface {
     private final HouseRepository houseRepository;
     private final HouseMapper houseMapper;
     private final CityRepository cityRepository;
-    private final UserAuthenticationProvider authenticationProvider;
 
     @Override
     public HouseDto newHouse(HouseDto houseDto, Long idUser){
@@ -58,29 +56,6 @@ public class HouseService implements HouseInterface {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
         return houseRepository.findAllByUserOrderById(optionalUser.get());
-    }
-
-    @Override
-    public Optional<House> findByUserAndName(Long idUser, String name) {
-        Optional<User> optionalUser = userRepository.findById(idUser);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), name);
-        if (optionalHouse.isEmpty()) {
-            throw new AppException("House not found", HttpStatus.NOT_FOUND);
-        }
-        return optionalHouse;
-    }
-
-    @Override
-    public Optional<House> findById(Long id) {
-        return houseRepository.findById(id);
-    }
-
-    @Override
-    public Collection<String> getHouseName(Long idUser) {
-        return houseRepository.getHouseName(idUser);
     }
 
     @Override
@@ -126,6 +101,19 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
+    public Optional<House> findByUserAndName(Long idUser, String name) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), name);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        return optionalHouse;
+    }
+
+    @Override
     public Message deleteHouse(Long id) {
         Optional<House> optionalHouse = houseRepository.findById(id);
         if (optionalHouse.isEmpty()){
@@ -133,10 +121,5 @@ public class HouseService implements HouseInterface {
         }
         houseRepository.delete(optionalHouse.get());
         return new Message("Delete success", HttpStatus.OK);
-    }
-
-    @Override
-    public Long findIdByName(String name) {
-        return houseRepository.findIdByName(name);
     }
 }

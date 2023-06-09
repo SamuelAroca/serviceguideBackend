@@ -1,6 +1,5 @@
 package proyecto.web.serviceguideBackend.user.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

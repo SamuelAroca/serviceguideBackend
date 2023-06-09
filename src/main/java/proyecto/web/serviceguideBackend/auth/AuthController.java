@@ -51,11 +51,6 @@ public class AuthController {
         return ResponseEntity.created(location).body(createdUser);
     }
 
-    @GetMapping("/whoiam/{token}")
-    public ResponseEntity<String> whoIAm(@PathVariable String token) {
-        return ResponseEntity.ok(userAuthenticationProvider.whoIAm(token));
-    }
-
     @GetMapping("/whoismyid/{token}")
     public ResponseEntity<Long> whoIsMyId(@PathVariable String token) {
         return ResponseEntity.ok(userAuthenticationProvider.whoIsMyId(token));

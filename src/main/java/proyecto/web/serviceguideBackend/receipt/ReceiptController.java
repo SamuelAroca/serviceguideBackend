@@ -11,7 +11,6 @@ import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
 import proyecto.web.serviceguideBackend.statistic.StatisticService;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,16 +38,6 @@ public class ReceiptController {
         return ResponseEntity.created(location).body(createdReceipt);
     }
 
-    @GetMapping("/findByHouse/{StringHouse}/{idUser}")
-    public ResponseEntity<Collection<Receipt>> findByHouse(@PathVariable String StringHouse, @PathVariable Long idUser) {
-        return ResponseEntity.ok(receiptService.findByHouse(StringHouse, idUser));
-    }
-
-    @GetMapping("/findByTypeServiceAndHouse/{StringTypeService}/{StringHouse}/{idUser}")
-    public ResponseEntity<Collection<Receipt>> findByTypeServiceAndHouse(@PathVariable String StringTypeService, @PathVariable String StringHouse, @PathVariable Long idUser) {
-        return ResponseEntity.ok(receiptService.findByTypeServiceAndHouse(StringTypeService, StringHouse, idUser));
-    }
-
     @GetMapping("/allReceiptsByUserId/{idUser}")
     public ResponseEntity<List<Receipt>> allReceiptsByUserId(@PathVariable Long idUser) {
         return ResponseEntity.ok(receiptService.allReceiptsByUserId(idUser));
@@ -72,25 +61,5 @@ public class ReceiptController {
     @GetMapping("/getLastReceipt/{idUser}")
     public Optional<Receipt> getLastReceipt(@PathVariable Long idUser) {
         return receiptService.getLastReceipt(idUser);
-    }
-
-    @GetMapping("/getAllReceiptByType/{idUser}/{type}")
-    public Collection<Receipt> getAllReceiptByType(@PathVariable Long idUser, @PathVariable String type) {
-        return receiptService.getAllReceiptsByType(idUser, type);
-    }
-
-    @GetMapping("/getTwoReceiptById/{idReceipt}")
-    public Long getTwoReceiptById(@PathVariable Long idReceipt) {
-        return receiptService.getTwoReceiptById(idReceipt);
-    }
-
-    @GetMapping("/getAllReceiptsByHouse/{house}/{idUser}")
-    public Collection<Receipt> getAllReceiptsByHouse(@PathVariable String house, @PathVariable Long idUser) {
-        return receiptService.getAllReceiptsByHouse(idUser, house);
-    }
-
-    @GetMapping("/getReceiptByHouse/{houseName}")
-    public Collection<Receipt> getReceiptByHouse(@PathVariable String houseName) {
-        return receiptService.getReceiptByHouse(houseName);
     }
 }

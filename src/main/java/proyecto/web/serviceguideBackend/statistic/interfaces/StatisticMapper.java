@@ -10,7 +10,6 @@ import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 public interface StatisticMapper {
 
     StatisticDto statisticDto(Statistic statistic);
-
     Statistic statistic(StatisticDto statisticDto);
 
 }
