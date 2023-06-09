@@ -14,6 +14,7 @@ public interface UserInterface {
     Optional<UpdateResponse> updateUser(UpdateUserDto updateUserDto, Long idUser);
     UserLoadDto loadById(String token);
     Optional<User> findByTokenPassword(String tokenPassword);
+    UserLoadDto loadUser(Long id);
     void save(User user);
     Message delete(Long idUser);
 
