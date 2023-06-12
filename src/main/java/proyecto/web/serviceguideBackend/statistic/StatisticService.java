@@ -178,10 +178,12 @@ public class StatisticService implements StatisticInterface {
         List<Integer> numbersWithoutDuplicates = new ArrayList<>(uniqueNumbers);
         numbersWithoutDuplicates.sort(Collections.reverseOrder());
         if (numbersWithoutDuplicates.size() == 1) {
+            double sumPriceLatest = 0D;
+            for (Receipt receipt : receiptList) {
+                sumPriceLatest += receipt.getPrice();
+            }
             SumOfReceiptDto sumOfReceiptDto = new SumOfReceiptDto();
-            Receipt receipt = receiptList.iterator().next();
-            double price = receipt.getPrice();
-            sumOfReceiptDto.setSumMonth((float) price);
+            sumOfReceiptDto.setSumMonth((float) sumPriceLatest);
             sumOfReceiptDto.setPercentage(0F);
             sumOfReceiptDto.setDifference(0F);
             sumOfReceiptDto.setLastSumMonth(0F);
