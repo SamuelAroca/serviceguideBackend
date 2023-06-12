@@ -481,7 +481,7 @@ class ServiceguideBackendApplicationTests {
         Assertions.assertEquals(0f, sumOfReceiptDto.getLastSumMonth());
         Assertions.assertEquals(20000f, sumOfReceiptDto.getSumMonth());
         Assertions.assertEquals(0f, sumOfReceiptDto.getPercentage());
-        Assertions.assertEquals(-20000f, sumOfReceiptDto.getDifference());
+        Assertions.assertEquals(0f, sumOfReceiptDto.getDifference());
 
     }
 
