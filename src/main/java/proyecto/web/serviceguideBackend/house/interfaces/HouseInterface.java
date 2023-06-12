@@ -15,4 +15,5 @@ public interface HouseInterface {
     Optional<House> findByUserAndName(Long idUser, String name);
     Message deleteHouse(Long id);
     Collection<String> getHouseName(Long idUser);
+
 }
