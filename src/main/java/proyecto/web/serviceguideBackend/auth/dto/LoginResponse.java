@@ -1,6 +1,5 @@
 package proyecto.web.serviceguideBackend.auth.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,11 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CredentialsDto {
+public class LoginResponse {
 
-    @NotNull
-    private String email;
-
-    private char @NotNull [] password;
+    private String token;
 
 }

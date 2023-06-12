@@ -20,7 +20,6 @@ import proyecto.web.serviceguideBackend.auth.AuthService;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -59,20 +58,6 @@ public class UserAuthenticationProvider {
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
 
-    public String whoIAm(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-        JWTVerifier verifier = JWT.require(algorithm)
-                .build();
-
-        DecodedJWT decoded = verifier.verify(token);
-
-        User user = userRepository.findByEmail(decoded.getIssuer())
-                .orElseThrow(() -> new AppException("Not found", HttpStatus.NOT_FOUND));
-
-        return user.getEmail();
-    }
-
     public Long whoIsMyId(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
@@ -101,14 +86,4 @@ public class UserAuthenticationProvider {
         return user.getFirstName() + " " +user.getLastName();
     }
 
-    public Optional<User> user(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-        JWTVerifier verifier = JWT.require(algorithm)
-                .build();
-
-        DecodedJWT decoded = verifier.verify(token);
-
-        return userRepository.findByEmail(decoded.getIssuer());
-    }
 }

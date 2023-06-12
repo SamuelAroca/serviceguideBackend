@@ -3,7 +3,6 @@ package proyecto.web.serviceguideBackend.house;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.city.City;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
@@ -25,11 +24,9 @@ public class HouseService implements HouseInterface {
     private final HouseRepository houseRepository;
     private final HouseMapper houseMapper;
     private final CityRepository cityRepository;
-    private final UserAuthenticationProvider authenticationProvider;
 
     @Override
-    public HouseDto newHouse(HouseDto houseDto, String token){
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public HouseDto newHouse(HouseDto houseDto, Long idUser){
         Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()){
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
@@ -53,38 +50,12 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Collection<House> findAllByUserOrderById(String token){
-        Long user = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(user);
+    public Collection<House> findAllByUserOrderById(Long idUser){
+        Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
         return houseRepository.findAllByUserOrderById(optionalUser.get());
-    }
-
-    @Override
-    public Optional<House> findByUserAndName(String token, String name) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), name);
-        if (optionalHouse.isEmpty()) {
-            throw new AppException("House not found", HttpStatus.NOT_FOUND);
-        }
-        return optionalHouse;
-    }
-
-    @Override
-    public Optional<House> findById(Long id) {
-        return houseRepository.findById(id);
-    }
-
-    @Override
-    public Collection<String> getHouseName(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        return houseRepository.getHouseName(id);
     }
 
     @Override
@@ -130,6 +101,19 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
+    public Optional<House> findByUserAndName(Long idUser, String name) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), name);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found", HttpStatus.NOT_FOUND);
+        }
+        return optionalHouse;
+    }
+
+    @Override
     public Message deleteHouse(Long id) {
         Optional<House> optionalHouse = houseRepository.findById(id);
         if (optionalHouse.isEmpty()){
@@ -140,7 +124,7 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Long findIdByName(String name) {
-        return houseRepository.findIdByName(name);
+    public Collection<String> getHouseName(Long idUser) {
+        return houseRepository.getHouseName(idUser);
     }
 }

@@ -30,9 +30,8 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Optional<UpdateResponse> updateUser(UpdateUserDto updateUser, String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
-        return Optional.ofNullable(userRepository.findById(id)
+    public Optional<UpdateResponse> updateUser(UpdateUserDto updateUser, Long idUser) {
+        return Optional.ofNullable(userRepository.findById(idUser)
                 .map(user -> {
                     Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
                     if (optionalUser.isPresent()) {
@@ -77,18 +76,22 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Optional<User> findById(String token) {
-        Long id = authenticationProvider.whoIsMyId(token);
+    public Optional<User> findByTokenPassword(String tokenPassword) {
+        return userRepository.findByTokenPassword(tokenPassword);
+    }
+
+    @Override
+    public UserLoadDto loadUser(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        return optionalUser;
-    }
-
-    @Override
-    public Optional<User> findByTokenPassword(String tokenPassword) {
-        return userRepository.findByTokenPassword(tokenPassword);
+        UserLoadDto userLoadDto = new UserLoadDto();
+        userLoadDto.setId(optionalUser.get().getId());
+        userLoadDto.setFirstName(optionalUser.get().getFirstName());
+        userLoadDto.setLastName(optionalUser.get().getLastName());
+        userLoadDto.setEmail(optionalUser.get().getEmail());
+        return userLoadDto;
     }
 
     @Override
@@ -97,8 +100,7 @@ public class UserService implements UserInterface {
     }
 
     @Override
-    public Message delete(String token) {
-        Long idUser = authenticationProvider.whoIsMyId(token);
+    public Message delete(Long idUser) {
         Optional<User> userOptional = userRepository.findById(idUser);
 
         if (userOptional.isEmpty()) {

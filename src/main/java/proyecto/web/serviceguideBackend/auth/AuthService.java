@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.auth.interfaces.AuthInterface;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
@@ -23,16 +22,6 @@ public class AuthService implements AuthInterface {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-
-    @Override
-    public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByEmail(credentialsDto.getEmail())
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
-        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
-            return userMapper.toUserDto(user);
-        }
-        throw new AppException("Wrong email or password", HttpStatus.BAD_REQUEST);
-    }
 
     @Override
     public UserDto register(SignUpDto userDto) {

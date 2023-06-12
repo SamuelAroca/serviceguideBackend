@@ -18,10 +18,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @PutMapping("/update/{token}")
+    @PutMapping("/update/{idUser}")
     @Transactional
-    public Optional<UpdateResponse> updateUser(@RequestBody UpdateUserDto updateUser, @PathVariable String token) {
-        return userService.updateUser(updateUser, token);
+    public Optional<UpdateResponse> updateUser(@RequestBody UpdateUserDto updateUser, @PathVariable Long idUser) {
+        return userService.updateUser(updateUser, idUser);
     }
 
     @GetMapping("/findById/{token}")
@@ -29,9 +29,14 @@ public class UserController {
         return ResponseEntity.ok(userService.loadById(token));
     }
 
-    @DeleteMapping("/delete/{token}")
+    @DeleteMapping("/delete/{idUser}")
     @Transactional
-    public ResponseEntity<Message> deleteUser(@PathVariable String token) {
-        return ResponseEntity.ok(userService.delete(token));
+    public ResponseEntity<Message> deleteUser(@PathVariable Long idUser) {
+        return ResponseEntity.ok(userService.delete(idUser));
+    }
+
+    @GetMapping("/loadUser/{idUser}")
+    public ResponseEntity<UserLoadDto> userById(@PathVariable Long idUser) {
+        return ResponseEntity.ok(userService.loadUser(idUser));
     }
 }

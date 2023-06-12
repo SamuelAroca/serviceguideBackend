@@ -1,6 +1,5 @@
 package proyecto.web.serviceguideBackend.user.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,16 +13,12 @@ public class UserDto {
 
     private Long id;
 
-    @NotNull
     private String firstName;
 
-    @NotNull
     private String lastName;
 
-    @NotNull
     private String email;
 
-    @NotNull
     private String token;
 
 }

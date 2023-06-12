@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
+import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -26,17 +27,11 @@ public class AuthController {
     private final AuthService authService;
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserRepository userRepository;
+    private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody @Valid CredentialsDto credentialsDto) {
-        UserDto userDto = authService.login(credentialsDto);
-        String token = userAuthenticationProvider.createToken(userDto.getEmail());
-        userDto.setToken(token);
-        Optional<User> optionalUser = userRepository.findByEmail(credentialsDto.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new AppException("Algo salió mal", HttpStatus.BAD_REQUEST);
-        }
-        return ResponseEntity.ok(userDto);
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid CredentialsDto credentialsDto) {
+        return ResponseEntity.ok(loginService.login(credentialsDto));
     }
 
     @PostMapping("/register")
@@ -54,11 +49,6 @@ public class AuthController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdUser.getId()).toUri();
         return ResponseEntity.created(location).body(createdUser);
-    }
-
-    @GetMapping("/whoiam/{token}")
-    public ResponseEntity<String> whoIAm(@PathVariable String token) {
-        return ResponseEntity.ok(userAuthenticationProvider.whoIAm(token));
     }
 
     @GetMapping("/whoismyid/{token}")
