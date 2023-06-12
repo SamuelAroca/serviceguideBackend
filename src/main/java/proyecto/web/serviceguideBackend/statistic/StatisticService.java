@@ -177,13 +177,21 @@ public class StatisticService implements StatisticInterface {
         Set<Integer> uniqueNumbers = new HashSet<>(months);
         List<Integer> numbersWithoutDuplicates = new ArrayList<>(uniqueNumbers);
         numbersWithoutDuplicates.sort(Collections.reverseOrder());
-        System.out.println(numbersWithoutDuplicates);
+        if (numbersWithoutDuplicates.size() == 1) {
+            SumOfReceiptDto sumOfReceiptDto = new SumOfReceiptDto();
+            Receipt receipt = receiptList.iterator().next();
+            double price = receipt.getPrice();
+            sumOfReceiptDto.setSumMonth((float) price);
+            sumOfReceiptDto.setPercentage(0F);
+            sumOfReceiptDto.setDifference(0F);
+            sumOfReceiptDto.setLastSumMonth(0F);
+            return sumOfReceiptDto;
+        }
         double sumPriceLatest = 0D;
         double sumPriceLast = 0D;
         double percentage;
         double difference;
         for (int i = 0; i < numbersWithoutDuplicates.size() && i < 2; i++) {
-            System.out.println(numbersWithoutDuplicates.get(i));
             Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, numbersWithoutDuplicates.get(i));
             for (Receipt receipt : list) {
                 if (i == 0) {
@@ -194,7 +202,6 @@ public class StatisticService implements StatisticInterface {
             }
         }
         difference = sumPriceLast - sumPriceLatest;
-        System.out.println(difference);
         percentage = (difference/sumPriceLast) * 100;
         SumOfReceiptDto sumOfReceiptDto = new SumOfReceiptDto();
         sumOfReceiptDto.setSumMonth((float) sumPriceLatest);
