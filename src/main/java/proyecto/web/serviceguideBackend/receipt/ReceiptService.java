@@ -92,6 +92,15 @@ public class ReceiptService implements ReceiptInterface {
                     if (optionalHouse.isEmpty()) {
                         throw new AppException("House Not Found", HttpStatus.NOT_FOUND);
                     }
+                    Calendar newReceiptCalendar = Calendar.getInstance();
+                    newReceiptCalendar.setTime(receiptDto.getDate());
+                    int receiptMonth = newReceiptCalendar.get(Calendar.MONTH) + 1;
+                    int receiptYear = newReceiptCalendar.get(Calendar.YEAR);
+
+                    List<Receipt> existingReceipts = receiptRepository.findByHouseAndTypeServiceAndMonthAndYear(optionalHouse.get(), optionalTypeService.get(), receiptMonth, receiptYear);
+                    if (!existingReceipts.isEmpty()) {
+                        throw new AppException("Receipt already exists for the given month and year", HttpStatus.BAD_REQUEST);
+                    }
                     Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(), optionalTypeService.get());
                     if (optionalReceipt.isPresent()) {
                         if (optionalReceipt.get().getReceiptName().equals(receiptDto.getReceiptName())) {
