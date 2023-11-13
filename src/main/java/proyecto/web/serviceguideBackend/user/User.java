@@ -34,7 +34,6 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    @Size(max = 100)
     private String password;
 
     private String tokenPassword;
