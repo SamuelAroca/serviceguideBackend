@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.receipt.interfaces;
 
+import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
@@ -15,5 +16,7 @@ public interface ReceiptInterface {
     Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
+    String extraerInformacionFactura(String textoFactura);
+    String readPDF(MultipartFile multipartFile);
 
 }

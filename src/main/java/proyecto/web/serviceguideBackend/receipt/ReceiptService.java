@@ -1,8 +1,11 @@
 package proyecto.web.serviceguideBackend.receipt;
 
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
@@ -17,7 +20,12 @@ import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeServiceRepository;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -143,5 +151,73 @@ public class ReceiptService implements ReceiptInterface {
     @Override
     public Long getTwoReceiptById(Long idReceipt) {
         return receiptRepository.findUserByReceiptId(idReceipt);
+    }
+
+    @Override
+    public String extraerInformacionFactura(String textoFactura) {
+        String patronAcueducto = "Acueducto (.*?)\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronAlcantarillado = "Alcantarillado (.*?)\\$ (\\d[\\d.,]*)";
+        String patronEnergia = "Energía (.*?)\\$ (\\d[\\d.,]*)";
+        String patronGas = "Gas (.*?)\\$ (\\d[\\d.,]*)";
+
+        // Crear los objetos de patrón
+        Pattern patternAcueducto = Pattern.compile(patronAcueducto);
+        Pattern patternAlcantarillado = Pattern.compile(patronAlcantarillado);
+        Pattern patternEnergia = Pattern.compile(patronEnergia);
+        Pattern patternGas = Pattern.compile(patronGas);
+
+        // Crear el objeto Matcher
+        Matcher matcherWater = patternAcueducto.matcher(textoFactura);
+        Matcher matcherEnergy = patternEnergia.matcher(textoFactura);
+        Matcher matcherSewerage = patternAlcantarillado.matcher(textoFactura);
+        Matcher matcherGas = patternGas.matcher(textoFactura);
+
+        // Extraer información
+        StringBuilder resultado = new StringBuilder();
+        while (matcherWater.find()) {
+            String concepto = matcherWater.group(1);
+            String valor = matcherWater.group(2);
+            resultado.append("Concepto Agua: ").append(concepto).append(", Valor: $").append(valor).append("\n");
+        }
+
+        while (matcherEnergy.find()) {
+            String concepto = matcherEnergy.group(1);
+            String valor = matcherEnergy.group(2);
+            resultado.append("Concepto Energia: ").append(concepto).append(", Valor: $").append(valor).append("\n");
+        }
+
+        while (matcherSewerage.find()) {
+            String concepto = matcherSewerage.group(1);
+            String valor = matcherSewerage.group(2);
+            resultado.append("Concepto Alcantarillado: ").append(concepto).append(", Valor: $").append(valor).append("\n");
+        }
+
+        while (matcherGas.find()) {
+            String concepto = matcherGas.group(1);
+            String valor = matcherGas.group(2);
+            resultado.append("Concepto Gas: ").append(concepto).append(", Valor: $").append(valor).append("\n");
+        }
+
+        // Puedes agregar más patrones y lógica según sea necesario
+        System.out.println(resultado);
+        return resultado.toString();
+    }
+
+    @Override
+    public String readPDF(MultipartFile archivoPdf) {
+        try {
+            PdfReader pdfReader = new PdfReader(archivoPdf.getInputStream());
+
+            // Extraer el texto de la página 2
+            String textoPagina = PdfTextExtractor.getTextFromPage(pdfReader, 2);
+
+            // Cerrar el lector de PDF
+            pdfReader.close();
+            System.out.println("Texto de la factura:\n" + textoPagina);
+            return extraerInformacionFactura(textoPagina);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error al procesar el archivo PDF";
+        }
     }
 }

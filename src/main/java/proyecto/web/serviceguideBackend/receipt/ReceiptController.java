@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
@@ -61,5 +62,10 @@ public class ReceiptController {
     @GetMapping("/getLastReceipt/{idUser}")
     public Optional<Receipt> getLastReceipt(@PathVariable Long idUser) {
         return receiptService.getLastReceipt(idUser);
+    }
+
+    @PostMapping("/read/")
+    public String readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
+        return receiptService.readPDF(archivoPdf);
     }
 }
