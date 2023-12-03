@@ -16,7 +16,7 @@ public interface ReceiptInterface {
     Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
-    String extraerInformacionFactura(String textoFactura);
-    String readPDF(MultipartFile multipartFile);
+    void extraerInformacionFactura(String textoFactura);
+    void readPDF(MultipartFile multipartFile);
 
 }

@@ -65,7 +65,7 @@ public class ReceiptController {
     }
 
     @PostMapping("/read/")
-    public String readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
-        return receiptService.readPDF(archivoPdf);
+    public void readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
+        receiptService.readPDF(archivoPdf);
     }
 }

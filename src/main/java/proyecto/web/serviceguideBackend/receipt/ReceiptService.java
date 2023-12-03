@@ -154,11 +154,11 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public String extraerInformacionFactura(String textoFactura) {
-        String patronAcueducto = "Acueducto (.*?)\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
-        String patronAlcantarillado = "Alcantarillado (.*?)\\$ (\\d[\\d.,]*)";
-        String patronEnergia = "Energía (.*?)\\$ (\\d[\\d.,]*)";
-        String patronGas = "Gas (.*?)\\$ (\\d[\\d.,]*)";
+    public void extraerInformacionFactura(String textoFactura) {
+        String patronAcueducto = "Acueducto (\\d[\\d.,]*) m3\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronAlcantarillado = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronEnergia = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronGas = "Gas (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
 
         // Crear los objetos de patrón
         Pattern patternAcueducto = Pattern.compile(patronAcueducto);
@@ -172,39 +172,73 @@ public class ReceiptService implements ReceiptInterface {
         Matcher matcherSewerage = patternAlcantarillado.matcher(textoFactura);
         Matcher matcherGas = patternGas.matcher(textoFactura);
 
-        // Extraer información
-        StringBuilder resultado = new StringBuilder();
+        double amountWater = 0;
+        double priceWater = 0;
         while (matcherWater.find()) {
-            String concepto = matcherWater.group(1);
-            String valor = matcherWater.group(2);
-            resultado.append("Concepto Agua: ").append(concepto).append(", Valor: $").append(valor).append("\n");
-        }
+            String concepto = matcherWater.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String valor = matcherWater.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
+            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
+            concepto = concepto.replace(".", "");
+            valor = valor.replace(".", "").replace(",", ".");
+
+            amountWater = Double.parseDouble(concepto);
+            priceWater = Double.parseDouble(valor);
+        }
+        System.out.println(amountWater);
+        System.out.println(priceWater);
+
+        double amountEnergy = 0;
+        double priceEnergy = 0;
         while (matcherEnergy.find()) {
-            String concepto = matcherEnergy.group(1);
-            String valor = matcherEnergy.group(2);
-            resultado.append("Concepto Energia: ").append(concepto).append(", Valor: $").append(valor).append("\n");
-        }
+            String concepto = matcherEnergy.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String valor = matcherEnergy.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
+            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
+            concepto = concepto.replace(".", "");
+            valor = valor.replace(".", "").replace(",", ".");
+
+            amountEnergy = Double.parseDouble(concepto);
+            priceEnergy = Double.parseDouble(valor);
+        }
+        System.out.println(amountEnergy);
+        System.out.println(priceEnergy);
+
+        double amountSewerage = 0;
+        double priceSewerage = 0;
         while (matcherSewerage.find()) {
-            String concepto = matcherSewerage.group(1);
-            String valor = matcherSewerage.group(2);
-            resultado.append("Concepto Alcantarillado: ").append(concepto).append(", Valor: $").append(valor).append("\n");
-        }
+            String concepto = matcherSewerage.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String valor = matcherSewerage.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
+            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
+            concepto = concepto.replace(".", "");
+            valor = valor.replace(".", "").replace(",", ".");
+
+            amountSewerage = Double.parseDouble(concepto);
+            priceSewerage = Double.parseDouble(valor);
+        }
+        System.out.println(amountSewerage);
+        System.out.println(priceSewerage);
+
+        double amountGas = 0;
+        double priceGas = 0;
         while (matcherGas.find()) {
-            String concepto = matcherGas.group(1);
-            String valor = matcherGas.group(2);
-            resultado.append("Concepto Gas: ").append(concepto).append(", Valor: $").append(valor).append("\n");
-        }
+            String concepto = matcherGas.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String valor = matcherGas.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-        // Puedes agregar más patrones y lógica según sea necesario
-        System.out.println(resultado);
-        return resultado.toString();
+            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
+            concepto = concepto.replace(".", "");
+            valor = valor.replace(".", "").replace(",", ".");
+
+            amountGas = Double.parseDouble(concepto);
+            priceGas = Double.parseDouble(valor);
+        }
+        System.out.println(amountGas);
+        System.out.println(priceGas);
     }
 
     @Override
-    public String readPDF(MultipartFile archivoPdf) {
+    public void readPDF(MultipartFile archivoPdf) {
         try {
             PdfReader pdfReader = new PdfReader(archivoPdf.getInputStream());
 
@@ -213,11 +247,9 @@ public class ReceiptService implements ReceiptInterface {
 
             // Cerrar el lector de PDF
             pdfReader.close();
-            System.out.println("Texto de la factura:\n" + textoPagina);
-            return extraerInformacionFactura(textoPagina);
+            extraerInformacionFactura(textoPagina);
         } catch (IOException e) {
-            e.printStackTrace();
-            return "Error al procesar el archivo PDF";
+            throw new AppException("Error al procesar el archivo PDF", HttpStatus.BAD_REQUEST);
         }
     }
 }
