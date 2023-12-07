@@ -329,7 +329,7 @@ class ServiceguideBackendApplicationTests {
         ReceiptDto receiptDto = new ReceiptDto();
         receiptDto.setReceiptName("Recibo Prueba Test @._");
         receiptDto.setPrice(20000D);
-        receiptDto.setAmount(100D);
+        receiptDto.setAmount(100F);
         receiptDto.setDate(date);
         receiptDto.setTypeService(typeService);
         receiptDto.setHouse(house);
@@ -408,7 +408,7 @@ class ServiceguideBackendApplicationTests {
         ReceiptDto receiptDto = new ReceiptDto();
         receiptDto.setReceiptName("Recibo Test Update ._@");
         receiptDto.setPrice(20000D);
-        receiptDto.setAmount(100D);
+        receiptDto.setAmount(100F);
         receiptDto.setDate(date);
         receiptDto.setTypeService(typeService);
         receiptDto.setHouse(house);
