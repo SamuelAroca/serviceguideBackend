@@ -24,7 +24,7 @@ public class ReceiptDto {
     private Double price;
 
     @NotNull
-    private Double amount;
+    private Float amount;
 
     @Nullable
     private String houseName;

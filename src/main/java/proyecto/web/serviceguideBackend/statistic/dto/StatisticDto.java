@@ -21,7 +21,7 @@ public class StatisticDto {
     private Double[] price;
 
     @NotNull
-    private Double[] amount;
+    private Float[] amount;
 
     @NotNull
     private StatisticType statisticsType;

@@ -64,8 +64,8 @@ public class ReceiptController {
         return receiptService.getLastReceipt(idUser);
     }
 
-    @PostMapping("/read/")
-    public void readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
-        receiptService.readPDF(archivoPdf);
+    @PostMapping("/read")
+    public ResponseEntity<String> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
+        return ResponseEntity.ok(receiptService.readPDF(archivoPdf));
     }
 }

@@ -40,7 +40,7 @@ public class StatisticService implements StatisticInterface {
         if (!statistics.isEmpty()) {
             StatisticDto statisticDto = new StatisticDto();
             List<Double[]> prices = new ArrayList<>();
-            List<Double[]> amount = new ArrayList<>();
+            List<Float[]> amount = new ArrayList<>();
             List<String[]> label = new ArrayList<>();
             for (int i = 0; i < statistics.size(); i++) {
                 prices.add(statistics.get(i).getPrice());
@@ -81,7 +81,7 @@ public class StatisticService implements StatisticInterface {
         List<Receipt> receiptList = receiptRepository.getTwoReceiptsById(idList.get(0).longValue(), idList.get(1).longValue());
 
         Double[] price = {receiptList.get(0).getPrice(), receiptList.get(1).getPrice()};
-        Double[] amount = {receiptList.get(0).getAmount(), receiptList.get(1).getAmount()};
+        Float[] amount = {receiptList.get(0).getAmount(), receiptList.get(1).getAmount()};
 
         /*Se extrae el mes y se pone la primera letra en Mayuscula*/
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);

@@ -37,7 +37,7 @@ public class Receipt {
 
     @NotNull
     @Column(length = 100)
-    private Double amount;
+    private Float amount;
 
     @Nullable
     @Column(length = 100)

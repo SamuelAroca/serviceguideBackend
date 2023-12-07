@@ -5,6 +5,7 @@ import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,8 @@ public interface ReceiptInterface {
     Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
-    void extraerInformacionFactura(String textoFactura);
-    void readPDF(MultipartFile multipartFile);
+    String extraerInformacionFactura(String textoFactura);
+    Date formatDate(String date);
+    String readPDF(MultipartFile multipartFile);
 
 }

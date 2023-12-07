@@ -20,9 +20,15 @@ import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeServiceRepository;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -154,91 +160,256 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public void extraerInformacionFactura(String textoFactura) {
+    public String extraerInformacionFactura(String textoFactura) {
         String patronAcueducto = "Acueducto (\\d[\\d.,]*) m3\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronAlcantarillado = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronEnergia = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronGas = "Gas (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronDate = "(\\d{1,2}-[a-zA-Z]{3}-\\d{4})";
+        String patronNumeroContrato = "Contrato (\\d+)";
+        String patronReceiptName = "Factura [A-Za-z]+ de \\d{4}";
 
         // Crear los objetos de patrón
         Pattern patternAcueducto = Pattern.compile(patronAcueducto);
         Pattern patternAlcantarillado = Pattern.compile(patronAlcantarillado);
         Pattern patternEnergia = Pattern.compile(patronEnergia);
         Pattern patternGas = Pattern.compile(patronGas);
+        Pattern patternDate = Pattern.compile(patronDate);
+        Pattern patternContract = Pattern.compile(patronNumeroContrato);
+        Pattern patternReceiptName = Pattern.compile(patronReceiptName);
 
         // Crear el objeto Matcher
         Matcher matcherWater = patternAcueducto.matcher(textoFactura);
         Matcher matcherEnergy = patternEnergia.matcher(textoFactura);
         Matcher matcherSewerage = patternAlcantarillado.matcher(textoFactura);
         Matcher matcherGas = patternGas.matcher(textoFactura);
+        Matcher matcherDate = patternDate.matcher(textoFactura);
+        Matcher matcherContract = patternContract.matcher(textoFactura);
+        Matcher matcherReceiptName = patternReceiptName.matcher(textoFactura);
 
-        double amountWater = 0;
+        float amountWater = 0;
         double priceWater = 0;
         while (matcherWater.find()) {
-            String concepto = matcherWater.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String concepto = matcherWater.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
             String valor = matcherWater.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
-            concepto = concepto.replace(".", "");
+            concepto = concepto.replace(".", "").replace(",", ".");
             valor = valor.replace(".", "").replace(",", ".");
 
-            amountWater = Double.parseDouble(concepto);
+            amountWater = Float.parseFloat(concepto);
             priceWater = Double.parseDouble(valor);
         }
-        System.out.println(amountWater);
-        System.out.println(priceWater);
 
-        double amountEnergy = 0;
+        float amountEnergy = 0;
         double priceEnergy = 0;
         while (matcherEnergy.find()) {
-            String concepto = matcherEnergy.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String concepto = matcherEnergy.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
             String valor = matcherEnergy.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
             concepto = concepto.replace(".", "");
             valor = valor.replace(".", "").replace(",", ".");
 
-            amountEnergy = Double.parseDouble(concepto);
+            amountEnergy = Float.parseFloat(concepto);
             priceEnergy = Double.parseDouble(valor);
         }
-        System.out.println(amountEnergy);
-        System.out.println(priceEnergy);
 
-        double amountSewerage = 0;
+        float amountSewerage = 0;
         double priceSewerage = 0;
         while (matcherSewerage.find()) {
-            String concepto = matcherSewerage.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String concepto = matcherSewerage.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
             String valor = matcherSewerage.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
             concepto = concepto.replace(".", "");
             valor = valor.replace(".", "").replace(",", ".");
 
-            amountSewerage = Double.parseDouble(concepto);
+            amountSewerage = Float.parseFloat(concepto);
             priceSewerage = Double.parseDouble(valor);
         }
-        System.out.println(amountSewerage);
-        System.out.println(priceSewerage);
 
-        double amountGas = 0;
+        float amountGas = 0;
         double priceGas = 0;
         while (matcherGas.find()) {
-            String concepto = matcherGas.group(1).replaceAll("[^\\d.]", ""); // Eliminar no dígitos ni puntos
+            String concepto = matcherGas.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
             String valor = matcherGas.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            // Eliminar puntos y cambiar la coma por un punto para representar la parte decimal
-            concepto = concepto.replace(".", "");
             valor = valor.replace(".", "").replace(",", ".");
 
-            amountGas = Double.parseDouble(concepto);
+            amountGas = Float.parseFloat(concepto);
             priceGas = Double.parseDouble(valor);
         }
-        System.out.println(amountGas);
-        System.out.println(priceGas);
+
+        Date fechaFormateada;
+        if (matcherDate.find()) {
+            String fechaEncontrada = matcherDate.group(1);
+            fechaFormateada = formatDate(fechaEncontrada);
+        } else {
+            throw new AppException("No se encontró la fecha en el texto.", HttpStatus.BAD_REQUEST);
+        }
+
+        String receiptName = null;
+        if (matcherReceiptName.find()) {
+            receiptName = matcherReceiptName.group(0);
+        }
+
+        String contract = null;
+        if (matcherContract.find()) {
+            contract = matcherContract.group(1);
+        }
+
+        Receipt receiptWater = new Receipt();
+        Receipt receiptEnergy = new Receipt();
+        Receipt receiptSewerage = new Receipt();
+        Receipt receiptGas = new Receipt();
+
+        assert contract != null;
+        Optional<House> optionalHouse = houseRepository.findByContract(contract);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found with the current contract number: " + contract, HttpStatus.NOT_FOUND);
+        }
+        receiptWater.setHouse(optionalHouse.get());
+        receiptEnergy.setHouse(optionalHouse.get());
+        receiptSewerage.setHouse(optionalHouse.get());
+        receiptGas.setHouse(optionalHouse.get());
+
+        assert receiptName != null;
+
+        String waterName = receiptName + " " + "Agua";
+        String energyName = receiptName + " " + "Energia";
+        String sewerageName = receiptName + " " + "Alcantarillado";
+        String gasName = receiptName + " " + "Gas";
+
+        receiptWater.setPrice(priceWater);
+        receiptEnergy.setPrice(priceEnergy);
+        receiptSewerage.setPrice(priceSewerage);
+        receiptGas.setPrice(priceGas);
+
+        receiptWater.setAmount(amountWater);
+        receiptEnergy.setAmount(amountEnergy);
+        receiptSewerage.setAmount(amountSewerage);
+        receiptGas.setAmount(amountGas);
+
+        receiptWater.setHouseName(optionalHouse.get().getName());
+        receiptEnergy.setHouseName(optionalHouse.get().getName());
+        receiptSewerage.setHouseName(optionalHouse.get().getName());
+        receiptGas.setHouseName(optionalHouse.get().getName());
+
+        assert fechaFormateada != null;
+        receiptWater.setDate(fechaFormateada);
+        receiptEnergy.setDate(fechaFormateada);
+        receiptSewerage.setDate(fechaFormateada);
+        receiptGas.setDate(fechaFormateada);
+
+        Optional<TypeService> optional = typeServiceRepository.findByTypeIgnoreCase("Water");
+        if (optional.isEmpty()) {
+            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
+        }
+        receiptWater.setTypeService(optional.get());
+
+        Optional<TypeService> optional1 = typeServiceRepository.findByTypeIgnoreCase("Energy");
+        if (optional1.isEmpty()) {
+            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
+        }
+        receiptEnergy.setTypeService(optional1.get());
+
+        Optional<TypeService> optional2 = typeServiceRepository.findByTypeIgnoreCase("Sewerage");
+        if (optional2.isEmpty()) {
+            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
+        }
+        receiptSewerage.setTypeService(optional2.get());
+
+        Optional<TypeService> optional3 = typeServiceRepository.findByTypeIgnoreCase("Gas");
+        if (optional3.isEmpty()) {
+            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
+        }
+        receiptGas.setTypeService(optional3.get());
+
+        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), waterName, optional.get());
+        if (optionalReceipt.isPresent()) {
+            throw new AppException("Receipt already registered with the next name: " + waterName, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Receipt> optionalReceipt1 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), energyName, optional.get());
+        if (optionalReceipt1.isPresent()) {
+            throw new AppException("Receipt already registered with the next name: " + energyName, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Receipt> optionalReceipt2 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), sewerageName, optional.get());
+        if (optionalReceipt2.isPresent()) {
+            throw new AppException("Receipt already registered with the next name: " + sewerageName, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Receipt> optionalReceipt3 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), gasName, optional.get());
+        if (optionalReceipt3.isPresent()) {
+            throw new AppException("Receipt already registered with the next name: " + gasName, HttpStatus.BAD_REQUEST);
+        }
+
+        receiptWater.setReceiptName(waterName);
+        receiptEnergy.setReceiptName(energyName);
+        receiptSewerage.setReceiptName(sewerageName);
+        receiptGas.setReceiptName(gasName);
+
+        receiptRepository.save(receiptWater);
+        receiptRepository.save(receiptEnergy);
+        receiptRepository.save(receiptSewerage);
+        receiptRepository.save(receiptGas);
+
+        return "Recibos guardados satisfactoriamente";
     }
 
     @Override
-    public void readPDF(MultipartFile archivoPdf) {
+    public Date formatDate(String date) {
+        try {
+            DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive()
+                    .appendPattern("dd-")
+                    .appendText(ChronoField.MONTH_OF_YEAR,
+                            new HashMap<>() {
+                                {
+                                    put(1L, "ene");
+                                    put(2L, "feb");
+                                    put(3L, "mar");
+                                    put(4L, "abr");
+                                    put(5L, "may");
+                                    put(6L, "jun");
+                                    put(7L, "jul");
+                                    put(8L, "ago");
+                                    put(9L, "sep");
+                                    put(10L, "oct");
+                                    put(11L, "nov");
+                                    put(12L, "dic");
+                                }
+                            })
+                    .appendPattern("-yyyy");
+
+            DateTimeFormatter formatter = builder.toFormatter(Locale.forLanguageTag("es-ES"));
+
+            LocalDate localDate = LocalDate.parse(date, formatter);
+
+            return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        } catch (DateTimeParseException e) {
+            throw new AppException("Error al Parsear la fecha " + e.getParsedString(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private static double parseNumber(String value) {
+        try {
+            // Obtener el formato de número para el locale actual
+            NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
+
+            // Parsear la cadena en un número
+            Number number = numberFormat.parse(value);
+
+            // Devolver el número como un double
+            return number.doubleValue();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Manejar la excepción de parseo, por ejemplo, lanzar una excepción personalizada o devolver un valor predeterminado
+            return 0.0;
+        }
+    }
+
+    @Override
+    public String readPDF(MultipartFile archivoPdf) {
         try {
             PdfReader pdfReader = new PdfReader(archivoPdf.getInputStream());
 
@@ -247,7 +418,7 @@ public class ReceiptService implements ReceiptInterface {
 
             // Cerrar el lector de PDF
             pdfReader.close();
-            extraerInformacionFactura(textoPagina);
+            return extraerInformacionFactura(textoPagina);
         } catch (IOException e) {
             throw new AppException("Error al procesar el archivo PDF", HttpStatus.BAD_REQUEST);
         }

@@ -32,7 +32,7 @@ public class Statistic {
     private Double[] price;
 
     @Column(name = "amount", columnDefinition = "DOUBLE PRECISION[]")
-    private Double[] amount;
+    private Float[] amount;
 
     @OneToOne
     @JoinColumn(name = "FK_TYPE", nullable = false)

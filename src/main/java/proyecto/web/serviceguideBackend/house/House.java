@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "house")
+@Table(name = "house", uniqueConstraints = {@UniqueConstraint(columnNames = {"contract"})})
 public class House {
 
     @Id

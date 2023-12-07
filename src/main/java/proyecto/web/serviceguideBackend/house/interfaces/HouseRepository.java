@@ -19,5 +19,6 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     Collection<String> getHouseName(Long id);
     @Query(value = "select h.id from House h where h.name = ?1")
     Long findIdByName(String name);
+    Optional<House> findByContract(@NotNull String contract);
 
 }
