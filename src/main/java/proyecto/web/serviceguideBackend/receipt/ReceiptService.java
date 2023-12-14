@@ -3,6 +3,8 @@ package proyecto.web.serviceguideBackend.receipt;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,7 @@ import proyecto.web.serviceguideBackend.house.HouseService;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptMapper;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
+import proyecto.web.serviceguideBackend.statistic.StatisticService;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
@@ -21,8 +24,6 @@ import proyecto.web.serviceguideBackend.receipt.typeService.TypeServiceRepositor
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -43,6 +44,7 @@ public class ReceiptService implements ReceiptInterface {
     private final TypeServiceRepository typeServiceRepository;
     private final HouseService houseService;
     private final UserRepository userRepository;
+    private final StatisticService statisticService;
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser) {
@@ -160,32 +162,32 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public String extraerInformacionFactura(String textoFactura) {
-        String patronAcueducto = "Acueducto (\\d[\\d.,]*) m3\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
-        String patronAlcantarillado = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
-        String patronEnergia = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+    public String extractReceiptInformation(String receiptText) {
+        String patronWater = "Acueducto (\\d[\\d.,]*) m3\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronSewerage = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronEnergy = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronGas = "Gas (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronDate = "(\\d{1,2}-[a-zA-Z]{3}-\\d{4})";
-        String patronNumeroContrato = "Contrato (\\d+)";
+        String patronContractNumber = "Contrato (\\d+)";
         String patronReceiptName = "Factura [A-Za-z]+ de \\d{4}";
 
         // Crear los objetos de patrón
-        Pattern patternAcueducto = Pattern.compile(patronAcueducto);
-        Pattern patternAlcantarillado = Pattern.compile(patronAlcantarillado);
-        Pattern patternEnergia = Pattern.compile(patronEnergia);
+        Pattern patternWater = Pattern.compile(patronWater);
+        Pattern patternSewerage = Pattern.compile(patronSewerage);
+        Pattern patternEnergy = Pattern.compile(patronEnergy);
         Pattern patternGas = Pattern.compile(patronGas);
         Pattern patternDate = Pattern.compile(patronDate);
-        Pattern patternContract = Pattern.compile(patronNumeroContrato);
+        Pattern patternContract = Pattern.compile(patronContractNumber);
         Pattern patternReceiptName = Pattern.compile(patronReceiptName);
 
         // Crear el objeto Matcher
-        Matcher matcherWater = patternAcueducto.matcher(textoFactura);
-        Matcher matcherEnergy = patternEnergia.matcher(textoFactura);
-        Matcher matcherSewerage = patternAlcantarillado.matcher(textoFactura);
-        Matcher matcherGas = patternGas.matcher(textoFactura);
-        Matcher matcherDate = patternDate.matcher(textoFactura);
-        Matcher matcherContract = patternContract.matcher(textoFactura);
-        Matcher matcherReceiptName = patternReceiptName.matcher(textoFactura);
+        Matcher matcherWater = patternWater.matcher(receiptText);
+        Matcher matcherEnergy = patternEnergy.matcher(receiptText);
+        Matcher matcherSewerage = patternSewerage.matcher(receiptText);
+        Matcher matcherGas = patternGas.matcher(receiptText);
+        Matcher matcherDate = patternDate.matcher(receiptText);
+        Matcher matcherContract = patternContract.matcher(receiptText);
+        Matcher matcherReceiptName = patternReceiptName.matcher(receiptText);
 
         float amountWater = 0;
         double priceWater = 0;
@@ -238,10 +240,10 @@ public class ReceiptService implements ReceiptInterface {
             priceGas = Double.parseDouble(valor);
         }
 
-        Date fechaFormateada;
+        Date formatedDate;
         if (matcherDate.find()) {
-            String fechaEncontrada = matcherDate.group(1);
-            fechaFormateada = formatDate(fechaEncontrada);
+            String dateFound = matcherDate.group(1);
+            formatedDate = formatDate(dateFound);
         } else {
             throw new AppException("No se encontró la fecha en el texto.", HttpStatus.BAD_REQUEST);
         }
@@ -293,11 +295,11 @@ public class ReceiptService implements ReceiptInterface {
         receiptSewerage.setHouseName(optionalHouse.get().getName());
         receiptGas.setHouseName(optionalHouse.get().getName());
 
-        assert fechaFormateada != null;
-        receiptWater.setDate(fechaFormateada);
-        receiptEnergy.setDate(fechaFormateada);
-        receiptSewerage.setDate(fechaFormateada);
-        receiptGas.setDate(fechaFormateada);
+        assert formatedDate != null;
+        receiptWater.setDate(formatedDate);
+        receiptEnergy.setDate(formatedDate);
+        receiptSewerage.setDate(formatedDate);
+        receiptGas.setDate(formatedDate);
 
         Optional<TypeService> optional = typeServiceRepository.findByTypeIgnoreCase("Water");
         if (optional.isEmpty()) {
@@ -353,6 +355,32 @@ public class ReceiptService implements ReceiptInterface {
         receiptRepository.save(receiptSewerage);
         receiptRepository.save(receiptGas);
 
+        Long idUser = optionalHouse.get().getUser().getId();
+        Pageable pageable = PageRequest.of(0,4);
+
+        List<Receipt> receiptList = receiptCollection(idUser, pageable);
+
+        Collections.reverse(receiptList);
+
+        try {
+            Receipt firstReceipt = receiptList.remove(0);
+            Long idFirstReceipt = firstReceipt.getId();
+            String typeFirstReceipt = firstReceipt.getTypeService().getType();
+            statisticService.individualReceipt(typeFirstReceipt, idFirstReceipt, "Bar");
+            System.out.println("Procesado el primer Receipt");
+        } catch (Exception e) {
+            // Manejar la excepción (puedes personalizar esto según tus necesidades)
+            System.err.println("Error al procesar el primer Receipt: " + e.getMessage());
+        }
+
+// Continuar con el procesamiento de los demás Receipts
+        for (Receipt receipt : receiptList) {
+            Long idReceipt = receipt.getId();
+            String typeReceipt = receipt.getTypeService().getType();
+            System.out.println(idReceipt);
+            statisticService.individualReceipt(typeReceipt, idReceipt, "Bar");
+        }
+
         return "Recibos guardados satisfactoriamente";
     }
 
@@ -391,23 +419,6 @@ public class ReceiptService implements ReceiptInterface {
         }
     }
 
-    private static double parseNumber(String value) {
-        try {
-            // Obtener el formato de número para el locale actual
-            NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
-
-            // Parsear la cadena en un número
-            Number number = numberFormat.parse(value);
-
-            // Devolver el número como un double
-            return number.doubleValue();
-        } catch (ParseException e) {
-            e.printStackTrace();
-            // Manejar la excepción de parseo, por ejemplo, lanzar una excepción personalizada o devolver un valor predeterminado
-            return 0.0;
-        }
-    }
-
     @Override
     public String readPDF(MultipartFile archivoPdf) {
         try {
@@ -418,9 +429,18 @@ public class ReceiptService implements ReceiptInterface {
 
             // Cerrar el lector de PDF
             pdfReader.close();
-            return extraerInformacionFactura(textoPagina);
+            return extractReceiptInformation(textoPagina);
         } catch (IOException e) {
             throw new AppException("Error al procesar el archivo PDF", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public List<Receipt> receiptCollection(Long idUser, Pageable pageable) {
+        List<Receipt> receiptList = receiptRepository.findLastFourReceipt(idUser,pageable);
+        if (receiptList.isEmpty()) {
+            throw new AppException("No tienes recibos", HttpStatus.NOT_FOUND);
+        }
+        return receiptList;
     }
 }
