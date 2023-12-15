@@ -68,7 +68,7 @@ public class ReceiptController {
     }
 
     @PostMapping("/read")
-    public ResponseEntity<String> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
+    public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
         return ResponseEntity.ok(receiptService.readPDF(archivoPdf));
     }
 

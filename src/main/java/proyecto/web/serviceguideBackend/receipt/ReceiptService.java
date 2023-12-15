@@ -162,7 +162,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public String extractReceiptInformation(String receiptText) {
+    public Message extractReceiptInformation(String receiptText) {
         String patronWater = "Acueducto (\\d[\\d.,]*) m3\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronSewerage = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronEnergy = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
@@ -381,7 +381,7 @@ public class ReceiptService implements ReceiptInterface {
             statisticService.individualReceipt(typeReceipt, idReceipt, "Bar");
         }
 
-        return "Recibos guardados satisfactoriamente";
+        return new Message("Recibos guardados satisfactoriamente", HttpStatus.OK);
     }
 
     @Override
@@ -420,7 +420,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public String readPDF(MultipartFile archivoPdf) {
+    public Message readPDF(MultipartFile archivoPdf) {
         try {
             PdfReader pdfReader = new PdfReader(archivoPdf.getInputStream());
 
