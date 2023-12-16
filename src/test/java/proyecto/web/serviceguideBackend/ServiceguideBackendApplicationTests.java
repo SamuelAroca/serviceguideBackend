@@ -1,6 +1,5 @@
 package proyecto.web.serviceguideBackend;
 
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +23,6 @@ import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
-import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
-import proyecto.web.serviceguideBackend.statistic.Statistic;
-import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
 import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;

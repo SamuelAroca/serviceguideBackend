@@ -2,8 +2,6 @@ package proyecto.web.serviceguideBackend.receipt;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +12,6 @@ import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
 import proyecto.web.serviceguideBackend.statistic.StatisticService;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,8 +30,7 @@ public class ReceiptController {
         ReceiptDto createdReceipt = receiptService.newReceipt(receiptDto, idUser);
 
         Long idReceipt = createdReceipt.getId();
-        String typeReceipt = createdReceipt.getTypeService().getType();
-        System.out.println(typeReceipt);
+        String typeReceipt = createdReceipt.getTypeService().name();
         statisticService.individualReceipt(typeReceipt, idReceipt, "Bar");
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -70,13 +66,5 @@ public class ReceiptController {
     @PostMapping("/read")
     public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
         return ResponseEntity.ok(receiptService.readPDF(archivoPdf));
-    }
-
-    @GetMapping("/lastFour/{idUser}")
-    public ResponseEntity<Collection<Receipt>> lastFour(@PathVariable Long idUser) {
-        Pageable pageable = PageRequest.of(0,1);
-        long count = receiptRepository.count();
-        System.out.println(count);
-        return ResponseEntity.ok(receiptService.receiptCollection(idUser, pageable));
     }
 }

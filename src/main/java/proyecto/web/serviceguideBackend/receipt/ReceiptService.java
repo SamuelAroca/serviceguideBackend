@@ -11,17 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
-import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.house.HouseService;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptMapper;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
+import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.statistic.StatisticService;
-import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
-import proyecto.web.serviceguideBackend.receipt.typeService.TypeServiceRepository;
-import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -41,20 +38,25 @@ public class ReceiptService implements ReceiptInterface {
     private final ReceiptRepository receiptRepository;
     private final ReceiptMapper receiptMapper;
     private final HouseRepository houseRepository;
-    private final TypeServiceRepository typeServiceRepository;
     private final HouseService houseService;
-    private final UserRepository userRepository;
     private final StatisticService statisticService;
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser) {
+
+        Receipt receipt = receiptMapper.serviceReceipt(receiptDto);
+
         Optional<House> optionalHouse = houseService.findByUserAndName(idUser, Objects.requireNonNull(receiptDto.getHouse()).getName());
         if (optionalHouse.isEmpty()) {
             throw new AppException("House not found", HttpStatus.NOT_FOUND);
         }
-        Optional<TypeService> typeService = typeServiceRepository.findByTypeIgnoreCase(Objects.requireNonNull(receiptDto.getTypeService()).getType());
-        if (typeService.isEmpty()) {
-            throw new AppException("Receipt Type not found", HttpStatus.NOT_FOUND);
+
+        switch (receiptDto.getTypeService().name()) {
+            case "WATER" -> receipt.setTypeService(TypeService.WATER);
+            case "ENERGY" -> receipt.setTypeService(TypeService.ENERGY);
+            case "SEWERAGE" -> receipt.setTypeService(TypeService.SEWERAGE);
+            case "GAS" -> receipt.setTypeService(TypeService.GAS);
+            default -> throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
         }
 
         Calendar newReceiptCalendar = Calendar.getInstance();
@@ -62,20 +64,19 @@ public class ReceiptService implements ReceiptInterface {
         int receiptMonth = newReceiptCalendar.get(Calendar.MONTH) + 1;
         int receiptYear = newReceiptCalendar.get(Calendar.YEAR);
 
-        List<Receipt> existingReceipts = receiptRepository.findByHouseAndTypeServiceAndMonthAndYear(optionalHouse.get(), typeService.get(), receiptMonth, receiptYear);
+        List<Receipt> existingReceipts = receiptRepository.findByHouseAndTypeServiceAndMonthAndYear(optionalHouse.get(), receipt.getTypeService().name(), receiptMonth, receiptYear);
         if (!existingReceipts.isEmpty()) {
             throw new AppException("Receipt already exists for the given month and year", HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(),typeService.get());
+        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(), receipt.getTypeService());
         if (optionalReceipt.isPresent()) {
             throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
         }
 
-        Receipt receipt = receiptMapper.serviceReceipt(receiptDto);
+
         receipt.setHouse(optionalHouse.get());
         receipt.setHouseName(optionalHouse.get().getName());
-        receipt.setTypeService(typeService.get());
 
         Receipt receiptSaved = receiptRepository.save(receipt);
         return receiptMapper.serviceReceiptDto(receiptSaved);
@@ -93,57 +94,7 @@ public class ReceiptService implements ReceiptInterface {
 
     @Override
     public Optional<Message> updateReceipt(ReceiptDto receiptDto, Long idReceipt) {
-        return Optional.of(receiptRepository.findById(idReceipt)
-                .map(receipt -> {
-                    Optional<TypeService> optionalTypeService = typeServiceRepository.findByTypeIgnoreCase(receiptDto.getTypeService().getType());
-                    if (optionalTypeService.isEmpty()) {
-                        throw new AppException("Type Receipt Not Found", HttpStatus.NOT_FOUND);
-                    }
-                    Long idUser = receiptRepository.findUserByReceiptId(idReceipt);
-                    Optional<User> optionalUser = userRepository.findById(idUser);
-                    if (optionalUser.isEmpty()) {
-                        throw new AppException("User Not Found", HttpStatus.NOT_FOUND);
-                    }
-                    Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), receiptDto.getHouse().getName());
-                    if (optionalHouse.isEmpty()) {
-                        throw new AppException("House Not Found", HttpStatus.NOT_FOUND);
-                    }
-                    Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), receiptDto.getReceiptName(), optionalTypeService.get());
-                    if (optionalReceipt.isPresent()) {
-                        if (optionalReceipt.get().getReceiptName().equals(receiptDto.getReceiptName())) {
-                            if (!optionalReceipt.get().getDate().equals(receiptDto.getDate())) {
-                                Calendar newReceiptCalendar = Calendar.getInstance();
-                                newReceiptCalendar.setTime(receiptDto.getDate());
-                                int receiptMonth = newReceiptCalendar.get(Calendar.MONTH) + 1;
-                                int receiptYear = newReceiptCalendar.get(Calendar.YEAR);
-
-                                List<Receipt> existingReceipts = receiptRepository.findByHouseAndTypeServiceAndMonthAndYear(optionalHouse.get(), optionalTypeService.get(), receiptMonth, receiptYear);
-                                if (!existingReceipts.isEmpty()) {
-                                    throw new AppException("Receipt already exists for the given month and year", HttpStatus.BAD_REQUEST);
-                                }
-                            }
-                            receipt.setReceiptName(receiptDto.getReceiptName());
-                            receipt.setPrice(receiptDto.getPrice());
-                            receipt.setAmount(receiptDto.getAmount());
-                            receipt.setDate(receiptDto.getDate());
-                            receipt.setTypeService(optionalTypeService.get());
-                            receipt.setHouse(optionalHouse.get());
-                            receipt.setHouseName(optionalHouse.get().getName());
-                            receiptRepository.save(receipt);
-                            return new Message("Receipt Updated successfully", HttpStatus.OK);
-                        }
-                        throw new AppException("Receipt name already registered", HttpStatus.BAD_REQUEST);
-                    }
-                    receipt.setReceiptName(receiptDto.getReceiptName());
-                    receipt.setPrice(receiptDto.getPrice());
-                    receipt.setAmount(receiptDto.getAmount());
-                    receipt.setDate(receiptDto.getDate());
-                    receipt.setTypeService(optionalTypeService.get());
-                    receipt.setHouse(optionalHouse.get());
-                    receipt.setHouseName(optionalHouse.get().getName());
-                    receiptRepository.save(receipt);
-                    return new Message("Receipt Updated successfully", HttpStatus.OK);
-                }).orElseThrow(() -> new AppException("Receipt not found", HttpStatus.NOT_FOUND)));
+        return null;//Falta reformatear
     }
 
     @Override
@@ -301,46 +252,30 @@ public class ReceiptService implements ReceiptInterface {
         receiptSewerage.setDate(formatedDate);
         receiptGas.setDate(formatedDate);
 
-        Optional<TypeService> optional = typeServiceRepository.findByTypeIgnoreCase("Water");
-        if (optional.isEmpty()) {
-            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
-        }
-        receiptWater.setTypeService(optional.get());
+        receiptWater.setTypeService(TypeService.WATER);
 
-        Optional<TypeService> optional1 = typeServiceRepository.findByTypeIgnoreCase("Energy");
-        if (optional1.isEmpty()) {
-            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
-        }
-        receiptEnergy.setTypeService(optional1.get());
+        receiptEnergy.setTypeService(TypeService.ENERGY);
 
-        Optional<TypeService> optional2 = typeServiceRepository.findByTypeIgnoreCase("Sewerage");
-        if (optional2.isEmpty()) {
-            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
-        }
-        receiptSewerage.setTypeService(optional2.get());
+        receiptSewerage.setTypeService(TypeService.SEWERAGE);
 
-        Optional<TypeService> optional3 = typeServiceRepository.findByTypeIgnoreCase("Gas");
-        if (optional3.isEmpty()) {
-            throw new AppException("Type Service not found", HttpStatus.NOT_FOUND);
-        }
-        receiptGas.setTypeService(optional3.get());
+        receiptGas.setTypeService(TypeService.GAS);
 
-        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), waterName, optional.get());
+        Optional<Receipt> optionalReceipt = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), waterName, TypeService.WATER);
         if (optionalReceipt.isPresent()) {
             throw new AppException("Receipt already registered with the next name: " + waterName, HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Receipt> optionalReceipt1 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), energyName, optional.get());
+        Optional<Receipt> optionalReceipt1 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), energyName, TypeService.ENERGY);
         if (optionalReceipt1.isPresent()) {
             throw new AppException("Receipt already registered with the next name: " + energyName, HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Receipt> optionalReceipt2 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), sewerageName, optional.get());
+        Optional<Receipt> optionalReceipt2 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), sewerageName, TypeService.SEWERAGE);
         if (optionalReceipt2.isPresent()) {
             throw new AppException("Receipt already registered with the next name: " + sewerageName, HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Receipt> optionalReceipt3 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), gasName, optional.get());
+        Optional<Receipt> optionalReceipt3 = receiptRepository.findByHouseAndReceiptNameAndTypeService(optionalHouse.get(), gasName, TypeService.GAS);
         if (optionalReceipt3.isPresent()) {
             throw new AppException("Receipt already registered with the next name: " + gasName, HttpStatus.BAD_REQUEST);
         }
@@ -365,9 +300,8 @@ public class ReceiptService implements ReceiptInterface {
         try {
             Receipt firstReceipt = receiptList.remove(0);
             Long idFirstReceipt = firstReceipt.getId();
-            String typeFirstReceipt = firstReceipt.getTypeService().getType();
-            statisticService.individualReceipt(typeFirstReceipt, idFirstReceipt, "Bar");
-            System.out.println("Procesado el primer Receipt");
+            String typeFirstReceipt = firstReceipt.getTypeService().name();
+            statisticService.individualReceipt(typeFirstReceipt, idFirstReceipt, "BAR");
         } catch (Exception e) {
             // Manejar la excepción (puedes personalizar esto según tus necesidades)
             System.err.println("Error al procesar el primer Receipt: " + e.getMessage());
@@ -376,9 +310,8 @@ public class ReceiptService implements ReceiptInterface {
 // Continuar con el procesamiento de los demás Receipts
         for (Receipt receipt : receiptList) {
             Long idReceipt = receipt.getId();
-            String typeReceipt = receipt.getTypeService().getType();
-            System.out.println(idReceipt);
-            statisticService.individualReceipt(typeReceipt, idReceipt, "Bar");
+            String typeReceipt = String.valueOf(receipt.getTypeService());
+            statisticService.individualReceipt(typeReceipt, idReceipt, "BAR");
         }
 
         return new Message("Recibos guardados satisfactoriamente", HttpStatus.OK);

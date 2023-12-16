@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticType;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
+import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticType;
 
 import java.util.List;
 
@@ -34,8 +34,7 @@ public class Statistic {
     @Column(name = "amount", columnDefinition = "DOUBLE PRECISION[]")
     private Float[] amount;
 
-    @OneToOne
-    @JoinColumn(name = "FK_TYPE", nullable = false)
+    @Enumerated(EnumType.STRING)
     @NotNull
     private StatisticType statisticsType;
 

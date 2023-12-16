@@ -8,13 +8,13 @@ import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
+import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
 import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticMapper;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticRepository;
 import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticType;
-import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticTypeRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
@@ -30,7 +30,6 @@ public class StatisticService implements StatisticInterface {
     private final ReceiptRepository receiptRepository;
     private final StatisticRepository statisticRepository;
     private final StatisticMapper statisticMapper;
-    private final StatisticTypeRepository statisticTypeRepository;
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
 
@@ -55,10 +54,7 @@ public class StatisticService implements StatisticInterface {
             }
             return statisticDto;
         }
-        Optional<StatisticType> optionalStatisticType = statisticTypeRepository.findByTypeIgnoreCase(typeGraphic);
-        if (optionalStatisticType.isEmpty()) {
-            throw new AppException("Type not found", HttpStatus.NOT_FOUND);
-        }
+
         Optional<Receipt> optionalReceipt = receiptRepository.findById(idReceipt);
         if (optionalReceipt.isEmpty()) {
             throw new AppException("Receipt not found", HttpStatus.NOT_FOUND);
@@ -68,7 +64,8 @@ public class StatisticService implements StatisticInterface {
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        List<Long> collectionId = receiptRepository.getIdByUser(optionalUser.get().getId(), typeReceipt);
+        TypeService typeService = TypeService.valueOf(typeReceipt);
+        List<Long> collectionId = receiptRepository.getIdByUser(optionalUser.get().getId(), typeService);
         /*Se declara el array y se extraen 2 id*/
         List<Double> idList = new ArrayList<>();
         for (int i = 0; i < 2 && i < collectionId.size(); i++) {
@@ -97,12 +94,14 @@ public class StatisticService implements StatisticInterface {
 
         String[] label = {monthCapitalize1, monthCapitalize2};
 
+        StatisticType statisticType = StatisticType.valueOf(typeGraphic);
+
         /*Se crea la nueva estadistica y se le pasan los datos generados*/
         Statistic statistic = new Statistic();
         statistic.setLabel(label);
         statistic.setPrice(price);
         statistic.setAmount(amount);
-        statistic.setStatisticsType(optionalStatisticType.get());
+        statistic.setStatisticsType(statisticType);
         statisticRepository.save(statistic);
 
         List<Statistic> statisticList = new ArrayList<>();
@@ -139,23 +138,19 @@ public class StatisticService implements StatisticInterface {
 
         for (Receipt receipt : receipts) {
             double receiptAmount = receipt.getAmount().doubleValue();
-            String typeServiceName = receipt.getTypeService().getType();
+            String typeServiceName = receipt.getTypeService().name();
 
-            if (typeServiceName.equals("WATER")) {
-                waterSum += receiptAmount;
-            } else if (typeServiceName.equals("ENERGY")) {
-                energySum += receiptAmount;
-            } else if (typeServiceName.equals("GAS")) {
-                gasSum += receiptAmount;
-            } else if (typeServiceName.equals("SEWERAGE")) {
-                sewerageSum += receiptAmount;
+            switch (typeServiceName) {
+                case "WATER" -> waterSum += receiptAmount;
+                case "ENERGY" -> energySum += receiptAmount;
+                case "GAS" -> gasSum += receiptAmount;
+                case "SEWERAGE" -> sewerageSum += receiptAmount;
             }
         }
 
         // Crear un array de double y almacenar las sumas por tipo
-        double[] sumStatistics = { waterSum, energySum, gasSum, sewerageSum };
 
-        return sumStatistics;
+        return new double[]{ waterSum, energySum, gasSum, sewerageSum };
     }
 
     @Override

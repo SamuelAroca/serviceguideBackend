@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import proyecto.web.serviceguideBackend.statistic.Statistic;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
+import proyecto.web.serviceguideBackend.statistic.Statistic;
 import proyecto.web.serviceguideBackend.house.House;
 
 import java.util.Date;
@@ -48,9 +48,9 @@ public class Receipt {
     @NotNull
     private Date date;
 
-    @OneToOne
-    @JoinColumn(name = "FK_TYPE_SERVICE", nullable = false)
+
     @NotNull
+    @Enumerated(EnumType.STRING)
     private TypeService typeService;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
