@@ -44,7 +44,7 @@ public class ReceiptController {
     }
 
     @PutMapping("/update/{idReceipt}")
-    public Optional<Message> updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt) {
+    public Message updateReceipt(@RequestBody ReceiptDto receiptDto, @PathVariable Long idReceipt) {
         return receiptService.updateReceipt(receiptDto, idReceipt);
     }
 

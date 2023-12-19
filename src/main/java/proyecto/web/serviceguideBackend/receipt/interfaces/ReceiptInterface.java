@@ -15,7 +15,7 @@ public interface ReceiptInterface {
     ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser);
     List<Receipt> allReceiptsByUserId(Long idUser);
     Optional<Receipt> getLastReceipt(Long idUser);
-    Optional<Message> updateReceipt(ReceiptDto receiptDto, Long id);
+    Message updateReceipt(ReceiptDto receiptDto, Long id);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
     Message extractReceiptInformation(String receiptText);

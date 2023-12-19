@@ -23,6 +23,7 @@ import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
+import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.statistic.dto.SumOfReceiptDto;
 import proyecto.web.serviceguideBackend.statistic.interfaces.StatisticInterface;
 import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;
@@ -116,8 +117,6 @@ class ServiceguideBackendApplicationTests {
     @Order(5)
     @Test
     void testUserGetByEmail() {
-        CredentialsDto credentialsDto = new CredentialsDto("prueba@gmail.com", "prueba123".toCharArray());
-        LoginResponse loginResponse = loginInterface.login(credentialsDto);
 
         Optional<User> optionalUser = userInterface.getByEmail("prueba@gmail.com");
 
@@ -171,10 +170,14 @@ class ServiceguideBackendApplicationTests {
         updateUserDto.setPassword("prueba123".toCharArray());
 
         Optional<UpdateResponse> updatedUserDto = userInterface.updateUser(updateUserDto, idUser);
+        if (updatedUserDto.isEmpty()) {
+            throw new AppException("Not Found", HttpStatus.NOT_FOUND);
+        }
         Assertions.assertEquals("User updated", updatedUserDto.get().getMessage());
 
         User updatedUser = userRepository.findByEmail(updateUserDto.getEmail()).orElse(null);
 
+        assert updatedUser != null;
         Assertions.assertEquals(updateUserDto.getFirstName(), updatedUser.getFirstName());
         Assertions.assertEquals(updateUserDto.getLastName(), updatedUser.getLastName());
     }
@@ -222,6 +225,9 @@ class ServiceguideBackendApplicationTests {
         String name = "Prueba Test ._@";
 
         Optional<House> optionalHouse = houseInterface.findByUserAndName(idUser, name);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("Not found", HttpStatus.NOT_FOUND);
+        }
 
         Assertions.assertNotNull(optionalHouse);
         Assertions.assertEquals(name, optionalHouse.get().getName());
@@ -264,6 +270,9 @@ class ServiceguideBackendApplicationTests {
         city.setCity("Medellín");
 
         Optional<House> houseOptional = houseInterface.findByUserAndName(idUser, houseName);
+        if (houseOptional.isEmpty()) {
+            throw new AppException("Not found", HttpStatus.NOT_FOUND);
+        }
         Long id = houseOptional.get().getId();
 
         HouseDto updateHouse = new HouseDto();
@@ -315,8 +324,7 @@ class ServiceguideBackendApplicationTests {
         calendar.set(2023, Calendar.FEBRUARY, 10);
         Date date = calendar.getTime();
 
-        TypeService typeService = new TypeService();
-        typeService.setType("WATER");
+        TypeService typeService = TypeService.WATER;
 
         String houseName = "Casa Prueba Update @._";
         Optional<House> optionalHouse = houseInterface.findByUserAndName(idUser, houseName);
@@ -360,6 +368,9 @@ class ServiceguideBackendApplicationTests {
         String lastReceiptName = "Recibo Prueba Test @._";
 
         Optional<Receipt> optionalReceipt = receiptInterface.getLastReceipt(idUser);
+        if (optionalReceipt.isEmpty()) {
+            throw new AppException("Not found", HttpStatus.NOT_FOUND);
+        }
 
         Assertions.assertNotNull(optionalReceipt);
         Assertions.assertEquals(lastReceiptName, optionalReceipt.get().getReceiptName());
@@ -392,8 +403,7 @@ class ServiceguideBackendApplicationTests {
         calendar.set(2023, Calendar.FEBRUARY, 10);
         Date date = calendar.getTime();
 
-        TypeService typeService = new TypeService();
-        typeService.setType("ENERGY");
+        TypeService typeService = TypeService.ENERGY;
 
         String houseName = "Casa Prueba Update @._";
         Optional<House> optionalHouse = houseInterface.findByUserAndName(idUser, houseName);
@@ -409,31 +419,26 @@ class ServiceguideBackendApplicationTests {
         receiptDto.setTypeService(typeService);
         receiptDto.setHouse(house);
 
-        Optional<Message> updatedResult = receiptInterface.updateReceipt(receiptDto, idReceipt);
+        Message updatedResult = receiptInterface.updateReceipt(receiptDto, idReceipt);
 
-        Assertions.assertTrue(updatedResult.isPresent(), "La actualización del recibo falló");
-        Message message = updatedResult.get();
-        Assertions.assertEquals("Receipt Updated successfully", message.getMessage(), "El mensaje de actualización del recibo es incorrecto");
-        Assertions.assertEquals(HttpStatus.OK, message.getStatus(), "El estado de la respuesta de actualización de la casa es incorrecto");
+        Assertions.assertFalse(updatedResult.getMessage().isEmpty(), "La actualización del recibo falló");
+        String message = updatedResult.getMessage();
+        HttpStatus status = updatedResult.getStatus();
+        Assertions.assertEquals("Receipt Updated successfully", message, "El mensaje de actualización del recibo es incorrecto");
+        Assertions.assertEquals(HttpStatus.OK, status, "El estado de la respuesta de actualización de la casa es incorrecto");
     }
 
     @Order(19)
     @Test
     void testStatisticIndividualReceipt() {
-        CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        LoginResponse loginResponse = loginInterface.login(credentialsDto);
 
         String typeReceipt = "ENERGY";
         String typeGraphic = "BAR";
         Long idReceipt = receiptRepository.findIdByName("Recibo Test Update ._@");
 
-        Assertions.assertThrows(AppException.class, () -> {
-            statisticInterface.individualReceipt(typeReceipt, idReceipt, typeGraphic);
-        }, "Recibo creado pero no se puede generar la estadistica");
+        Assertions.assertThrows(AppException.class, () -> statisticInterface.individualReceipt(typeReceipt, idReceipt, typeGraphic), "Recibo creado pero no se puede generar la estadistica");
 
-        AppException exception = Assertions.assertThrows(AppException.class, () -> {
-            statisticInterface.individualReceipt(typeReceipt, idReceipt, typeGraphic);
-        });
+        AppException exception = Assertions.assertThrows(AppException.class, () -> statisticInterface.individualReceipt(typeReceipt, idReceipt, typeGraphic));
         Assertions.assertEquals(HttpStatus.OK, exception.getStatus());
     }
 
@@ -465,8 +470,6 @@ class ServiceguideBackendApplicationTests {
     @Order(21)
     @Test
     void testStatisticSumOfReceiptDto() {
-        CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        LoginResponse loginResponse = loginInterface.login(credentialsDto);
 
         String houseName = "Casa Prueba Update @._";
         Long idHouse = houseRepository.findIdByName(houseName);
@@ -484,8 +487,6 @@ class ServiceguideBackendApplicationTests {
     @Order(22)
     @Test
     void testReceiptDeleteReceipt() {
-        CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        LoginResponse loginResponse = loginInterface.login(credentialsDto);
 
         Long idReceipt = receiptRepository.findIdByName("Recibo Test Update ._@");
 
@@ -498,8 +499,6 @@ class ServiceguideBackendApplicationTests {
     @Order(23)
     @Test
     void testHouseDeleteHouse() {
-        CredentialsDto credentialsDto = new CredentialsDto("pruebaUPDATE@gmail.com", "prueba123".toCharArray());
-        LoginResponse loginResponse = loginInterface.login(credentialsDto);
 
         Long idHouse = houseRepository.findIdByName("Casa Prueba Update @._");
 
