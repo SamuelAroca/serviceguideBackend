@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
+import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.dto.*;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;
@@ -22,7 +22,7 @@ public class UserService implements UserInterface {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserAuthenticationProvider authenticationProvider;
+    private final JwtService authenticationProvider;
 
     @Override
     public Optional<User> getByEmail(String email) {
@@ -31,33 +31,7 @@ public class UserService implements UserInterface {
 
     @Override
     public Optional<UpdateResponse> updateUser(UpdateUserDto updateUser, Long idUser) {
-        return Optional.ofNullable(userRepository.findById(idUser)
-                .map(user -> {
-                    Optional<User> optionalUser = userRepository.findByEmail(updateUser.getEmail());
-                    if (optionalUser.isPresent()) {
-                        if (optionalUser.get().getEmail().equals(updateUser.getEmail())) {
-                            user.setFirstName(updateUser.getFirstName());
-                            user.setLastName(updateUser.getLastName());
-                            user.setEmail(updateUser.getEmail());
-                            if (updateUser.getPassword() != null) {
-                                user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
-                            }
-                            userRepository.save(user);
-                            String newToken = authenticationProvider.createToken(updateUser.getEmail());
-                            return new UpdateResponse("User updated", HttpStatus.OK, newToken);
-                        }
-                        throw new AppException("Email already exist", HttpStatus.INTERNAL_SERVER_ERROR);
-                    }
-                    user.setFirstName(updateUser.getFirstName());
-                    user.setLastName(updateUser.getLastName());
-                    user.setEmail(updateUser.getEmail());
-                    if (updateUser.getPassword() != null) {
-                        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(updateUser.getPassword())));
-                    }
-                    userRepository.save(user);
-                    String newToken = authenticationProvider.createToken(updateUser.getEmail());
-                    return new UpdateResponse("User updated", HttpStatus.OK, newToken);
-                }).orElseThrow(() -> new AppException("Username does not exist", HttpStatus.NOT_FOUND)));
+
     }
 
     @Override

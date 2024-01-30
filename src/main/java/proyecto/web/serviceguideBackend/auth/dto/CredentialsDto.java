@@ -15,6 +15,6 @@ public class CredentialsDto {
     @NotNull
     private String email;
 
-    private char @NotNull [] password;
+    private String password;
 
 }

@@ -23,6 +23,6 @@ public class UpdateUserDto {
     private String email;
 
     @Nullable
-    private char[] password;
+    private String password;
 
 }

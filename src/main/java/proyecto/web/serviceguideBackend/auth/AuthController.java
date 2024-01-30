@@ -10,7 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
-import proyecto.web.serviceguideBackend.config.UserAuthenticationProvider;
+import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
@@ -25,39 +25,34 @@ import java.util.Optional;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserAuthenticationProvider userAuthenticationProvider;
-    private final UserRepository userRepository;
-    private final LoginService loginService;
+    private final JwtService jwtService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid CredentialsDto credentialsDto) {
-        return ResponseEntity.ok(loginService.login(credentialsDto));
+        try {
+            return ResponseEntity.ok(authService.login(credentialsDto));
+        } catch (RuntimeException e) {
+            throw new AppException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/register")
     @Transactional
     public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
-        UserDto createdUser = authService.register(user);
-        String token = userAuthenticationProvider.createToken(user.getEmail());
-        createdUser.setToken(token);
-
-        Optional<User> findUSer = userRepository.findByEmail(user.getEmail());
-        if (findUSer.isEmpty()) {
-            throw new AppException("Algo salió mal", HttpStatus.BAD_REQUEST);
+        try {
+            return ResponseEntity.ok(authService.register(user));
+        } catch (RuntimeException e) {
+            throw new AppException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdUser.getId()).toUri();
-        return ResponseEntity.created(location).body(createdUser);
     }
 
     @GetMapping("/whoismyid/{token}")
     public ResponseEntity<Long> whoIsMyId(@PathVariable String token) {
-        return ResponseEntity.ok(userAuthenticationProvider.whoIsMyId(token));
+        return ResponseEntity.ok(jwtService.whoIsMyId(token));
     }
 
     @GetMapping("/myName/{token}")
     public ResponseEntity<String> myName(@PathVariable String token) {
-        return ResponseEntity.ok(userAuthenticationProvider.myName(token));
+        return ResponseEntity.ok(jwtService.myName(token));
     }
 }

@@ -22,6 +22,6 @@ public class SignUpDto {
     private String email;
 
     @NotEmpty
-    private char[] password;
+    private String password;
 
 }
