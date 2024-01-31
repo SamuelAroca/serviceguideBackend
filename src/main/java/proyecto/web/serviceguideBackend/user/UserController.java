@@ -9,8 +9,6 @@ import proyecto.web.serviceguideBackend.user.dto.UpdateResponse;
 import proyecto.web.serviceguideBackend.user.dto.UpdateUserDto;
 import proyecto.web.serviceguideBackend.user.dto.UserLoadDto;
 
-import java.util.Optional;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -20,7 +18,7 @@ public class UserController {
 
     @PutMapping("/update/{idUser}")
     @Transactional
-    public Optional<UpdateResponse> updateUser(@RequestBody UpdateUserDto updateUser, @PathVariable Long idUser) {
+    public UpdateResponse updateUser(@RequestBody UpdateUserDto updateUser, @PathVariable Long idUser) {
         return userService.updateUser(updateUser, idUser);
     }
 

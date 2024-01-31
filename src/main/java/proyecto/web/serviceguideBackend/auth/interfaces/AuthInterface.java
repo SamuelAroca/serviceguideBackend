@@ -9,6 +9,5 @@ public interface AuthInterface {
 
     UserDto register(SignUpDto userDto);
     LoginResponse login(CredentialsDto credentialsDto);
-    UserDto findByEmail(String email);
 
 }

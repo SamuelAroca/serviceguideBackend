@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.config;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,9 +55,9 @@ public class WebConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(@NotNull CorsRegistry registry) {
+            public void addCorsMappings(@Nullable CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(allowedOrigin)
+                        .allowedOrigins("http://localhost:5002")
                         .allowedMethods("GET", "POST", "PUT", "DELETE","OPTIONS")
                         .allowCredentials(true);
             }

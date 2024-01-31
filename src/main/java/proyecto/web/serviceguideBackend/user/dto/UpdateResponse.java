@@ -1,13 +1,12 @@
 package proyecto.web.serviceguideBackend.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
+@Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class UpdateResponse {
 
     private String message;

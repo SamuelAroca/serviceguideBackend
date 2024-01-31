@@ -18,7 +18,6 @@ import proyecto.web.serviceguideBackend.user.dto.UserDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.enums.Role;
-import proyecto.web.serviceguideBackend.user.interfaces.UserMapper;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
 import java.util.Optional;
@@ -28,7 +27,6 @@ import java.util.Optional;
 public class AuthService implements AuthInterface {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -71,14 +69,7 @@ public class AuthService implements AuthInterface {
                 .build();
     }
 
-    @Override
-    public UserDto findByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException("Wrong email or password", HttpStatus.NOT_FOUND));
-        return userMapper.toUserDto(user);
-    }
-
-    private void saveUserToken(User user, String jwtToken) {
+    public void saveUserToken(User user, String jwtToken) {
         var token = Token.builder()
                 .user(user)
                 .token(jwtToken)
@@ -89,7 +80,7 @@ public class AuthService implements AuthInterface {
         tokenRepository.save(token);
     }
 
-    private void revokedAllUserTokens(User user) {
+    public void revokedAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
