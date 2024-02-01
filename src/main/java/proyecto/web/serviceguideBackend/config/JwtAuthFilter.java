@@ -65,11 +65,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
+        try {
+            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+            if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+                return authHeader.substring(7);
+            }
+        } catch (Exception e) {
+            throw new AppException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        throw new AppException("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        return null;
     }
 }

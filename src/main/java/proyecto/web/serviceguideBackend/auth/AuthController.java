@@ -6,22 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
-import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.dto.UserDto;
-import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
-
-import java.net.URI;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users/auth")
+@CrossOrigin("http://localhost:5002")
 public class AuthController {
 
     private final AuthService authService;

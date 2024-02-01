@@ -48,6 +48,7 @@ public class AuthService implements AuthInterface {
                 .build();
         var savedUser = userRepository.save(user);
         var token = jwtService.getToken(user);
+        revokedAllUserTokens(user);
         return UserDto.builder()
                 .id(savedUser.getId())
                 .email(savedUser.getEmail())

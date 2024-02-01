@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import proyecto.web.serviceguideBackend.auth.AuthService;
 import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.dto.*;
@@ -31,6 +32,7 @@ public class UserService implements UserInterface {
     }
 
     @Override
+    @Transactional
     public UpdateResponse updateUser(UpdateUserDto updateUser, Long idUser) {
 
         if (updateUser.getFirstName().isEmpty() || updateUser.getLastName().isEmpty() || updateUser.getEmail().isEmpty()) {
@@ -56,6 +58,11 @@ public class UserService implements UserInterface {
             if (!updateUser.getPassword().isEmpty() || !passwordEncoder.matches(updateUser.getPassword(), user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
             }
+        }
+
+        if (!user.getFirstName().equals(updateUser.getFirstName()) || !user.getLastName().equals(updateUser.getLastName())) {
+            user.setFirstName(updateUser.getFirstName());
+            user.setLastName(updateUser.getLastName());
         }
 
         var savedUser = userRepository.save(user);

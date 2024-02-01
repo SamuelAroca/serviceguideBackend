@@ -1,9 +1,6 @@
 package proyecto.web.serviceguideBackend.config;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
 @Configuration
@@ -23,9 +18,6 @@ import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 public class WebConfig {
 
     private final UserRepository userRepository;
-
-    @Value("${front.URL}")
-    private String allowedOrigin;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -49,18 +41,5 @@ public class WebConfig {
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@Nullable CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5002")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE","OPTIONS")
-                        .allowCredentials(true);
-            }
-        };
     }
 }
