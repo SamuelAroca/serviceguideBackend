@@ -11,10 +11,10 @@ import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.auth.interfaces.AuthInterface;
 import proyecto.web.serviceguideBackend.config.JwtService;
+import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.token.Token;
 import proyecto.web.serviceguideBackend.token.enums.TokenType;
 import proyecto.web.serviceguideBackend.token.interfaces.TokenRepository;
-import proyecto.web.serviceguideBackend.user.dto.UserDto;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.enums.Role;
@@ -33,7 +33,7 @@ public class AuthService implements AuthInterface {
     private final TokenRepository tokenRepository;
 
     @Override
-    public UserDto register(SignUpDto userDto) {
+    public Message register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("User already registered", HttpStatus.BAD_REQUEST);
@@ -46,16 +46,8 @@ public class AuthService implements AuthInterface {
                 .role(Role.USER)
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .build();
-        var savedUser = userRepository.save(user);
-        var token = jwtService.getToken(user);
-        revokedAllUserTokens(user);
-        return UserDto.builder()
-                .id(savedUser.getId())
-                .email(savedUser.getEmail())
-                .firstName(savedUser.getFirstName())
-                .lastName(savedUser.getLastName())
-                .token(token)
-                .build();
+        userRepository.save(user);
+        return new Message("Register successfully", HttpStatus.OK);
     }
 
     @Override

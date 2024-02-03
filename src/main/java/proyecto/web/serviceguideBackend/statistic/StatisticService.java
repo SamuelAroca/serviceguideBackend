@@ -22,6 +22,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -160,19 +161,28 @@ public class StatisticService implements StatisticInterface {
             throw new AppException("Casa no encontrada", HttpStatus.NOT_FOUND);
         }
         Collection<Receipt> receiptList = receiptRepository.findByHouse(optionalHouse.get());
-        List<Integer> months = new ArrayList<>();
+        List<YearMonth> yearMonths = new ArrayList<>();
+
         for (Receipt receipt : receiptList) {
             Date receiptDate = receipt.getDate();
-            java.util.Date utilDate = new java.util.Date(receiptDate.getTime());
+            Date utilDate = new Date(receiptDate.getTime());
             Instant instant = utilDate.toInstant();
             LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
-            int latestMonth = localDate.getMonthValue();
-            months.add(latestMonth);
+
+            YearMonth yearMonth = YearMonth.of(localDate.getYear(), localDate.getMonth());
+            yearMonths.add(yearMonth);
         }
-        Set<Integer> uniqueNumbers = new HashSet<>(months);
-        List<Integer> numbersWithoutDuplicates = new ArrayList<>(uniqueNumbers);
-        numbersWithoutDuplicates.sort(Collections.reverseOrder());
-        if (numbersWithoutDuplicates.size() == 1) {
+
+        Comparator<YearMonth> customComparator = Comparator
+                .comparing(YearMonth::getYear)
+                .thenComparing(YearMonth::getMonthValue);
+
+        List<YearMonth> sortedYearMonths = yearMonths.stream()
+                .distinct()
+                .sorted(customComparator)
+                .collect(Collectors.toList());
+
+        if (sortedYearMonths.size() == 1) {
             double sumPriceLatest = 0D;
             for (Receipt receipt : receiptList) {
                 sumPriceLatest += receipt.getPrice();
@@ -184,22 +194,29 @@ public class StatisticService implements StatisticInterface {
             sumOfReceiptDto.setLastSumMonth(0F);
             return sumOfReceiptDto;
         }
+
         double sumPriceLatest = 0D;
         double sumPriceLast = 0D;
         double percentage;
         double difference;
-        for (int i = 0; i < numbersWithoutDuplicates.size() && i < 2; i++) {
-            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, numbersWithoutDuplicates.get(i));
+
+        // Obtener los últimos dos elementos de la lista ordenada
+        List<YearMonth> lastTwoMonths = sortedYearMonths.subList(Math.max(0, sortedYearMonths.size() - 2), sortedYearMonths.size());
+
+        for (int i = 0; i < lastTwoMonths.size(); i++) {
+            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, lastTwoMonths.get(i).getMonthValue());
             for (Receipt receipt : list) {
                 if (i == 0) {
-                    sumPriceLatest += receipt.getPrice();
-                } else {
                     sumPriceLast += receipt.getPrice();
+                } else {
+                    sumPriceLatest += receipt.getPrice();
                 }
             }
         }
+
         difference = sumPriceLast - sumPriceLatest;
-        percentage = (difference/sumPriceLast) * 100;
+        percentage = (difference / sumPriceLast) * 100;
+
         SumOfReceiptDto sumOfReceiptDto = new SumOfReceiptDto();
         sumOfReceiptDto.setSumMonth((float) sumPriceLatest);
         sumOfReceiptDto.setDifference((float) difference);
@@ -208,4 +225,5 @@ public class StatisticService implements StatisticInterface {
 
         return sumOfReceiptDto;
     }
+
 }

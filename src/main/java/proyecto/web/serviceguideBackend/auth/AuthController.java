@@ -10,13 +10,12 @@ import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.JwtService;
+import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
-import proyecto.web.serviceguideBackend.user.dto.UserDto;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users/auth")
-@CrossOrigin("http://localhost:5002")
 public class AuthController {
 
     private final AuthService authService;
@@ -33,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<UserDto> register(@RequestBody @Valid SignUpDto user) {
+    public ResponseEntity<Message> register(@RequestBody @Valid SignUpDto user) {
         try {
             return ResponseEntity.ok(authService.register(user));
         } catch (RuntimeException e) {
