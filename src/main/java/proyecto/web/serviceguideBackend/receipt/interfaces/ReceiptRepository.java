@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
@@ -36,6 +37,16 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     Long findIdByName(String name);
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 order by r.id DESC")
     List<Receipt> findLastFourReceipt(@NotNull Long id, Pageable pageable);
+    @Query(value = "SELECT r FROM Receipt r " +
+            "JOIN r.house h " +
+            "JOIN h.user u " +
+            "WHERE u.id = :userId AND h.id = :houseId AND " +
+            "((YEAR(r.date) = :currentYear AND MONTH(r.date) = :currentMonth) OR " +
+            "(YEAR(r.date) = :previousYear AND MONTH(r.date) = :previousMonth)) ORDER BY r.date DESC")
+    List<Receipt> findLastTwoMonthsReceiptsForUserAndHouse(@Param("userId") Long userId, @Param("houseId") Long houseId,
+                                                           @Param("currentYear") int currentYear, @Param("currentMonth") int currentMonth,
+                                                           @Param("previousYear") int previousYear, @Param("previousMonth") int previousMonth,
+                                                           Pageable pageable);
     long count();
 
 }

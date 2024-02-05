@@ -1,6 +1,7 @@
 package proyecto.web.serviceguideBackend.statistic;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import proyecto.web.serviceguideBackend.statistic.dto.StatisticDto;
@@ -27,5 +28,10 @@ public class StatisticController {
     @GetMapping("/informationReceipt/{idHouse}")
     public ResponseEntity<SumOfReceiptDto> informationReceipt(@PathVariable Long idHouse) {
         return ResponseEntity.ok(statisticService.sumOfReceiptDto(idHouse));
+    }
+
+    @GetMapping("/generateReportPDF/{userId}/{houseId}")
+    public ResponseEntity<ByteArrayResource> generateReportPDF(@PathVariable Long userId, @PathVariable Long houseId) {
+        return statisticService.generateReportPDF(userId, houseId);
     }
 }
