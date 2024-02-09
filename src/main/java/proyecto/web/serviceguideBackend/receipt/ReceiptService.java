@@ -4,10 +4,8 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfCanvasProcessor;
-import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.ITextExtractionStrategy;
-import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -195,7 +193,7 @@ public class ReceiptService implements ReceiptInterface {
 
     @Override
     public Message extractReceiptInformation(String receiptText) {
-        String patronWater = "Acueducto (\\d[\\d.,]*) m3\\n[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
+        String patronWater = "Acueducto (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronSewerage = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronEnergy = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronGas = "Gas (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
@@ -223,53 +221,53 @@ public class ReceiptService implements ReceiptInterface {
 
         float amountWater = 0;
         double priceWater = 0;
+
         while (matcherWater.find()) {
-            String concepto = matcherWater.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
-            String valor = matcherWater.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
+            String quantity = matcherWater.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
+            String price = matcherWater.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            concepto = concepto.replace(".", "").replace(",", ".");
-            valor = valor.replace(".", "").replace(",", ".");
+            quantity = quantity.replace(".", "").replace(",", ".");
+            price = price.replace(".", "").replace(",", ".");
 
-            amountWater = Float.parseFloat(concepto);
-            priceWater = Double.parseDouble(valor);
+            amountWater = Float.parseFloat(quantity);
+            priceWater = Double.parseDouble(price);
         }
-
         float amountEnergy = 0;
         double priceEnergy = 0;
         while (matcherEnergy.find()) {
-            String concepto = matcherEnergy.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
-            String valor = matcherEnergy.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
+            String quantity = matcherEnergy.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
+            String price = matcherEnergy.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            concepto = concepto.replace(".", "");
-            valor = valor.replace(".", "").replace(",", ".");
+            quantity = quantity.replace(".", "");
+            price = price.replace(".", "").replace(",", ".");
 
-            amountEnergy = Float.parseFloat(concepto);
-            priceEnergy = Double.parseDouble(valor);
+            amountEnergy = Float.parseFloat(quantity);
+            priceEnergy = Double.parseDouble(price);
         }
 
         float amountSewerage = 0;
         double priceSewerage = 0;
         while (matcherSewerage.find()) {
-            String concepto = matcherSewerage.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
-            String valor = matcherSewerage.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
+            String quantity = matcherSewerage.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
+            String price = matcherSewerage.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            concepto = concepto.replace(".", "");
-            valor = valor.replace(".", "").replace(",", ".");
+            quantity = quantity.replace(".", "");
+            price = price.replace(".", "").replace(",", ".");
 
-            amountSewerage = Float.parseFloat(concepto);
-            priceSewerage = Double.parseDouble(valor);
+            amountSewerage = Float.parseFloat(quantity);
+            priceSewerage = Double.parseDouble(price);
         }
 
         float amountGas = 0;
         double priceGas = 0;
         while (matcherGas.find()) {
-            String concepto = matcherGas.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
-            String valor = matcherGas.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
+            String quantity = matcherGas.group(1).replaceAll("[^\\d.]", "."); // Eliminar no dígitos ni puntos
+            String price = matcherGas.group(2).replaceAll("[^\\d.,]", ""); // Eliminar no dígitos ni puntos ni comas
 
-            valor = valor.replace(".", "").replace(",", ".");
+            price = price.replace(".", "").replace(",", ".");
 
-            amountGas = Float.parseFloat(concepto);
-            priceGas = Double.parseDouble(valor);
+            amountGas = Float.parseFloat(quantity);
+            priceGas = Double.parseDouble(price);
         }
 
         Date formatedDate;
@@ -452,7 +450,7 @@ public class ReceiptService implements ReceiptInterface {
             // Obtener el texto de la estrategia
             String textoPagina = strategy.getResultantText();
 
-            System.out.println("Texto de la página: " + textoPagina);
+            //System.out.println("Texto de la página: " + textoPagina);
 
             // Cerrar el lector y el documento de PDF
             pdfDocument.close();
