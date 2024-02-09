@@ -1,7 +1,14 @@
 package proyecto.web.serviceguideBackend.receipt;
 
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.PdfReader;
+import com.itextpdf.kernel.pdf.canvas.parser.PdfCanvasProcessor;
+import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
+import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
+import com.itextpdf.kernel.pdf.canvas.parser.listener.ITextExtractionStrategy;
+import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -430,12 +437,27 @@ public class ReceiptService implements ReceiptInterface {
     public Message readPDF(MultipartFile archivoPdf) {
         try {
             PdfReader pdfReader = new PdfReader(archivoPdf.getInputStream());
+            PdfDocument pdfDocument = new PdfDocument(pdfReader);
 
-            // Extraer el texto de la página 2
-            String textoPagina = PdfTextExtractor.getTextFromPage(pdfReader, 2);
+            // Obtener la página 2
+            PdfPage page = pdfDocument.getPage(2);
 
-            // Cerrar el lector de PDF
+            // Configurar la estrategia de extracción de texto
+            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+
+            // Procesar la página usando la estrategia
+            PdfCanvasProcessor processor = new PdfCanvasProcessor(strategy);
+            processor.processPageContent(page);
+
+            // Obtener el texto de la estrategia
+            String textoPagina = strategy.getResultantText();
+
+            System.out.println("Texto de la página: " + textoPagina);
+
+            // Cerrar el lector y el documento de PDF
+            pdfDocument.close();
             pdfReader.close();
+
             return extractReceiptInformation(textoPagina);
         } catch (IOException e) {
             throw new AppException("Error al procesar el archivo PDF", HttpStatus.BAD_REQUEST);

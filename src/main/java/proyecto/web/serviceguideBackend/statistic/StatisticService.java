@@ -1,13 +1,20 @@
 package proyecto.web.serviceguideBackend.statistic;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.io.exceptions.IOException;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.*;
+
+import com.itextpdf.layout.properties.BorderRadius;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -244,74 +251,42 @@ public class StatisticService implements StatisticInterface {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             // Crear el documento PDF
-            Document document = new Document();
-            PdfWriter writer = PdfWriter.getInstance(document, baos);
-            writer.setFullCompression();
-
-            document.open();
-
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
             document.setMargins(0, 0, 0, 0);
 
             // Agregar el título del informe
             Paragraph title = new Paragraph("REPORTE ESTADÍSTICO");
-            title.setAlignment(Element.ALIGN_CENTER);
+            title.setTextAlignment(TextAlignment.CENTER);
             document.add(title);
 
             // Agregar espacio
-            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("\n"));
 
             // Agregar el subtítulo con la fecha a la derecha
             Paragraph subtitle = new Paragraph("Fecha: " + obtenerFechaActual());
-            subtitle.setAlignment(Element.ALIGN_RIGHT);
+            subtitle.setTextAlignment(TextAlignment.RIGHT);
             document.add(subtitle);
 
-            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("\n"));
 
             Paragraph subtitleInformation = new Paragraph("Información de evaluación");
             document.add(subtitleInformation);
 
-            document.add(Chunk.NEWLINE);
-
-            /* Agregar el cuadro con la frase centrada
-            float rectWidth = PageSize.A4.getWidth() - 134 * 2;
-            float rectHeight = 80;
-            float rectX = 134;
-            float rectY = 620;
-
-            Rectangle rect = new Rectangle(rectX, rectY, rectX + rectWidth, rectY + rectHeight);
-            rect.setBorder(Rectangle.BOX);
-            rect.setBorderWidth(10);
-            //rect.setBorderColor(new BaseColor(10, 152, 197));
-            rect.setBorderColor(BaseColor.RED);
-
-            PdfContentByte cb = writer.getDirectContent();
-
-            Phrase phrase = new Phrase("La información que encontrará a continuación fue tomada teniendo en cuenta el siguiente rango de tiempo", new Font(Font.FontFamily.HELVETICA, 14)); // Ajusta el tamaño de la fuente según sea necesario
-
-            ColumnText columnText = new ColumnText(cb);
-            columnText.setSimpleColumn(rect);
-            columnText.addElement(phrase);
-            columnText.setAlignment(Element.ALIGN_CENTER);
-            columnText.go(); */
+            document.add(new Paragraph("\n"));
 
             // Agregar el cuadro con la frase centrada
-            float columnWidth[] = {200f};
-            PdfPTable table = new PdfPTable(columnWidth);
-            PdfPCell cell_1 = new PdfPCell();
-            Paragraph paragraph = new Paragraph("La información que encontrará a continuación fue tomada teniendo en cuenta el siguiente rango de tiempo");
-            cell_1.addElement(paragraph);
-            table.addCell(cell_1);
+            // Agregar el cuadro con la frase centrada
+            Table tableParagraph = new Table(UnitValue.createPercentArray(new float[]{200f}));
+            Cell cell_1 = new Cell().add(new Paragraph("La información que encontrará a continuación fue tomada teniendo en cuenta el siguiente rango de tiempo"));
+            cell_1.setBorder(Border.NO_BORDER);
+            cell_1.setBorderRadius(new BorderRadius(10)); // Ajusta el radio según sea necesario
+            tableParagraph.addCell(cell_1);
 
+            document.add(tableParagraph);
 
-            // Obtener la información de los últimos dos recibos
-            List<Receipt> lastTwoReceipts = obtenerUltimosDosRecibos(userId, houseId);
-
-            // Agregar la tabla con la información de los recibos
-            try {
-                agregarTablaRecibos(document, lastTwoReceipts);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
+            document.add(tableParagraph);
 
             document.close();
 
@@ -324,82 +299,17 @@ public class StatisticService implements StatisticInterface {
             ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
 
             // Devolver una respuesta con el recurso y los encabezados
-            return ResponseEntity
-                    .ok()
-                    .headers(headers)
-                    .body(resource);
+            return ResponseEntity.ok().headers(headers).body(resource);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity
-                    .status(500)
-                    .body(null);
+            return ResponseEntity.status(500).body(null);
         }
     }
 
     private String obtenerFechaActual() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd 'de' MMMM 'del' yyyy", new Locale("es", "ES"));
         return dateFormat.format(new Date());
-    }
-
-    private List<Receipt> obtenerUltimosDosRecibos(Long userId, Long houseId) {
-        // Obtener el año y mes actuales
-        Calendar calendar = Calendar.getInstance();
-        int currentYear = calendar.get(Calendar.YEAR);
-        int currentMonth = calendar.get(Calendar.MONTH) + 1; // Sumamos 1 porque los meses comienzan desde 0
-
-        // Obtener el mes y año del mes pasado
-        calendar.add(Calendar.MONTH, -1);
-        int previousYear = calendar.get(Calendar.YEAR);
-        int previousMonth = calendar.get(Calendar.MONTH) + 1;
-
-        return receiptRepository.findLastTwoMonthsReceiptsForUserAndHouse(userId, houseId, currentYear, currentMonth, previousYear, previousMonth, PageRequest.of(0, 2));
-    }
-
-    // Método para agregar la tabla con la información de los recibos al documento
-    private void agregarTablaRecibos(Document document, List<Receipt> receipts) throws DocumentException {
-        PdfPTable table = new PdfPTable(8);
-        table.setWidthPercentage(100);
-
-        // Agregar encabezados de columna
-        agregarCeldaEncabezado(table, "ID");
-        agregarCeldaEncabezado(table, "Amount");
-        agregarCeldaEncabezado(table, "Date");
-        agregarCeldaEncabezado(table, "House Name");
-        agregarCeldaEncabezado(table, "Price");
-        agregarCeldaEncabezado(table, "Receipt Name");
-        agregarCeldaEncabezado(table, "Type Service");
-
-        // Agregar filas con información de los recibos
-        for (Receipt receipt : receipts) {
-            agregarCelda(table, receipt.getId().toString());
-            agregarCelda(table, receipt.getAmount().toString());
-            agregarCelda(table, obtenerFechaFormateada(receipt.getDate()));
-            agregarCelda(table, receipt.getHouseName());
-            agregarCelda(table, receipt.getPrice().toString());
-            agregarCelda(table, receipt.getReceiptName());
-            agregarCelda(table, receipt.getTypeService().toString());
-        }
-
-        document.add(table);
-    }
-
-    private void agregarCeldaEncabezado(PdfPTable table, String texto) {
-        PdfPCell cell = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        table.addCell(cell);
-    }
-
-    private void agregarCelda(PdfPTable table, String texto) {
-        PdfPCell cell = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        table.addCell(cell);
-    }
-
-    private String obtenerFechaFormateada(Date fecha) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", new Locale("es", "ES"));
-        return dateFormat.format(fecha);
     }
     
 }
