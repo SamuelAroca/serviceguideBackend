@@ -3,6 +3,7 @@ package proyecto.web.serviceguideBackend.statistic;
 import com.itextpdf.io.exceptions.IOException;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -39,6 +40,7 @@ import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
 import java.awt.*;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -260,7 +262,7 @@ public class StatisticService implements StatisticInterface {
             Document document = new Document(pdf);
 
             // Agregar el título del informe
-            Paragraph title = new Paragraph("REPORTE ESTADÍSTICO");
+            Paragraph title = new Paragraph("REPORTE ESTADÍSTICO").setFontSize(20).setBold();
             title.setTextAlignment(TextAlignment.CENTER);
             document.add(title);
 
@@ -268,13 +270,13 @@ public class StatisticService implements StatisticInterface {
             document.add(new Paragraph("\n"));
 
             // Agregar el subtítulo con la fecha a la derecha
-            Paragraph subtitle = new Paragraph("Fecha: " + obtenerFechaActual());
+            Paragraph subtitle = new Paragraph("Fecha: " + obtenerFechaActual()).setFontSize(15).setBold();
             subtitle.setTextAlignment(TextAlignment.RIGHT);
             document.add(subtitle);
 
             document.add(new Paragraph("\n"));
 
-            Paragraph subtitleInformation = new Paragraph("Información de evaluación");
+            Paragraph subtitleInformation = new Paragraph("Información de evaluación").setFontSize(15).setBold();
             document.add(subtitleInformation);
 
             document.add(new Paragraph("\n"));
@@ -298,9 +300,34 @@ public class StatisticService implements StatisticInterface {
 
             document.add(new Paragraph("\n"));
 
-            // Agregar el título del informe
-            Paragraph logo = new Paragraph("ServiceGuide");
-            Paragraph slogan = new Paragraph("'Producción y consumo responsable'");
+            //Títulos de suma de recibos
+            Table tableTitleMonth = new Table(new float[]{1, 1});
+            DeviceRgb borderColor2 = new DeviceRgb(0, 191, 255);
+            tableTitleMonth.setWidth(UnitValue.createPercentValue(100));
+            tableTitleMonth.setTextAlignment(TextAlignment.CENTER);
+            tableTitleMonth.setBackgroundColor(borderColor2);
+
+            // Crear la celda para "Último Mes"
+            Cell cellLastMonth = new Cell().add(new Paragraph("Último Mes").setFontSize(16));
+            cellLastMonth.setWidth(UnitValue.createPercentValue(50));
+
+            // Crear la celda para "Mes Anterior"
+            Cell cellPreviousMonth = new Cell().add(new Paragraph("Mes Anterior").setFontSize(16));
+            cellPreviousMonth.setWidth(UnitValue.createPercentValue(50));
+
+            tableTitleMonth.addCell(cellLastMonth);
+            tableTitleMonth.addCell(cellPreviousMonth);
+
+            document.add(tableTitleMonth);
+
+            // Agregar la tabla con la información de los recibos por tipo
+            agregarTablaRecibosConFechas(document, lastTwoMonthsReceipts);
+
+            // Agregar la firma de ServiceGuide
+            document.add(new AreaBreak());
+
+            Paragraph logo = new Paragraph("ServiceGuide").setFontSize(16);
+            Paragraph slogan = new Paragraph("'Producción y consumo responsable'").setFontSize(12);
             logo.setTextAlignment(TextAlignment.CENTER);
             slogan.setTextAlignment(TextAlignment.CENTER);
             document.add(logo);
@@ -320,14 +347,13 @@ public class StatisticService implements StatisticInterface {
 
             document.add(title);
 
-            
-
+            //CERRAR DOCUMENTO
             document.close();
 
             // Configurar encabezados para la respuesta HTTP
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("inline", "reporte_estadistico.pdf");
+            headers.setContentDispositionFormData("inline", "reporte_serviceguide.pdf");
 
             // Crear un recurso ByteArray para la respuesta
             ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
@@ -359,29 +385,91 @@ public class StatisticService implements StatisticInterface {
     }
 
     private void agregarTablaRecibos(Document document, List<Receipt> lastTwoMonthsReceipts) {
-        Table table = new Table(new float[]{2, 2, 2, 2, 2, 2});
+        Table table = new Table(new float[]{2, 2, 2, 2});
         table.setWidth(UnitValue.createPercentValue(100));
         table.setTextAlignment(TextAlignment.CENTER);
 
         // Agregar encabezados de la tabla
-        table.addCell(new Cell().add(new Paragraph("Receipt Name")));
-        table.addCell(new Cell().add(new Paragraph("Date")));
-        table.addCell(new Cell().add(new Paragraph("Amount")));
-        table.addCell(new Cell().add(new Paragraph("Price")));
-        table.addCell(new Cell().add(new Paragraph("Type Service")));
-        table.addCell(new Cell().add(new Paragraph("House Name")));
+        table.addCell(new Cell().add(new Paragraph("Receipt Name").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Date").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Type Service").setBold()));
+        table.addCell(new Cell().add(new Paragraph("House Name").setBold()));
 
         // Agregar filas con la información de los recibos
         for (Receipt receipt : lastTwoMonthsReceipts) {
             table.addCell(new Cell().add(new Paragraph(receipt.getReceiptName())));
             table.addCell(new Cell().add(new Paragraph(receipt.getDate().toString())));
-            table.addCell(new Cell().add(new Paragraph(receipt.getAmount().toString())));
-            table.addCell(new Cell().add(new Paragraph(receipt.getPrice().toString())));
             table.addCell(new Cell().add(new Paragraph(receipt.getTypeService().toString())));
             table.addCell(new Cell().add(new Paragraph(receipt.getHouse().getName())));
         }
 
         document.add(table);
     }
-    
+
+    private String formatCurrency(double amount) {
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
+        return currencyFormat.format(amount);
+    }
+
+    private void agregarTablaRecibosConFechas(Document document, List<Receipt> lastTwoMonthsReceipts) {
+        // Filtrar los recibos con fechas iguales y diferentes
+        List<Receipt> sameDateReceipts = lastTwoMonthsReceipts.stream()
+                .filter(receipt -> receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
+                .collect(Collectors.toList());
+
+        List<Receipt> differentDateReceipts = lastTwoMonthsReceipts.stream()
+                .filter(receipt -> !receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
+                .collect(Collectors.toList());
+
+        // Calcular la suma de los Price para sameDate y differentDate
+        double sumSameDate = sameDateReceipts.stream().mapToDouble(Receipt::getPrice).sum();
+        double sumDifferentDate = differentDateReceipts.stream().mapToDouble(Receipt::getPrice).sum();
+
+        Table table = new Table(new float[]{1, 1});
+        table.setWidth(UnitValue.createPercentValue(100));
+        table.setTextAlignment(TextAlignment.CENTER);
+
+        // Agregar filas con la información de los recibos con fechas iguales y diferentes
+        int maxRowCount = Math.max(sameDateReceipts.size(), differentDateReceipts.size());
+        for (int i = 0; i < maxRowCount; i++) {
+            Cell sameDateCell = new Cell();
+            sameDateCell.setWidth(UnitValue.createPercentValue(50));
+            if (i < sameDateReceipts.size()) {
+                addReceiptInformationToCell(sameDateCell, sameDateReceipts.get(i));
+            }
+            table.addCell(sameDateCell);
+
+            Cell differentDateCell = new Cell();
+            differentDateCell.setWidth(UnitValue.createPercentValue(50));
+            if (i < differentDateReceipts.size()) {
+                addReceiptInformationToCell(differentDateCell, differentDateReceipts.get(i));
+            }
+            table.addCell(differentDateCell);
+        }
+
+        // Agregar celdas adicionales al final de cada columna con la suma de los Price
+        Cell sumSameDateCell = new Cell().add(new Paragraph("Total: " + formatCurrency(sumSameDate) + " COP").setBold());
+        Cell sumDifferentDateCell = new Cell().add(new Paragraph("Total: " + formatCurrency(sumDifferentDate) + " COP").setBold());
+
+        table.addCell(sumSameDateCell);
+        table.addCell(sumDifferentDateCell);
+
+        document.add(table);
+    }
+
+    private void addReceiptInformationToCell(Cell cell, Receipt receipt) {
+        String amountUnit = (receipt.getTypeService() == TypeService.ENERGY) ? " Kwh" : " m³";
+
+        Paragraph paragraph = new Paragraph()
+                .add(new Text("Type Service: ").setBold())
+                .add(receipt.getTypeService().toString())
+                .add("\n")
+                .add(new Text("Amount: ").setBold())
+                .add(receipt.getAmount().toString() + amountUnit)
+                .add("\n")
+                .add(new Text("Price: ").setBold())
+                .add(new Text(formatCurrency(receipt.getPrice())));
+
+        cell.add(paragraph);
+    }
 }
