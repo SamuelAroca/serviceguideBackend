@@ -10,6 +10,7 @@ import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,20 +34,10 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     List<Receipt> findByHouseAndTypeServiceAndMonthAndYear(House house, TypeService typeService, int month, int year);
     @Query(value = "select r from Receipt r inner join House h on r.house.id = h.id where h.id = ?1 and MONTH(r.date) = ?2")
     Collection<Receipt> listReceiptByHouseAndMonth(Long idHouse, int month);
-    @Query(value = "select r.id from Receipt r where r.receiptName = ?1")
-    Long findIdByName(String name);
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 order by r.id DESC")
     List<Receipt> findLastFourReceipt(@NotNull Long id, Pageable pageable);
-    @Query(value = "SELECT r FROM Receipt r " +
-            "JOIN r.house h " +
-            "JOIN h.user u " +
-            "WHERE u.id = :userId AND h.id = :houseId AND " +
-            "((YEAR(r.date) = :currentYear AND MONTH(r.date) = :currentMonth) OR " +
-            "(YEAR(r.date) = :previousYear AND MONTH(r.date) = :previousMonth)) ORDER BY r.date DESC")
-    List<Receipt> findLastTwoMonthsReceiptsForUserAndHouse(@Param("userId") Long userId, @Param("houseId") Long houseId,
-                                                           @Param("currentYear") int currentYear, @Param("currentMonth") int currentMonth,
-                                                           @Param("previousYear") int previousYear, @Param("previousMonth") int previousMonth,
-                                                           Pageable pageable);
+    @Query(value = "select r from Receipt r where r.house.user.id = ?1 and r.house.id = ?2 and r.date between ?3 and ?4 order by r.date desc ")
+    List<Receipt> findLastTwoMonthsReceipts(Long userId, Long houseId, Date startDate, Date endDate);
     long count();
 
 }

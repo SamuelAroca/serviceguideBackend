@@ -1,13 +1,16 @@
 package proyecto.web.serviceguideBackend.statistic;
 
 import com.itextpdf.io.exceptions.IOException;
-import com.itextpdf.layout.borders.Border;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.*;
+import com.itextpdf.kernel.colors.Color;
 
 import com.itextpdf.layout.properties.BorderRadius;
 import com.itextpdf.layout.properties.TextAlignment;
@@ -35,6 +38,7 @@ import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticType;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -254,7 +258,6 @@ public class StatisticService implements StatisticInterface {
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
-            document.setMargins(0, 0, 0, 0);
 
             // Agregar el título del informe
             Paragraph title = new Paragraph("REPORTE ESTADÍSTICO");
@@ -277,16 +280,47 @@ public class StatisticService implements StatisticInterface {
             document.add(new Paragraph("\n"));
 
             // Agregar el cuadro con la frase centrada
-            // Agregar el cuadro con la frase centrada
+            DeviceRgb borderColor = new DeviceRgb(10, 152, 197);
             Table tableParagraph = new Table(UnitValue.createPercentArray(new float[]{200f}));
-            Cell cell_1 = new Cell().add(new Paragraph("La información que encontrará a continuación fue tomada teniendo en cuenta el siguiente rango de tiempo"));
-            cell_1.setBorder(Border.NO_BORDER);
-            cell_1.setBorderRadius(new BorderRadius(10)); // Ajusta el radio según sea necesario
+            Cell cell_1 = new Cell().add(new Paragraph("La información que encontrará a continuación fue tomada teniendo en cuenta los siguiente datos"));
+            cell_1.setTextAlignment(TextAlignment.CENTER);
+            cell_1.setBorderRadius(new BorderRadius(10));
+            cell_1.setBorder(new SolidBorder(borderColor, 2));
             tableParagraph.addCell(cell_1);
 
             document.add(tableParagraph);
 
-            document.add(tableParagraph);
+            document.add(new Paragraph("\n"));
+
+            // Agregar tabla con la informacaión de los recibos
+            List<Receipt> lastTwoMonthsReceipts = obtenerUltimosRecibos(userId, houseId);
+            agregarTablaRecibos(document, lastTwoMonthsReceipts);
+
+            document.add(new Paragraph("\n"));
+
+            // Agregar el título del informe
+            Paragraph logo = new Paragraph("ServiceGuide");
+            Paragraph slogan = new Paragraph("'Producción y consumo responsable'");
+            logo.setTextAlignment(TextAlignment.CENTER);
+            slogan.setTextAlignment(TextAlignment.CENTER);
+            document.add(logo);
+            document.add(slogan);
+
+            // Agregar línea después del título
+            DeviceRgb deviceRgb = new DeviceRgb(10, 152, 197);
+            SolidLine solidLine = new SolidLine(2);
+            solidLine.setColor(deviceRgb);
+
+            LineSeparator line = new LineSeparator(solidLine);
+
+            document.add(line);
+
+            //NUEVA PÁGINA
+            pdf.addNewPage();
+
+            document.add(title);
+
+            
 
             document.close();
 
@@ -310,6 +344,44 @@ public class StatisticService implements StatisticInterface {
     private String obtenerFechaActual() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd 'de' MMMM 'del' yyyy", new Locale("es", "ES"));
         return dateFormat.format(new Date());
+    }
+
+    private List<Receipt> obtenerUltimosRecibos(Long userId, Long houseId) {
+        // Obtener la fecha de inicio (hace dos meses desde la fecha actual)
+        LocalDate startDate = LocalDate.now().minusMonths(2);
+        Date startDateParam = Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        // Obtener la fecha de fin (fecha actual)
+        LocalDate endDate = LocalDate.now();
+        Date endDateParam = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return receiptRepository.findLastTwoMonthsReceipts(userId, houseId, startDateParam, endDateParam);
+    }
+
+    private void agregarTablaRecibos(Document document, List<Receipt> lastTwoMonthsReceipts) {
+        Table table = new Table(new float[]{2, 2, 2, 2, 2, 2});
+        table.setWidth(UnitValue.createPercentValue(100));
+        table.setTextAlignment(TextAlignment.CENTER);
+
+        // Agregar encabezados de la tabla
+        table.addCell(new Cell().add(new Paragraph("Receipt Name")));
+        table.addCell(new Cell().add(new Paragraph("Date")));
+        table.addCell(new Cell().add(new Paragraph("Amount")));
+        table.addCell(new Cell().add(new Paragraph("Price")));
+        table.addCell(new Cell().add(new Paragraph("Type Service")));
+        table.addCell(new Cell().add(new Paragraph("House Name")));
+
+        // Agregar filas con la información de los recibos
+        for (Receipt receipt : lastTwoMonthsReceipts) {
+            table.addCell(new Cell().add(new Paragraph(receipt.getReceiptName())));
+            table.addCell(new Cell().add(new Paragraph(receipt.getDate().toString())));
+            table.addCell(new Cell().add(new Paragraph(receipt.getAmount().toString())));
+            table.addCell(new Cell().add(new Paragraph(receipt.getPrice().toString())));
+            table.addCell(new Cell().add(new Paragraph(receipt.getTypeService().toString())));
+            table.addCell(new Cell().add(new Paragraph(receipt.getHouse().getName())));
+        }
+
+        document.add(table);
     }
     
 }

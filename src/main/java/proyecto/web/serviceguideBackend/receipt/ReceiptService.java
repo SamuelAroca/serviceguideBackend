@@ -450,8 +450,6 @@ public class ReceiptService implements ReceiptInterface {
             // Obtener el texto de la estrategia
             String textoPagina = strategy.getResultantText();
 
-            //System.out.println("Texto de la página: " + textoPagina);
-
             // Cerrar el lector y el documento de PDF
             pdfDocument.close();
             pdfReader.close();
