@@ -3,7 +3,6 @@ package proyecto.web.serviceguideBackend.statistic;
 import com.itextpdf.io.exceptions.IOException;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
-import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -39,7 +38,6 @@ import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticType;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.awt.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -324,28 +322,50 @@ public class StatisticService implements StatisticInterface {
             agregarTablaRecibosConFechas(document, lastTwoMonthsReceipts);
 
             // Agregar la firma de ServiceGuide
-            document.add(new AreaBreak());
-
-            Paragraph logo = new Paragraph("ServiceGuide").setFontSize(16);
-            Paragraph slogan = new Paragraph("'Producción y consumo responsable'").setFontSize(12);
-            logo.setTextAlignment(TextAlignment.CENTER);
-            slogan.setTextAlignment(TextAlignment.CENTER);
-            document.add(logo);
-            document.add(slogan);
-
-            // Agregar línea después del título
-            DeviceRgb deviceRgb = new DeviceRgb(10, 152, 197);
-            SolidLine solidLine = new SolidLine(2);
-            solidLine.setColor(deviceRgb);
-
-            LineSeparator line = new LineSeparator(solidLine);
-
-            document.add(line);
-
-            //NUEVA PÁGINA
-            pdf.addNewPage();
+            agregarLogoServiceGuide(document);
 
             document.add(title);
+
+            Color red = new DeviceRgb(255, 0, 0);
+            Color green = new DeviceRgb(0, 255, 0);
+
+            Paragraph paragraph = new Paragraph().add(new Text("Recuerda que si la siguiente tabla está de color "))
+                    .add(new Text("'ROJO' ").setFontColor(red)).add("es un ")
+                    .add(new Text("'GASTO' ").setFontColor(red)).add("y si está de color ")
+                    .add(new Text("'VERDE' ").setFontColor(green)).add("es un ")
+                    .add(new Text("'AHORRO'").setFontColor(green));
+            document.add(paragraph);
+
+            document.add(new Paragraph("\n"));
+
+            // Agregar tabla con diferencias y ahorros
+            agregarNuevaTablaConDiferenciasYAhorrros(document, lastTwoMonthsReceipts);
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph paragraphMayoresGastos = new Paragraph("El servicio que más gasto tuvo fue:")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontSize(15);
+            document.add(paragraphMayoresGastos);
+
+            // Agregar tabla con mayores gastos
+            agregarTablaRecibosPriceMayores(document, lastTwoMonthsReceipts);
+
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+
+            Paragraph recomendation = new Paragraph("Para optimizar tu presupuesto y ser más consciente de tus gastos, " +
+                    "te sugeriría analizar detenidamente el aumento en los servicios este mes en comparación con el anterior. " +
+                    "Identificar las áreas de mayor consumo te permitirá tomar decisiones informadas para controlar y ajustar tus hábitos de gasto, " +
+                    "contribuyendo a un manejo más eficiente de tus recursos económicos")
+                    .setTextAlignment(TextAlignment.CENTER).setFontSize(15);
+            document.add(recomendation);
+
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+
+            //Agregar firma ServiceGuide
+            agregarLogoServiceGuide(document);
 
             //CERRAR DOCUMENTO
             document.close();
@@ -367,8 +387,28 @@ public class StatisticService implements StatisticInterface {
         }
     }
 
+    private void agregarLogoServiceGuide(Document document) {
+
+        Paragraph logo = new Paragraph("ServiceGuide").setFontSize(16);
+        Paragraph slogan = new Paragraph("'Producción y consumo responsable'").setFontSize(12);
+        logo.setTextAlignment(TextAlignment.CENTER);
+        slogan.setTextAlignment(TextAlignment.CENTER);
+        document.add(logo);
+        document.add(slogan);
+
+        // Agregar línea después del título
+        DeviceRgb deviceRgb = new DeviceRgb(10, 152, 197);
+        SolidLine solidLine = new SolidLine(2);
+        solidLine.setColor(deviceRgb);
+
+        LineSeparator line = new LineSeparator(solidLine);
+
+        document.add(line);
+    }
+
     private String obtenerFechaActual() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd 'de' MMMM 'del' yyyy", new Locale("es", "ES"));
+        Locale locale = new Locale.Builder().setLanguage("es").setRegion("ES").build();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd 'de' MMMM 'del' yyyy", locale);
         return dateFormat.format(new Date());
     }
 
@@ -407,7 +447,8 @@ public class StatisticService implements StatisticInterface {
     }
 
     private String formatCurrency(double amount) {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
+        Locale locale = new Locale.Builder().setLanguage("es").setRegion("CO").build();
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
         return currencyFormat.format(amount);
     }
 
@@ -415,11 +456,11 @@ public class StatisticService implements StatisticInterface {
         // Filtrar los recibos con fechas iguales y diferentes
         List<Receipt> sameDateReceipts = lastTwoMonthsReceipts.stream()
                 .filter(receipt -> receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
-                .collect(Collectors.toList());
+                .toList();
 
         List<Receipt> differentDateReceipts = lastTwoMonthsReceipts.stream()
                 .filter(receipt -> !receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
-                .collect(Collectors.toList());
+                .toList();
 
         // Calcular la suma de los Price para sameDate y differentDate
         double sumSameDate = sameDateReceipts.stream().mapToDouble(Receipt::getPrice).sum();
@@ -428,6 +469,14 @@ public class StatisticService implements StatisticInterface {
         Table table = new Table(new float[]{1, 1});
         table.setWidth(UnitValue.createPercentValue(100));
         table.setTextAlignment(TextAlignment.CENTER);
+
+        Date sameDate = sameDateReceipts.isEmpty() ? null : sameDateReceipts.get(0).getDate();
+        Cell sameDateCel = new Cell().add(new Paragraph(sameDate != null ? sameDate.toString() : "No date").setBold());
+        table.addCell(sameDateCel);
+
+        Date differentDate = differentDateReceipts.isEmpty() ? null : differentDateReceipts.get(0).getDate();
+        Cell differentDateCel = new Cell().add(new Paragraph(differentDate != null ? differentDate.toString() : "No date").setBold());
+        table.addCell(differentDateCel);
 
         // Agregar filas con la información de los recibos con fechas iguales y diferentes
         int maxRowCount = Math.max(sameDateReceipts.size(), differentDateReceipts.size());
@@ -471,5 +520,102 @@ public class StatisticService implements StatisticInterface {
                 .add(new Text(formatCurrency(receipt.getPrice())));
 
         cell.add(paragraph);
+    }
+
+    private void agregarNuevaTablaConDiferenciasYAhorrros(Document document, List<Receipt> lastTwoMonthsReceipts) {
+        // Filtrar los recibos con fechas iguales y diferentes
+        List<Receipt> sameDateReceipts = lastTwoMonthsReceipts.stream()
+                .filter(receipt -> receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
+                .toList();
+
+        List<Receipt> differentDateReceipts = lastTwoMonthsReceipts.stream()
+                .filter(receipt -> !receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
+                .toList();
+
+        // Calcular la suma de los Price para sameDate y differentDate
+        double sumSameDate = sameDateReceipts.stream().mapToDouble(Receipt::getPrice).sum();
+        double sumDifferentDate = differentDateReceipts.stream().mapToDouble(Receipt::getPrice).sum();
+
+        // Calcular la diferencia y el porcentaje de ahorro
+        double difference = sumDifferentDate - sumSameDate;
+        double percentageSaving = (difference / sumDifferentDate) * 100;
+
+        // Establecer el color según la diferencia
+        Color cellColor = (difference >= 0) ? new DeviceRgb(0, 255, 0) : new DeviceRgb(255, 0, 0);
+
+        // Crear la nueva tabla con dos celdas
+        Table nuevaTabla = new Table(new float[]{1, 1});
+        nuevaTabla.setWidth(UnitValue.createPercentValue(100));
+        nuevaTabla.setTextAlignment(TextAlignment.CENTER);
+
+        Cell title1 = new Cell().add(new Paragraph("Diferencia de gasto/ahorro").setFontSize(15).setBold());
+        nuevaTabla.addCell(title1);
+
+        Cell title2 = new Cell().add(new Paragraph("Porcentaje de gasto/ahorro").setFontSize(15).setBold());
+        nuevaTabla.addCell(title2);
+
+        // Celda izquierda con la diferencia
+        Cell differenceCell = new Cell().add(new Paragraph(formatCurrency(difference) + " COP").setBold());
+        differenceCell.setBackgroundColor(cellColor);
+        nuevaTabla.addCell(differenceCell);
+
+        // Celda derecha con el porcentaje de ahorro
+        Cell percentageCell = new Cell().add(new Paragraph(String.format("%.2f%%", percentageSaving)).setBold());
+        percentageCell.setBackgroundColor((percentageSaving >= 0) ? new DeviceRgb(0, 255, 0) : new DeviceRgb(255, 0, 0));
+        nuevaTabla.addCell(percentageCell);
+
+        // Agregar la nueva tabla al documento
+        document.add(nuevaTabla);
+    }
+
+    private void agregarTablaRecibosPriceMayores(Document document, List<Receipt> lastTwoMonthsReceipts) {
+        // Filtrar los recibos con fechas iguales y diferentes
+        List<Receipt> sameDateReceipts = lastTwoMonthsReceipts.stream()
+                .filter(receipt -> receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
+                .collect(Collectors.toList());
+
+        List<Receipt> differentDateReceipts = lastTwoMonthsReceipts.stream()
+                .filter(receipt -> !receipt.getDate().equals(lastTwoMonthsReceipts.get(0).getDate()))
+                .collect(Collectors.toList());
+
+        // Obtener las celdas con el precio más alto de cada fecha
+        Cell highestSameDateCell = getHighestPriceCell(sameDateReceipts);
+        Cell highestDifferentDateCell = getHighestPriceCell(differentDateReceipts);
+
+        // Crear una nueva tabla con las celdas obtenidas
+        Table highestPriceTable = new Table(new float[]{1, 1});
+        highestPriceTable.setWidth(UnitValue.createPercentValue(100));
+        highestPriceTable.setTextAlignment(TextAlignment.CENTER);
+
+        Cell title1 = new Cell().add(new Paragraph("Último mes")
+                .setFontSize(15)
+                .setBold()
+                .setBackgroundColor(new DeviceRgb(0, 191, 255)));
+        highestPriceTable.addCell(title1);
+
+        Cell title2 = new Cell().add(new Paragraph("Mes Anterior")
+                .setFontSize(15)
+                .setBold()
+                .setBackgroundColor(new DeviceRgb(0, 191, 255)));
+        highestPriceTable.addCell(title2);
+
+        // Agregar las celdas al final de cada columna
+        highestPriceTable.addCell(highestSameDateCell);
+        highestPriceTable.addCell(highestDifferentDateCell);
+
+        document.add(highestPriceTable);
+    }
+
+    private Cell getHighestPriceCell(List<Receipt> receipts) {
+        // Encontrar la celda con el precio más alto
+        Optional<Receipt> highestPriceReceipt = receipts.stream()
+                .max(Comparator.comparingDouble(Receipt::getPrice));
+
+        // Crear la celda con la información del recibo con el precio más alto
+        Cell highestPriceCell = new Cell();
+        highestPriceCell.setWidth(UnitValue.createPercentValue(50));
+        highestPriceReceipt.ifPresent(receipt -> addReceiptInformationToCell(highestPriceCell, receipt));
+
+        return highestPriceCell;
     }
 }
