@@ -31,7 +31,7 @@ public class ReceiptController {
 
         Long idReceipt = createdReceipt.getId();
         String typeReceipt = createdReceipt.getTypeService().name();
-        statisticService.individualReceipt(typeReceipt, idReceipt, "Bar");
+        statisticService.individualReceipt(typeReceipt, idReceipt, "BAR");
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(createdReceipt.getId()).toUri();
