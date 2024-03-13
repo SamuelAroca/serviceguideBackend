@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
+import proyecto.web.serviceguideBackend.house.dto.OnlyHouse;
 
 import java.net.URI;
 import java.util.Collection;
@@ -51,5 +52,10 @@ public class HouseController {
     @Transactional
     public Message deleteHouse(@PathVariable Long idHouse){
         return houseService.deleteHouse(idHouse);
+    }
+
+    @GetMapping("/onlyHouse/{idUser}")
+    public ResponseEntity<Collection<OnlyHouse>> onlyHouse(@PathVariable Long idUser){
+        return ResponseEntity.ok(houseService.onlyHouse(idUser));
     }
 }

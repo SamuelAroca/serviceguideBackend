@@ -3,18 +3,21 @@ package proyecto.web.serviceguideBackend.house;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.city.City;
+import proyecto.web.serviceguideBackend.city.interfaces.CityRepository;
+import proyecto.web.serviceguideBackend.dto.Message;
+import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
+import proyecto.web.serviceguideBackend.house.dto.OnlyHouse;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseInterface;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseMapper;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.user.User;
-import proyecto.web.serviceguideBackend.exceptions.AppException;
-import proyecto.web.serviceguideBackend.city.interfaces.CityRepository;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -126,5 +129,30 @@ public class HouseService implements HouseInterface {
     @Override
     public Collection<String> getHouseName(Long idUser) {
         return houseRepository.getHouseName(idUser);
+    }
+
+    @Override
+    public Collection<OnlyHouse> onlyHouse(Long idUser) {
+
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        Collection<House> houseList = houseRepository.findAllByUserOrderById(optionalUser.get());
+
+        Collection<OnlyHouse> onlyHouses = new ArrayList<>();
+        for (House house : houseList) {
+            OnlyHouse onlyHouse = new OnlyHouse(
+                    house.getId(),
+                    house.getName(),
+                    house.getStratum(),
+                    house.getNeighborhood(),
+                    house.getAddress(),
+                    house.getContract(),
+                    house.getCities());
+
+            onlyHouses.add(onlyHouse);
+        }
+        return onlyHouses;
     }
 }

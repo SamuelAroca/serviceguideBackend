@@ -39,4 +39,13 @@ public class HouseDto {
     @Nullable
     private User user;
 
+    public HouseDto(@Nullable Long id, @NotNull String name, @NotNull Integer stratum, @NotNull String neighborhood, @Nullable String address, @NotNull String contract, @NotNull City cities) {
+        this.id = id;
+        this.name = name;
+        this.stratum = stratum;
+        this.neighborhood = neighborhood;
+        this.address = address;
+        this.contract = contract;
+        this.cities = cities;
+    }
 }
