@@ -54,8 +54,8 @@ public class HouseController {
         return houseService.deleteHouse(idHouse);
     }
 
-    @GetMapping("/onlyHouse/{idUser}")
-    public ResponseEntity<Collection<OnlyHouse>> onlyHouse(@PathVariable Long idUser){
-        return ResponseEntity.ok(houseService.onlyHouse(idUser));
+    @GetMapping("/onlyHouse/{token}")
+    public ResponseEntity<Collection<OnlyHouse>> onlyHouse(@PathVariable String token){
+        return ResponseEntity.ok(houseService.onlyHouse(token));
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.city.City;
 import proyecto.web.serviceguideBackend.city.interfaces.CityRepository;
+import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
@@ -27,6 +28,7 @@ public class HouseService implements HouseInterface {
     private final HouseRepository houseRepository;
     private final HouseMapper houseMapper;
     private final CityRepository cityRepository;
+    private final JwtService jwtService;
 
     @Override
     public HouseDto newHouse(HouseDto houseDto, Long idUser){
@@ -132,7 +134,9 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Collection<OnlyHouse> onlyHouse(Long idUser) {
+    public Collection<OnlyHouse> onlyHouse(String token) {
+
+        Long idUser = jwtService.whoIsMyId(token);
 
         Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
