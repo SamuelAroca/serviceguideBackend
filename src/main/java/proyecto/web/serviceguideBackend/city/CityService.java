@@ -15,6 +15,6 @@ public class CityService implements CityInterface {
 
     @Override
     public Collection<City> listAll() {
-        return cityRepository.findAll();
+        return cityRepository.findAllByOrderById();
     }
 }
