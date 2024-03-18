@@ -26,6 +26,7 @@ import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
+import proyecto.web.serviceguideBackend.utils.Utils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -48,6 +49,7 @@ public class ReceiptService implements ReceiptInterface {
     private final HouseService houseService;
     private final StatisticService statisticService;
     private final UserRepository userRepository;
+    private final Utils utils;
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser) {
@@ -432,32 +434,8 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Message readPDF(MultipartFile archivoPdf) {
-        try {
-            PdfReader pdfReader = new PdfReader(archivoPdf.getInputStream());
-            PdfDocument pdfDocument = new PdfDocument(pdfReader);
-
-            // Obtener la página 2
-            PdfPage page = pdfDocument.getPage(2);
-
-            // Configurar la estrategia de extracción de texto
-            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-
-            // Procesar la página usando la estrategia
-            PdfCanvasProcessor processor = new PdfCanvasProcessor(strategy);
-            processor.processPageContent(page);
-
-            // Obtener el texto de la estrategia
-            String textoPagina = strategy.getResultantText();
-
-            // Cerrar el lector y el documento de PDF
-            pdfDocument.close();
-            pdfReader.close();
-
-            return extractReceiptInformation(textoPagina);
-        } catch (IOException e) {
-            throw new AppException("Error al procesar el archivo PDF", HttpStatus.BAD_REQUEST);
-        }
+    public Message readPDF(MultipartFile file) {
+        return extractReceiptInformation(utils.readPdf(file));
     }
 
     @Override
