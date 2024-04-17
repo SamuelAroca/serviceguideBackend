@@ -20,7 +20,7 @@ public interface ReceiptInterface {
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
     Message extractReceiptInformation(String receiptText, Long idUser);
-    Date formatDate(String date);
+    Date formatDate(String date, String receiptName);
     Message readPDF(MultipartFile multipartFile, HttpServletRequest request);
     List<Receipt> receiptCollection(Long idUser, Pageable pageable);
 
