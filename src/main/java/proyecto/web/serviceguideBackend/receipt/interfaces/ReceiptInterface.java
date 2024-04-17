@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.receipt.interfaces;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.dto.Message;
@@ -18,9 +19,9 @@ public interface ReceiptInterface {
     Message updateReceipt(ReceiptDto receiptDto, Long id);
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
-    Message extractReceiptInformation(String receiptText);
+    Message extractReceiptInformation(String receiptText, Long idUser);
     Date formatDate(String date);
-    Message readPDF(MultipartFile multipartFile);
+    Message readPDF(MultipartFile multipartFile, HttpServletRequest request);
     List<Receipt> receiptCollection(Long idUser, Pageable pageable);
 
 }

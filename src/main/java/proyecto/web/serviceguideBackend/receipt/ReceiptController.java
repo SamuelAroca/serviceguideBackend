@@ -1,5 +1,7 @@
 package proyecto.web.serviceguideBackend.receipt;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +66,7 @@ public class ReceiptController {
     }
 
     @PostMapping("/read")
-    public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf) {
-        return ResponseEntity.ok(receiptService.readPDF(archivoPdf));
+    public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf, HttpServletRequest request) {
+        return ResponseEntity.ok(receiptService.readPDF(archivoPdf, request));
     }
 }

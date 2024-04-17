@@ -1,22 +1,26 @@
 package proyecto.web.serviceguideBackend.receipt;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.dto.Message;
+import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.House;
-import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.house.HouseService;
+import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
+import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptInterface;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptMapper;
 import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.statistic.StatisticService;
-import proyecto.web.serviceguideBackend.exceptions.AppException;
-import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 import proyecto.web.serviceguideBackend.utils.Utils;
@@ -42,6 +46,7 @@ public class ReceiptService implements ReceiptInterface {
     private final StatisticService statisticService;
     private final UserRepository userRepository;
     private final Utils utils;
+    private final JwtService jwtService;
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser) {
@@ -186,7 +191,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Message extractReceiptInformation(String receiptText) {
+    public Message extractReceiptInformation(String receiptText, Long idUser) {
         String patronWater = "Acueducto (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronSewerage = "Alcantarillado (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronEnergy = "Energía (\\d[\\d.,]*) kwh[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
@@ -212,6 +217,17 @@ public class ReceiptService implements ReceiptInterface {
         Matcher matcherDate = patternDate.matcher(receiptText);
         Matcher matcherContract = patternContract.matcher(receiptText);
         Matcher matcherReceiptName = patternReceiptName.matcher(receiptText);
+
+        String contract = null;
+        if (matcherContract.find()) {
+            contract = matcherContract.group(1);
+        }
+
+        assert contract != null;
+        Optional<House> optionalHouse = houseRepository.findByContractAndUser(contract, idUser);
+        if (optionalHouse.isEmpty()) {
+            throw new AppException("House not found with the current contract number: " + contract, HttpStatus.NOT_FOUND);
+        }
 
         float amountWater = 0;
         double priceWater = 0;
@@ -277,21 +293,11 @@ public class ReceiptService implements ReceiptInterface {
             receiptName = matcherReceiptName.group(0);
         }
 
-        String contract = null;
-        if (matcherContract.find()) {
-            contract = matcherContract.group(1);
-        }
-
         Receipt receiptWater = new Receipt();
         Receipt receiptEnergy = new Receipt();
         Receipt receiptSewerage = new Receipt();
         Receipt receiptGas = new Receipt();
 
-        assert contract != null;
-        Optional<House> optionalHouse = houseRepository.findByContract(contract);
-        if (optionalHouse.isEmpty()) {
-            throw new AppException("House not found with the current contract number: " + contract, HttpStatus.NOT_FOUND);
-        }
         receiptWater.setHouse(optionalHouse.get());
         receiptEnergy.setHouse(optionalHouse.get());
         receiptSewerage.setHouse(optionalHouse.get());
@@ -363,7 +369,6 @@ public class ReceiptService implements ReceiptInterface {
         receiptRepository.save(receiptSewerage);
         receiptRepository.save(receiptGas);
 
-        Long idUser = optionalHouse.get().getUser().getId();
         Pageable pageable = PageRequest.of(0,4);
 
         List<Receipt> receiptList = receiptCollection(idUser, pageable);
@@ -426,8 +431,9 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Message readPDF(MultipartFile file) {
-        return extractReceiptInformation(utils.readPdf(file));
+    public Message readPDF(MultipartFile file, HttpServletRequest request) {
+        Long idUser = getTokenFromRequest(request);
+        return extractReceiptInformation(utils.readPdf(file), idUser);
     }
 
     @Override
@@ -437,5 +443,18 @@ public class ReceiptService implements ReceiptInterface {
             throw new AppException("No tienes recibos", HttpStatus.NOT_FOUND);
         }
         return receiptList;
+    }
+
+    private Long getTokenFromRequest(HttpServletRequest request) {
+        try {
+            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+            if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+                return jwtService.whoIsMyId(authHeader.substring(7));
+            }
+        } catch (Exception e) {
+            throw new AppException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
     }
 }
