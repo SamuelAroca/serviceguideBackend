@@ -25,11 +25,15 @@ import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 import proyecto.web.serviceguideBackend.utils.Utils;
 
+import java.text.DateFormatSymbols;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.MonthDay;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -280,17 +284,20 @@ public class ReceiptService implements ReceiptInterface {
             priceGas = Double.parseDouble(price);
         }
 
-        Date formatedDate;
-        if (matcherDate.find()) {
-            String dateFound = matcherDate.group(1);
-            formatedDate = formatDate(dateFound);
-        } else {
-            throw new AppException("No se encontró la fecha en el texto.", HttpStatus.BAD_REQUEST);
-        }
-
         String receiptName = null;
         if (matcherReceiptName.find()) {
             receiptName = matcherReceiptName.group(0);
+            System.out.println(receiptName);
+        }
+
+        Date formatedDate;
+        if (matcherDate.find()) {
+            String dateFound = matcherDate.group(1);
+            System.out.println(dateFound);
+            formatedDate = formatDate(dateFound, receiptName);
+            System.out.println(formatedDate);
+        } else {
+            throw new AppException("No se encontró la fecha en el texto.", HttpStatus.BAD_REQUEST);
         }
 
         Receipt receiptWater = new Receipt();
@@ -396,7 +403,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Date formatDate(String date) {
+    public Date formatDate(String date, String receiptName) {
         try {
             DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                     .parseCaseInsensitive()
@@ -424,11 +431,48 @@ public class ReceiptService implements ReceiptInterface {
 
             LocalDate localDate = LocalDate.parse(date, formatter);
 
+            // Extraer el nombre del mes del recibo
+            String receiptMonth = receiptName.substring(receiptName.indexOf(" ") + 1, receiptName.indexOf(" de"));
+            receiptMonth = receiptMonth.toLowerCase();
+
+            // Comparar con el mes de la fecha obtenida
+            Month month = localDate.getMonth();
+            String monthName = month.getDisplayName(TextStyle.FULL, new Locale("es", "ES")).toLowerCase();
+
+            // Si los nombres de los meses no coinciden, ajustar la fecha al primer día del mes del recibo
+            try {
+                if (!receiptMonth.equals(monthName)) {
+                    // Normalizar el nombre del mes a minúsculas
+                    String normalizedMonth = receiptMonth.toLowerCase();
+
+                    // Obtener el nombre del mes en inglés
+                    DateFormatSymbols symbols = new DateFormatSymbols(new Locale("es", "ES"));
+                    String[] monthNames = symbols.getMonths();
+                    int monthIndex = Arrays.asList(monthNames).indexOf(normalizedMonth);
+
+                    // Verificar si se encontró el nombre del mes
+                    if (monthIndex != -1) {
+                        // Parsear el nombre del mes en inglés
+                        Month adjustedMonth = Month.of(monthIndex + 1); // El índice comienza en 0, pero Month.of() espera un número de mes basado en 1
+                        localDate = localDate.withMonth(adjustedMonth.getValue());
+                        localDate = localDate.withDayOfMonth(1); // Ajustar al primer día del mes
+                    } else {
+                        // Manejar el caso en que no se encontró el nombre del mes
+                        throw new DateTimeParseException("Nombre del mes no válido: " + receiptMonth, receiptMonth, 0);
+                    }
+                }
+            } catch (DateTimeParseException e) {
+                // Manejar la excepción DateTimeParseException aquí
+                // Por ejemplo, lanzar una nueva excepción, imprimir un mensaje de error, etc.
+                throw new AppException("Error al Parsear la fecha " + e.getParsedString(), HttpStatus.BAD_REQUEST);
+            }
+
             return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         } catch (DateTimeParseException e) {
             throw new AppException("Error al Parsear la fecha " + e.getParsedString(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @Override
     public Message readPDF(MultipartFile file, HttpServletRequest request) {
