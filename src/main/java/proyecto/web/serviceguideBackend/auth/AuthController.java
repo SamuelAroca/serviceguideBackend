@@ -32,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<Message> register(@RequestBody @Valid SignUpDto user) {
+    public ResponseEntity<LoginResponse> register(@RequestBody @Valid SignUpDto user) {
         try {
             return ResponseEntity.ok(authService.register(user));
         } catch (RuntimeException e) {

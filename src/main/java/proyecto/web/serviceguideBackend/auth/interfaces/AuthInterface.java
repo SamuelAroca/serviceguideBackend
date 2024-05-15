@@ -7,7 +7,7 @@ import proyecto.web.serviceguideBackend.dto.Message;
 
 public interface AuthInterface {
 
-    Message register(SignUpDto userDto);
+    LoginResponse register(SignUpDto userDto);
     LoginResponse login(CredentialsDto credentialsDto);
 
 }

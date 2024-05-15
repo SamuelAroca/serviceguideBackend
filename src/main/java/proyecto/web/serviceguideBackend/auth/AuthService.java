@@ -33,7 +33,7 @@ public class AuthService implements AuthInterface {
     private final TokenRepository tokenRepository;
 
     @Override
-    public Message register(SignUpDto userDto) {
+    public LoginResponse register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
             throw new AppException("User already registered", HttpStatus.BAD_REQUEST);
@@ -46,8 +46,14 @@ public class AuthService implements AuthInterface {
                 .role(Role.USER)
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .build();
-        userRepository.save(user);
-        return new Message("Register successfully", HttpStatus.OK);
+        var userSaved = userRepository.save(user);
+
+        var token = jwtService.getToken(userSaved);
+        revokedAllUserTokens(userSaved);
+        saveUserToken(userSaved, token);
+        return LoginResponse.builder()
+                .token(token)
+                .build();
     }
 
     @Override
