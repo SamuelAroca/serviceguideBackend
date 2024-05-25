@@ -455,7 +455,7 @@ public class ReceiptService implements ReceiptInterface {
                         // Parsear el nombre del mes en inglés
                         Month adjustedMonth = Month.of(monthIndex + 1); // El índice comienza en 0, pero Month.of() espera un número de mes basado en 1
                         localDate = localDate.withMonth(adjustedMonth.getValue());
-                        localDate = localDate.withDayOfMonth(1); // Ajustar al primer día del mes
+                        localDate = localDate.withDayOfMonth(5); // Ajustar al primer día del mes
                     } else {
                         // Manejar el caso en que no se encontró el nombre del mes
                         throw new DateTimeParseException("Nombre del mes no válido: " + receiptMonth, receiptMonth, 0);
