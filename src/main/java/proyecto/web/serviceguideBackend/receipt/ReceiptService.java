@@ -4,12 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.House;
@@ -49,7 +46,6 @@ public class ReceiptService implements ReceiptInterface {
     private final StatisticService statisticService;
     private final UserRepository userRepository;
     private final Utils utils;
-    private final JwtService jwtService;
 
     @Override
     public ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser) {
@@ -477,7 +473,7 @@ public class ReceiptService implements ReceiptInterface {
 
     @Override
     public Message readPDF(MultipartFile file, HttpServletRequest request) {
-        Long idUser = getTokenFromRequest(request);
+        Long idUser = utils.getTokenFromRequest(request);
         return extractReceiptInformation(utils.readPdf(file), idUser);
     }
 
@@ -488,18 +484,5 @@ public class ReceiptService implements ReceiptInterface {
             throw new AppException("No tienes recibos", HttpStatus.NOT_FOUND);
         }
         return receiptList;
-    }
-
-    private Long getTokenFromRequest(HttpServletRequest request) {
-        try {
-            final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-            if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-                return jwtService.whoIsMyId(authHeader.substring(7));
-            }
-        } catch (Exception e) {
-            throw new AppException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return null;
     }
 }

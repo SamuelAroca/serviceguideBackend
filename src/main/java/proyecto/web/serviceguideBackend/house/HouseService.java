@@ -1,8 +1,10 @@
 package proyecto.web.serviceguideBackend.house;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.city.City;
 import proyecto.web.serviceguideBackend.city.interfaces.CityRepository;
 import proyecto.web.serviceguideBackend.config.JwtService;
@@ -15,10 +17,13 @@ import proyecto.web.serviceguideBackend.house.interfaces.HouseMapper;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
+import proyecto.web.serviceguideBackend.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
@@ -29,6 +34,7 @@ public class HouseService implements HouseInterface {
     private final HouseMapper houseMapper;
     private final CityRepository cityRepository;
     private final JwtService jwtService;
+    private final Utils utils;
 
     @Override
     public HouseDto newHouse(HouseDto houseDto, Long idUser){
@@ -154,9 +160,94 @@ public class HouseService implements HouseInterface {
                     house.getAddress(),
                     house.getContract(),
                     house.getCities());
-
             onlyHouses.add(onlyHouse);
         }
         return onlyHouses;
+    }
+
+    @Override
+    public Message readPDF(MultipartFile file, HttpServletRequest request) {
+        Long idUser = utils.getTokenFromRequest(request);
+        return extractReceiptInformation(utils.readPdf(file), idUser);
+    }
+
+    private Message extractReceiptInformation(String receiptText, Long idUser) {
+
+        House house = new House();
+
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        house.setUser(optionalUser.get());
+
+        // Expresión regular corregida
+        String patronStratum = "Estrato:\\s*(\\d+)";
+        Pattern patternStratum = Pattern.compile(patronStratum);
+        Matcher matcherStratum = patternStratum.matcher(receiptText);
+        String stratum = "";
+        if (matcherStratum.find()) {
+            stratum = matcherStratum.group(1);
+            int stratumInt = Integer.parseInt(stratum);
+            if (stratumInt < 1 || stratumInt > 6) {
+                throw new AppException("Stratum out of range", HttpStatus.BAD_REQUEST);
+            }
+            house.setStratum(Integer.parseInt(stratum));
+        } else {
+            throw new AppException("Stratum not found", HttpStatus.NOT_FOUND);
+        }
+
+        // Ciudad en Antioquia
+        String patronCity = "([\\p{L}\\s]+)\\s*-\\s*Antioquia";
+        Pattern patternCity = Pattern.compile(patronCity);
+        Matcher matcherCity = patternCity.matcher(receiptText);
+        String city = "";
+        if (matcherCity.find()) {
+            city = matcherCity.group(1).trim();
+        } else {
+            throw new AppException("City not found", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<City> optionalCity = cityRepository.findByCity(city);
+        if (optionalCity.isEmpty()) {
+            throw new AppException("City not found", HttpStatus.NOT_FOUND);
+        }
+        house.setCities(optionalCity.get());
+
+        String patronAddress = "Dirección de cobro:\\s*(.*)";
+        Pattern patternAddress = Pattern.compile(patronAddress);
+        Matcher matcherAddress = patternAddress.matcher(receiptText);
+        String address = "";
+        if (matcherAddress.find()) {
+            address = matcherAddress.group(1).trim();
+            house.setAddress(address);
+        } else {
+            throw new AppException("Address not found", HttpStatus.NOT_FOUND);
+        }
+
+        String patronContract = "Contrato\\s*(\\d+)";
+        Pattern patternContract = Pattern.compile(patronContract);
+        Matcher matcherContract = patternContract.matcher(receiptText);
+        String contract = "";
+        if (matcherContract.find()) {
+            contract = matcherContract.group(1);
+        } else {
+            throw new AppException("Contract not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<House> optionalHouse = houseRepository.findByContractAndUser(contract, idUser);
+        if (optionalHouse.isPresent()) {
+            throw new AppException("Contract already registered", HttpStatus.BAD_REQUEST);
+        }
+        house.setContract(contract);
+
+        String name = "Casa " + contract;
+        String neighborhood = "Barrio de " + optionalCity.get().getCity();
+        house.setName(name);
+        house.setNeighborhood(neighborhood);
+
+        houseRepository.save(house);
+
+        return new Message("House created successfully", HttpStatus.OK);
     }
 }

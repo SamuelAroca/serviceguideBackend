@@ -1,5 +1,7 @@
 package proyecto.web.serviceguideBackend.house.interfaces;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
@@ -18,5 +20,6 @@ public interface HouseInterface {
     Message deleteHouse(Long id);
     Collection<String> getHouseName(Long idUser);
     Collection<OnlyHouse> onlyHouse(String token);
+    Message readPDF(MultipartFile file, HttpServletRequest request);
 
 }
