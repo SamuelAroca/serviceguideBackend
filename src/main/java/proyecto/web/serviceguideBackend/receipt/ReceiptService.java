@@ -28,7 +28,6 @@ import proyecto.web.serviceguideBackend.utils.Utils;
 import java.text.DateFormatSymbols;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.MonthDay;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -287,15 +286,13 @@ public class ReceiptService implements ReceiptInterface {
         String receiptName = null;
         if (matcherReceiptName.find()) {
             receiptName = matcherReceiptName.group(0);
-            System.out.println(receiptName);
         }
 
         Date formatedDate;
         if (matcherDate.find()) {
             String dateFound = matcherDate.group(1);
-            System.out.println(dateFound);
+            assert receiptName != null;
             formatedDate = formatDate(dateFound, receiptName);
-            System.out.println(formatedDate);
         } else {
             throw new AppException("No se encontró la fecha en el texto.", HttpStatus.BAD_REQUEST);
         }
@@ -309,8 +306,6 @@ public class ReceiptService implements ReceiptInterface {
         receiptEnergy.setHouse(optionalHouse.get());
         receiptSewerage.setHouse(optionalHouse.get());
         receiptGas.setHouse(optionalHouse.get());
-
-        assert receiptName != null;
 
         String waterName = receiptName + " " + "Agua";
         String energyName = receiptName + " " + "Energia";
@@ -398,7 +393,6 @@ public class ReceiptService implements ReceiptInterface {
             String typeReceipt = String.valueOf(receipt.getTypeService());
             statisticService.individualReceipt(typeReceipt, idReceipt, "BAR");
         }
-
         return new Message("Recibos guardados satisfactoriamente", HttpStatus.OK);
     }
 
@@ -432,8 +426,14 @@ public class ReceiptService implements ReceiptInterface {
             LocalDate localDate = LocalDate.parse(date, formatter);
 
             // Extraer el nombre del mes del recibo
+            // Factura diciembre de 2023
             String receiptMonth = receiptName.substring(receiptName.indexOf(" ") + 1, receiptName.indexOf(" de"));
             receiptMonth = receiptMonth.toLowerCase();
+
+            int indexOfDe = receiptName.lastIndexOf(" de");
+            // Extraer el año desde el índice siguiente al espacio
+            String receiptYearStr = receiptName.substring(indexOfDe + 4);
+            int receiptYear = Integer.parseInt(receiptYearStr);
 
             // Comparar con el mes de la fecha obtenida
             Month month = localDate.getMonth();
@@ -456,6 +456,9 @@ public class ReceiptService implements ReceiptInterface {
                         Month adjustedMonth = Month.of(monthIndex + 1); // El índice comienza en 0, pero Month.of() espera un número de mes basado en 1
                         localDate = localDate.withMonth(adjustedMonth.getValue());
                         localDate = localDate.withDayOfMonth(5); // Ajustar al primer día del mes
+                    if (receiptYear != localDate.getYear()) {
+                        localDate = localDate.withYear(receiptYear);
+                    }
                     } else {
                         // Manejar el caso en que no se encontró el nombre del mes
                         throw new DateTimeParseException("Nombre del mes no válido: " + receiptMonth, receiptMonth, 0);
@@ -466,13 +469,11 @@ public class ReceiptService implements ReceiptInterface {
                 // Por ejemplo, lanzar una nueva excepción, imprimir un mensaje de error, etc.
                 throw new AppException("Error al Parsear la fecha " + e.getParsedString(), HttpStatus.BAD_REQUEST);
             }
-
             return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         } catch (DateTimeParseException e) {
             throw new AppException("Error al Parsear la fecha " + e.getParsedString(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @Override
     public Message readPDF(MultipartFile file, HttpServletRequest request) {
