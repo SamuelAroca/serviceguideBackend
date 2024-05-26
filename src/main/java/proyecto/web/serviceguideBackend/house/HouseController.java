@@ -1,10 +1,12 @@
 package proyecto.web.serviceguideBackend.house;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
@@ -57,5 +59,10 @@ public class HouseController {
     @GetMapping("/onlyHouse/{token}")
     public ResponseEntity<Collection<OnlyHouse>> onlyHouse(@PathVariable String token){
         return ResponseEntity.ok(houseService.onlyHouse(token));
+    }
+
+    @PostMapping("/read")
+    public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf") MultipartFile archivoPdf, HttpServletRequest request) {
+        return ResponseEntity.ok(houseService.readPDF(archivoPdf, request));
     }
 }
