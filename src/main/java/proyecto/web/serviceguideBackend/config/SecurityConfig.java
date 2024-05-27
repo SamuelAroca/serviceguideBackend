@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register", "/api/email/send-email", "/api/email/change-password").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/powerbi/embed-token").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager->
