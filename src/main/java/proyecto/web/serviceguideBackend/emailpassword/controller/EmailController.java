@@ -12,14 +12,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import proyecto.web.serviceguideBackend.dto.Message;
-import proyecto.web.serviceguideBackend.emailpassword.dto.ChangePasswordDto;
-import proyecto.web.serviceguideBackend.emailpassword.dto.EmailValuesDto;
+import proyecto.web.serviceguideBackend.emailpassword.dto.*;
+import proyecto.web.serviceguideBackend.emailpassword.repository.VerificationCodeRepository;
 import proyecto.web.serviceguideBackend.emailpassword.service.EmailService;
+import proyecto.web.serviceguideBackend.emailpassword.verificationCode.VerificationCode;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.UserService;
+import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @RestController
@@ -30,6 +34,8 @@ public class EmailController {
     private final EmailService emailService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final VerificationCodeRepository verificationCodeRepository;
 
     @Value("${spring.mail.username}")
     private String mailFrom;
@@ -80,5 +86,55 @@ public class EmailController {
         user.setTokenPassword(null);
         userService.save(user);
         return ResponseEntity.ok(new Message("Updated password", HttpStatus.OK));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        String verificationCode = generateVerificationCode();
+        VerificationCode code = new VerificationCode(optionalUser.get(), verificationCode);
+        verificationCodeRepository.save(code);
+
+        emailService.sendVerificationEmail(request.getEmail(), verificationCode);
+
+        return ResponseEntity.ok(new Message("Verification code sent", HttpStatus.OK));
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verifyCode(@RequestBody VerifyCodeRequest request) {
+        Optional<VerificationCode> optionalCode = verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode());
+        if (optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
+            throw new AppException("Invalid or expired verification code", HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok(new Message("Verification successful", HttpStatus.OK));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        if (optionalUser.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        Optional<VerificationCode> optionalCode = verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode());
+        if (optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
+            throw new AppException("Invalid or expired verification code", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = optionalUser.get();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new Message("Password reset successfully", HttpStatus.OK));
+    }
+
+    private String generateVerificationCode() {
+        // Generate a random 6-digit code
+        return String.format("%06d", new Random().nextInt(999999));
     }
 }

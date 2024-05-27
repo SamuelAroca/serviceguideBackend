@@ -26,7 +26,7 @@ public class AuthController {
         try {
             return ResponseEntity.ok(authService.login(credentialsDto));
         } catch (RuntimeException e) {
-            throw new AppException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new AppException("User or password incorrect", HttpStatus.BAD_REQUEST);
         }
     }
 

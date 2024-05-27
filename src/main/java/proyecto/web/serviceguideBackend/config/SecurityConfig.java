@@ -34,7 +34,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register", "/api/email/send-email", "/api/email/change-password").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register",
+                                        "/api/email/send-email", "/api/email/change-password", "/api/email/forgot-password",
+                                        "/api/email/verify-code", "/api/email/reset-password").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/powerbi/embed-token").permitAll()
                                 .anyRequest().authenticated()
                 )
