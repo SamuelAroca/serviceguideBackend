@@ -171,6 +171,11 @@ public class HouseService implements HouseInterface {
         return extractReceiptInformation(utils.readPdf(file), idUser);
     }
 
+    @Override
+    public Long findIdByName(String name) {
+        return houseRepository.findIdByName(name);
+    }
+
     private Message extractReceiptInformation(String receiptText, Long idUser) {
 
         House house = new House();

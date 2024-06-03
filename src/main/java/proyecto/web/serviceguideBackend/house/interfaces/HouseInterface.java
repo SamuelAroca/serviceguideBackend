@@ -21,5 +21,6 @@ public interface HouseInterface {
     Collection<String> getHouseName(Long idUser);
     Collection<OnlyHouse> onlyHouse(String token);
     Message readPDF(MultipartFile file, HttpServletRequest request);
+    Long findIdByName(String name);
 
 }

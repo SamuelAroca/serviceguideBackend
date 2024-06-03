@@ -65,4 +65,9 @@ public class HouseController {
     public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf") MultipartFile archivoPdf, HttpServletRequest request) {
         return ResponseEntity.ok(houseService.readPDF(archivoPdf, request));
     }
+
+    @GetMapping("/findIdByName/{name}")
+    public ResponseEntity<Long> findIdByName(@PathVariable String name){
+        return ResponseEntity.ok(houseService.findIdByName(name));
+    }
 }
