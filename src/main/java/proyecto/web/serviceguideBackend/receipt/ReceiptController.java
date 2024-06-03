@@ -69,4 +69,9 @@ public class ReceiptController {
     public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf")MultipartFile archivoPdf, HttpServletRequest request) {
         return ResponseEntity.ok(receiptService.readPDF(archivoPdf, request));
     }
+
+    @GetMapping("/getReceiptsByHouseAndUser/{idUser}/{houseId}")
+    public ResponseEntity<List<Receipt>> getReceiptsByHouseAndUser(@PathVariable Long idUser, @PathVariable Long houseId) {
+        return ResponseEntity.ok(receiptRepository.getAllReceiptsByHouseId(idUser, houseId));
+    }
 }
