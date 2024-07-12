@@ -20,7 +20,7 @@ public interface HouseInterface {
     Message deleteHouse(Long id);
     Collection<String> getHouseName(Long idUser);
     Collection<OnlyHouse> onlyHouse(String token);
-    Message readPDF(MultipartFile file, HttpServletRequest request);
+    House readPDF(MultipartFile file, HttpServletRequest request);
     Long findIdByName(String name);
 
 }

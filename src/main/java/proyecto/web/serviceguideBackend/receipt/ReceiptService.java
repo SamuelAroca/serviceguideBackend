@@ -225,7 +225,9 @@ public class ReceiptService implements ReceiptInterface {
         assert contract != null;
         Optional<House> optionalHouse = houseRepository.findByContractAndUser(contract, idUser);
         if (optionalHouse.isEmpty()) {
-            throw new AppException("House not found with the current contract number: " + contract, HttpStatus.NOT_FOUND);
+            //throw new AppException("House not found with the current contract number: " + contract, HttpStatus.NOT_FOUND);
+            House houseSaved = houseService.extractReceiptInformation(receiptText, idUser);
+            optionalHouse = Optional.of(houseSaved);
         }
 
         float amountWater = 0;

@@ -166,7 +166,7 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Message readPDF(MultipartFile file, HttpServletRequest request) {
+    public House readPDF(MultipartFile file, HttpServletRequest request) {
         Long idUser = utils.getTokenFromRequest(request);
         return extractReceiptInformation(utils.readPdf(file), idUser);
     }
@@ -176,7 +176,7 @@ public class HouseService implements HouseInterface {
         return houseRepository.findIdByName(name);
     }
 
-    private Message extractReceiptInformation(String receiptText, Long idUser) {
+    public House extractReceiptInformation(String receiptText, Long idUser) {
 
         House house = new House();
 
@@ -251,8 +251,6 @@ public class HouseService implements HouseInterface {
         house.setName(name);
         house.setNeighborhood(neighborhood);
 
-        houseRepository.save(house);
-
-        return new Message("House created successfully", HttpStatus.OK);
+        return houseRepository.save(house);
     }
 }

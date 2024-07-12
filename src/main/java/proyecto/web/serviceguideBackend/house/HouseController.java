@@ -62,7 +62,7 @@ public class HouseController {
     }
 
     @PostMapping("/read")
-    public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf") MultipartFile archivoPdf, HttpServletRequest request) {
+    public ResponseEntity<House> readReceipt(@RequestParam("archivoPdf") MultipartFile archivoPdf, HttpServletRequest request) {
         return ResponseEntity.ok(houseService.readPDF(archivoPdf, request));
     }
 
