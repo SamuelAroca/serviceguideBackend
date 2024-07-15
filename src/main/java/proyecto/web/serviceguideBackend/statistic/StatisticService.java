@@ -10,7 +10,6 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.kernel.colors.Color;
 
 import com.itextpdf.layout.properties.BorderRadius;
 import com.itextpdf.layout.properties.TextAlignment;
@@ -38,7 +37,6 @@ import proyecto.web.serviceguideBackend.statistic.statisticType.StatisticType;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -191,7 +189,6 @@ public class StatisticService implements StatisticInterface {
             Date utilDate = new Date(receiptDate.getTime());
             Instant instant = utilDate.toInstant();
             LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
-
             YearMonth yearMonth = YearMonth.of(localDate.getYear(), localDate.getMonth());
             yearMonths.add(yearMonth);
         }
@@ -227,7 +224,7 @@ public class StatisticService implements StatisticInterface {
         List<YearMonth> lastTwoMonths = sortedYearMonths.subList(Math.max(0, sortedYearMonths.size() - 2), sortedYearMonths.size());
 
         for (int i = 0; i < lastTwoMonths.size(); i++) {
-            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonth(idHouse, lastTwoMonths.get(i).getMonthValue());
+            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonthAndYear(idHouse, lastTwoMonths.get(i).getMonthValue(), lastTwoMonths.get(i).getYear());
             for (Receipt receipt : list) {
                 if (i == 0) {
                     sumPriceLast += receipt.getPrice();
