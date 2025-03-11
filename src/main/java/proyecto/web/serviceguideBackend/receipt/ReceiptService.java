@@ -197,7 +197,9 @@ public class ReceiptService implements ReceiptInterface {
         String patronGas = "Gas (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronDate = "(\\d{1,2}-[a-zA-Z]{3}-\\d{4})";
         String patronContractNumber = "Contrato (\\d+)";
-        String patronReceiptName = "Factura [A-Za-z]+ de \\d{4}";
+        //String patronReceiptName = "Factura [A-Za-z]+ de \\d{4}";
+        String patronReceiptName = "Resumen de facturación [a-zA-Z]+ de \\d{4}";
+
 
         // Crear los objetos de patrón
         Pattern patternWater = Pattern.compile(patronWater);
