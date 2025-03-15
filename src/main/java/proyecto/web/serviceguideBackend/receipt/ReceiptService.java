@@ -285,7 +285,7 @@ public class ReceiptService implements ReceiptInterface {
             priceGas = Double.parseDouble(price);
         }
 
-        String receiptName = null;
+        String receiptName;
         if (matcherReceiptName1.find()) {
             receiptName = matcherReceiptName1.group(0);
         } else if (matcherReceiptName2.find()) {
