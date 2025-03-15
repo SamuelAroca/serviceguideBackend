@@ -197,8 +197,8 @@ public class ReceiptService implements ReceiptInterface {
         String patronGas = "Gas (\\d[\\d.,]*) m3[\\s\\t]*\\$[\\s\\t]*([\\d.,]+)";
         String patronDate = "(\\d{1,2}-[a-zA-Z]{3}-\\d{4})";
         String patronContractNumber = "Contrato (\\d+)";
-        //String patronReceiptName = "Factura [A-Za-z]+ de \\d{4}";
-        String patronReceiptName = "Resumen de facturación [a-zA-Z]+ de \\d{4}";
+        String patronReceiptName1 = "Factura [A-Za-z]+ de \\d{4}";
+        String patronReceiptName2 = "facturación [a-zA-Z]+ de \\d{4}";
 
 
         // Crear los objetos de patrón
@@ -208,7 +208,8 @@ public class ReceiptService implements ReceiptInterface {
         Pattern patternGas = Pattern.compile(patronGas);
         Pattern patternDate = Pattern.compile(patronDate);
         Pattern patternContract = Pattern.compile(patronContractNumber);
-        Pattern patternReceiptName = Pattern.compile(patronReceiptName);
+        Pattern patternReceiptName1 = Pattern.compile(patronReceiptName1);
+        Pattern patternReceiptName2 = Pattern.compile(patronReceiptName2);
 
         // Crear el objeto Matcher
         Matcher matcherWater = patternWater.matcher(receiptText);
@@ -217,7 +218,8 @@ public class ReceiptService implements ReceiptInterface {
         Matcher matcherGas = patternGas.matcher(receiptText);
         Matcher matcherDate = patternDate.matcher(receiptText);
         Matcher matcherContract = patternContract.matcher(receiptText);
-        Matcher matcherReceiptName = patternReceiptName.matcher(receiptText);
+        Matcher matcherReceiptName1 = patternReceiptName1.matcher(receiptText);
+        Matcher matcherReceiptName2 = patternReceiptName2.matcher(receiptText);
 
         String contract = null;
         if (matcherContract.find()) {
@@ -284,8 +286,12 @@ public class ReceiptService implements ReceiptInterface {
         }
 
         String receiptName = null;
-        if (matcherReceiptName.find()) {
-            receiptName = matcherReceiptName.group(0);
+        if (matcherReceiptName1.find()) {
+            receiptName = matcherReceiptName1.group(0);
+        } else if (matcherReceiptName2.find()) {
+            receiptName = matcherReceiptName2.group(0);
+        } else {
+            receiptName = "Factura Genérica";
         }
 
         Date formatedDate;
@@ -294,7 +300,12 @@ public class ReceiptService implements ReceiptInterface {
             assert receiptName != null;
             formatedDate = formatDate(dateFound, receiptName);
         } else {
-            throw new AppException("No se encontró la fecha en el texto.", HttpStatus.BAD_REQUEST);
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy"); // Ajusta el formato si es necesario
+            String currentDateStr = today.format(formatter);
+
+            // Formatear la fecha actual usando tu función existente
+            formatedDate = formatDate(currentDateStr, receiptName);
         }
 
         Receipt receiptWater = new Receipt();
@@ -307,10 +318,12 @@ public class ReceiptService implements ReceiptInterface {
         receiptSewerage.setHouse(optionalHouse.get());
         receiptGas.setHouse(optionalHouse.get());
 
-        String waterName = receiptName + " " + "Agua";
-        String energyName = receiptName + " " + "Energia";
-        String sewerageName = receiptName + " " + "Alcantarillado";
-        String gasName = receiptName + " " + "Gas";
+        String NameCapitalize = receiptName.substring(0, 1).toUpperCase() + receiptName.substring(1);
+
+        String waterName = NameCapitalize + " " + "Agua";
+        String energyName = NameCapitalize + " " + "Energia";
+        String sewerageName = NameCapitalize + " " + "Alcantarillado";
+        String gasName = NameCapitalize + " " + "Gas";
 
         receiptWater.setPrice(priceWater);
         receiptEnergy.setPrice(priceEnergy);
@@ -437,7 +450,7 @@ public class ReceiptService implements ReceiptInterface {
 
             // Comparar con el mes de la fecha obtenida
             Month month = localDate.getMonth();
-            String monthName = month.getDisplayName(TextStyle.FULL, new Locale("es", "ES")).toLowerCase();
+            String monthName = month.getDisplayName(TextStyle.FULL, Locale.of("es", "ES")).toLowerCase();
 
             // Si los nombres de los meses no coinciden, ajustar la fecha al primer día del mes del recibo
             try {
@@ -446,7 +459,7 @@ public class ReceiptService implements ReceiptInterface {
                     String normalizedMonth = receiptMonth.toLowerCase();
 
                     // Obtener el nombre del mes en inglés
-                    DateFormatSymbols symbols = new DateFormatSymbols(new Locale("es", "ES"));
+                    DateFormatSymbols symbols = new DateFormatSymbols(Locale.of("es", "ES"));
                     String[] monthNames = symbols.getMonths();
                     int monthIndex = Arrays.asList(monthNames).indexOf(normalizedMonth);
 
