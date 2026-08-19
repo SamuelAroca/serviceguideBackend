@@ -1,12 +1,19 @@
 version: '3.8'
 
 services:
+
   myapp:
     container_name: ServiceGuideBack
     build: .
+    image: myapp:latest
     ports:
       - "5001:5001"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-    image: myapp:latest
     command: java -jar /app/target/serviceguideBackend.jar
+    networks:
+      - serviceguide-postgres_default
+
+networks:
+  serviceguide-postgres_default:
+    external: true
