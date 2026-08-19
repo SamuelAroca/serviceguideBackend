@@ -123,7 +123,7 @@ public class StatisticService implements StatisticInterface {
         statistic.setStatisticsType(statisticType);
         statisticRepository.save(statistic);
 
-        currentReceipt.setStatistics(List.of(statistic));
+        currentReceipt.setStatistics(new ArrayList<>(List.of(statistic)));
         receiptRepository.save(currentReceipt);
 
         return statisticMapper.statisticDto(statistic);
