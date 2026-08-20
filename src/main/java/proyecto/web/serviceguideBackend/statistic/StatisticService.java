@@ -59,10 +59,6 @@ public class StatisticService implements StatisticInterface {
     public StatisticDto individualReceipt(String typeReceipt, Long idReceipt, String typeGraphic) {
         List<Statistic> statistics = statisticRepository.getStatisticByReceipt(idReceipt);
         if (!statistics.isEmpty()) {
-            // El código original recorría toda la lista sobrescribiendo el mismo
-            // StatisticDto en cada vuelta; al final solo sobrevivían los valores
-            // del último elemento. Es exactamente lo mismo que tomar el último
-            // directamente, sin el trabajo extra de O(n).
             Statistic lastStatistic = statistics.get(statistics.size() - 1);
             StatisticDto statisticDto = new StatisticDto();
             statisticDto.setPrice(lastStatistic.getPrice());
@@ -83,13 +79,11 @@ public class StatisticService implements StatisticInterface {
         TypeService typeService = TypeService.valueOf(typeReceipt);
         List<Long> collectionId = receiptRepository.getIdByUser(user.getId(), typeService);
 
-        /*Se declara el array y se extraen 2 id*/
         List<Long> idList = new ArrayList<>();
         for (int i = 0; i < 2 && i < collectionId.size(); i++) {
             idList.add(collectionId.get(i));
         }
 
-        /*Se verifica si la lista tiene solo un dato y si es verdadero lanza una excepcion*/
         if (idList.size() == 1) {
             throw new AppException("Recibo creado pero no se puede generar la estadistica", HttpStatus.OK);
         }
@@ -99,23 +93,12 @@ public class StatisticService implements StatisticInterface {
         Double[] price = {receiptList.get(0).getPrice(), receiptList.get(1).getPrice()};
         Float[] amount = {receiptList.get(0).getAmount(), receiptList.get(1).getAmount()};
 
-        /*
-         * BUG corregido: la fecha del primer recibo se parseaba con un
-         * DateTimeFormatter que coincide con Date.toString() ("E MMM dd
-         * HH:mm:ss z yyyy"), pero la del segundo recibo se parseaba con
-         * LocalDate.parse(str) SIN formatter, que solo acepta el formato ISO
-         * "yyyy-MM-dd". Como Date.toString() nunca produce ese formato, esa
-         * línea lanzaba DateTimeParseException prácticamente siempre que se
-         * llegaba a generar una estadística nueva. Ahora ambas fechas se
-         * convierten directamente desde java.util.Date, sin pasar por texto.
-         */
         String monthCapitalize1 = capitalizedSpanishMonth(receiptList.get(0).getDate());
         String monthCapitalize2 = capitalizedSpanishMonth(receiptList.get(1).getDate());
         String[] label = {monthCapitalize1, monthCapitalize2};
 
         StatisticType statisticType = StatisticType.valueOf(typeGraphic);
 
-        /*Se crea la nueva estadistica y se le pasan los datos generados*/
         Statistic statistic = new Statistic();
         statistic.setLabel(label);
         statistic.setPrice(price);
@@ -193,7 +176,6 @@ public class StatisticService implements StatisticInterface {
         double sumPriceLatest = 0D;
         double sumPriceLast = 0D;
 
-        // Obtener los últimos dos elementos de la lista ordenada
         List<YearMonth> lastTwoMonths = sortedYearMonths.subList(Math.max(0, sortedYearMonths.size() - 2), sortedYearMonths.size());
 
         for (int i = 0; i < lastTwoMonths.size(); i++) {
@@ -222,9 +204,6 @@ public class StatisticService implements StatisticInterface {
     public ResponseEntity<ByteArrayResource> generateReportPDF(Long userId, Long houseId) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        // try-with-resources: el Document cierra en cascada el PdfDocument y el
-        // PdfWriter. Antes, si algo lanzaba una excepción a mitad del reporte,
-        // document.close() nunca se ejecutaba y el recurso quedaba sin cerrar.
         try (Document document = new Document(new PdfDocument(new PdfWriter(baos)))) {
             PdfDocument pdf = document.getPdfDocument();
 
@@ -319,18 +298,6 @@ public class StatisticService implements StatisticInterface {
         document.add(table);
     }
 
-    /**
-     * Convierte un java.util.Date a LocalDate directamente vía epoch millis,
-     * sin pasar por texto. Reemplaza los distintos parseos manuales de
-     * String.valueOf(date) que había repetidos (y rotos) en el servicio.
-
-     * OJO: no se usa date.toInstant() a propósito. Cuando la fecha viene de
-     * Hibernate mapeada como columna DATE, en tiempo de ejecución llega como
-     * java.sql.Date (subclase de java.util.Date), y java.sql.Date sobreescribe
-     * toInstant() para lanzar UnsupportedOperationException, ya que
-     * conceptualmente no tiene componente de hora. getTime() sí es seguro en
-     * ambas subclases, así que construimos el Instant a partir de los millis.
-     */
     private static LocalDate toLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }

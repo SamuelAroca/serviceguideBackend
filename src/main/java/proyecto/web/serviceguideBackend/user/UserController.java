@@ -22,8 +22,9 @@ public class UserController {
         return userService.updateUser(updateUser, idUser);
     }
 
-    @GetMapping("/findById/{token}")
-    public ResponseEntity<UserLoadDto> userById(@PathVariable String token) {
+    @GetMapping("/findById")
+    public ResponseEntity<UserLoadDto> userById(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
         return ResponseEntity.ok(userService.loadById(token));
     }
 

@@ -40,13 +40,18 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/whoismyid/{token}")
-    public ResponseEntity<Long> whoIsMyId(@PathVariable String token) {
+    @GetMapping("/whoismyid")
+    public ResponseEntity<Long> whoIsMyId(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new AppException("Missing or invalid Authorization header", HttpStatus.UNAUTHORIZED);
+        }
+        String token = authHeader.substring("Bearer ".length());
         return ResponseEntity.ok(jwtService.whoIsMyId(token));
     }
 
-    @GetMapping("/myName/{token}")
-    public ResponseEntity<String> myName(@PathVariable String token) {
+    @GetMapping("/myName")
+    public ResponseEntity<String> myName(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
         return ResponseEntity.ok(jwtService.myName(token));
     }
 }

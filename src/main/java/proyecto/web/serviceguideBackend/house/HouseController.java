@@ -56,8 +56,9 @@ public class HouseController {
         return houseService.deleteHouse(idHouse);
     }
 
-    @GetMapping("/onlyHouse/{token}")
-    public ResponseEntity<Collection<OnlyHouse>> onlyHouse(@PathVariable String token){
+    @GetMapping("/onlyHouse")
+    public ResponseEntity<Collection<OnlyHouse>> onlyHouse(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
         return ResponseEntity.ok(houseService.onlyHouse(token));
     }
 

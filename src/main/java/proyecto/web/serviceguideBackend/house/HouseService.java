@@ -191,7 +191,7 @@ public class HouseService implements HouseInterface {
         String patronStratum = "Estrato:\\s*(\\d+)";
         Pattern patternStratum = Pattern.compile(patronStratum);
         Matcher matcherStratum = patternStratum.matcher(receiptText);
-        String stratum = "";
+        String stratum;
         if (matcherStratum.find()) {
             stratum = matcherStratum.group(1);
             int stratumInt = Integer.parseInt(stratum);
@@ -207,7 +207,7 @@ public class HouseService implements HouseInterface {
         String patronCity = "([\\p{L}\\s]+)\\s*-\\s*Antioquia";
         Pattern patternCity = Pattern.compile(patronCity);
         Matcher matcherCity = patternCity.matcher(receiptText);
-        String city = "";
+        String city;
         if (matcherCity.find()) {
             city = matcherCity.group(1).trim();
         } else {
@@ -223,7 +223,7 @@ public class HouseService implements HouseInterface {
         String patronAddress = "Dirección de cobro:\\s*(.*)";
         Pattern patternAddress = Pattern.compile(patronAddress);
         Matcher matcherAddress = patternAddress.matcher(receiptText);
-        String address = "";
+        String address;
         if (matcherAddress.find()) {
             address = matcherAddress.group(1).trim();
             house.setAddress(address);
@@ -234,7 +234,7 @@ public class HouseService implements HouseInterface {
         String patronContract = "Contrato\\s*(\\d+)";
         Pattern patternContract = Pattern.compile(patronContract);
         Matcher matcherContract = patternContract.matcher(receiptText);
-        String contract = "";
+        String contract;
         if (matcherContract.find()) {
             contract = matcherContract.group(1);
         } else {
