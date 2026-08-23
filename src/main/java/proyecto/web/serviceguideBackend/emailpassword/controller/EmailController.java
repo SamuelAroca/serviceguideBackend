@@ -21,9 +21,9 @@ import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.UserService;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 @RestController
@@ -36,6 +36,8 @@ public class EmailController {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final VerificationCodeRepository verificationCodeRepository;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Value("${spring.mail.username}")
     private String mailFrom;
@@ -135,6 +137,6 @@ public class EmailController {
 
     private String generateVerificationCode() {
         // Generate a random 6-digit code
-        return String.format("%06d", new Random().nextInt(999999));
+        return String.format("%06d", SECURE_RANDOM.nextInt(1_000_000));
     }
 }
