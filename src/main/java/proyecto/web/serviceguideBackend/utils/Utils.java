@@ -16,8 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
 public class Utils {
@@ -47,7 +45,11 @@ public class Utils {
             pdfReader.close();
 
             return textoPagina;
-        } catch (IOException e) {
+        } catch (Exception e) {
+            // iText lanza com.itextpdf.io.exceptions.IOException (no
+            // java.io.IOException) para PDFs corruptos, y un
+            // IndexOutOfBoundsException si el archivo tiene menos de 2
+            // páginas; ambos deben caer aquí como error de negocio.
             throw new AppException("Error al procesar el archivo PDF", HttpStatus.BAD_REQUEST);
         }
     }

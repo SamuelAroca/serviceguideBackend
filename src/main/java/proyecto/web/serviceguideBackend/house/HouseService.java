@@ -1,10 +1,8 @@
 package proyecto.web.serviceguideBackend.house;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.city.City;
 import proyecto.web.serviceguideBackend.city.CityService;
 import proyecto.web.serviceguideBackend.config.JwtService;
@@ -17,7 +15,6 @@ import proyecto.web.serviceguideBackend.house.interfaces.HouseMapper;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
-import proyecto.web.serviceguideBackend.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +31,6 @@ public class HouseService implements HouseInterface {
     private final HouseMapper houseMapper;
     private final CityService cityService;
     private final JwtService jwtService;
-    private final Utils utils;
 
     @Override
     public HouseDto newHouse(HouseDto houseDto, Long idUser){
@@ -152,12 +148,6 @@ public class HouseService implements HouseInterface {
             onlyHouses.add(onlyHouse);
         }
         return onlyHouses;
-    }
-
-    @Override
-    public House readPDF(MultipartFile file, HttpServletRequest request) {
-        Long idUser = utils.getTokenFromRequest(request);
-        return extractReceiptInformation(utils.readPdf(file), idUser);
     }
 
     @Override

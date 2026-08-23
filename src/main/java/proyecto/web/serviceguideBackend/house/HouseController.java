@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
 import proyecto.web.serviceguideBackend.house.dto.OnlyHouse;
+import proyecto.web.serviceguideBackend.receipt.ReceiptService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class HouseController {
 
     private final HouseService houseService;
+    private final ReceiptService receiptService;
 
     @PostMapping("/add/{idUser}")
     @Transactional
@@ -62,9 +64,14 @@ public class HouseController {
         return ResponseEntity.ok(houseService.onlyHouse(token));
     }
 
+    // Sube la casa Y el/los recibo(s) que trae el PDF en un solo paso.
+    // Antes solo creaba la casa (houseService.readPDF), obligando a subir
+    // el mismo PDF una segunda vez desde "Agregar recibo" para que el
+    // recibo quedara registrado. receiptService.readPDF ya hace ambas
+    // cosas (crea la casa si no existe y luego los recibos).
     @PostMapping("/read")
-    public ResponseEntity<House> readReceipt(@RequestParam("archivoPdf") MultipartFile archivoPdf, HttpServletRequest request) {
-        return ResponseEntity.ok(houseService.readPDF(archivoPdf, request));
+    public ResponseEntity<Message> readReceipt(@RequestParam("archivoPdf") MultipartFile archivoPdf, HttpServletRequest request) {
+        return ResponseEntity.ok(receiptService.readPDF(archivoPdf, request));
     }
 
     @GetMapping("/findIdByName/{name}")
