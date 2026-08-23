@@ -42,6 +42,7 @@ import java.time.*;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -84,7 +85,7 @@ public class StatisticService implements StatisticInterface {
             idList.add(collectionId.get(i));
         }
 
-        if (idList.size() == 1) {
+        if (idList.size() < 2) {
             throw new AppException("Recibo creado pero no se puede generar la estadistica", HttpStatus.OK);
         }
 
@@ -173,21 +174,17 @@ public class StatisticService implements StatisticInterface {
             return sumOfReceiptDto;
         }
 
-        double sumPriceLatest = 0D;
-        double sumPriceLast = 0D;
-
         List<YearMonth> lastTwoMonths = sortedYearMonths.subList(Math.max(0, sortedYearMonths.size() - 2), sortedYearMonths.size());
 
-        for (int i = 0; i < lastTwoMonths.size(); i++) {
-            Collection<Receipt> list = receiptRepository.listReceiptByHouseAndMonthAndYear(
-                    idHouse, lastTwoMonths.get(i).getMonthValue(), lastTwoMonths.get(i).getYear());
-            double sum = list.stream().mapToDouble(Receipt::getPrice).sum();
-            if (i == 0) {
-                sumPriceLast += sum;
-            } else {
-                sumPriceLatest += sum;
-            }
-        }
+        // receiptList ya trae todos los recibos de la casa; se agrupan en memoria
+        // en vez de volver a consultar la BD por cada uno de los últimos dos meses.
+        Map<YearMonth, Double> sumByYearMonth = receiptList.stream()
+                .collect(Collectors.groupingBy(
+                        receipt -> YearMonth.from(toLocalDate(receipt.getDate())),
+                        Collectors.summingDouble(Receipt::getPrice)));
+
+        double sumPriceLast = sumByYearMonth.getOrDefault(lastTwoMonths.get(0), 0D);
+        double sumPriceLatest = sumByYearMonth.getOrDefault(lastTwoMonths.get(1), 0D);
 
         double difference = sumPriceLast - sumPriceLatest;
         double percentage = (difference / sumPriceLast) * 100;

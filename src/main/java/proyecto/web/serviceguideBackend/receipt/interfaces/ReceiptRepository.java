@@ -33,8 +33,6 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     List<Receipt> getAllReceiptsByHouseId(Long idUser, Long houseId);
     @Query(value = "select r from Receipt r where r.house = ?1 and r.typeService = ?2 and MONTH(r.date) = ?3 and YEAR(r.date) = ?4")
     List<Receipt> findByHouseAndTypeServiceAndMonthAndYear(House house, TypeService typeService, int month, int year);
-    @Query(value = "select r from Receipt r inner join House h on r.house.id = h.id where h.id = ?1 and MONTH(r.date) = ?2 and YEAR(r.date) = ?3")
-    Collection<Receipt> listReceiptByHouseAndMonthAndYear(Long idHouse, int month, int year);
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 order by r.id DESC")
     List<Receipt> findLastFourReceipt(@NotNull Long id, Pageable pageable);
     @Query(value = "select r from Receipt r where r.house.user.id = ?1 and r.house.id = ?2 and r.date between ?3 and ?4 order by r.date desc ")

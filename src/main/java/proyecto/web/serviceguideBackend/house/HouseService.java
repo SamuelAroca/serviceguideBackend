@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import proyecto.web.serviceguideBackend.city.City;
-import proyecto.web.serviceguideBackend.city.interfaces.CityRepository;
+import proyecto.web.serviceguideBackend.city.CityService;
 import proyecto.web.serviceguideBackend.config.JwtService;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
@@ -32,7 +32,7 @@ public class HouseService implements HouseInterface {
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
     private final HouseMapper houseMapper;
-    private final CityRepository cityRepository;
+    private final CityService cityService;
     private final JwtService jwtService;
     private final Utils utils;
 
@@ -46,7 +46,7 @@ public class HouseService implements HouseInterface {
         if (optionalHouse.isPresent()) {
             throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
         }
-        Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
+        Optional<City> optionalColombianCities = cityService.findByCity(houseDto.getCities().getCity());
         if (optionalColombianCities.isPresent()) {
 
             House house = houseMapper.newHouse(houseDto);
@@ -78,28 +78,17 @@ public class HouseService implements HouseInterface {
                     if (optionalUser.isEmpty()) {
                         throw new AppException("User not found", HttpStatus.NOT_FOUND);
                     }
+
                     Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), houseDto.getName());
-                    if (optionalHouse.isPresent()) {
-                        if (optionalHouse.get().getName().equals(houseDto.getName())) {
-                            Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
-                            if (optionalColombianCities.isEmpty()) {
-                                throw new AppException("City not found", HttpStatus.NOT_FOUND);
-                            }
-                            house.setName(houseDto.getName());
-                            house.setStratum(houseDto.getStratum());
-                            house.setNeighborhood(houseDto.getNeighborhood());
-                            house.setAddress(houseDto.getAddress());
-                            house.setContract(houseDto.getContract());
-                            house.setCities(optionalColombianCities.get());
-                            houseRepository.save(house);
-                            return new Message("House Updated successfully", HttpStatus.OK);
-                        }
+                    if (optionalHouse.isPresent() && !optionalHouse.get().getId().equals(id)) {
                         throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
                     }
-                    Optional<City> optionalColombianCities = cityRepository.findByCity(houseDto.getCities().getCity());
+
+                    Optional<City> optionalColombianCities = cityService.findByCity(houseDto.getCities().getCity());
                     if (optionalColombianCities.isEmpty()) {
                         throw new AppException("City not found", HttpStatus.NOT_FOUND);
                     }
+
                     house.setName(houseDto.getName());
                     house.setStratum(houseDto.getStratum());
                     house.setNeighborhood(houseDto.getNeighborhood());
@@ -214,7 +203,7 @@ public class HouseService implements HouseInterface {
             throw new AppException("City not found", HttpStatus.NOT_FOUND);
         }
 
-        Optional<City> optionalCity = cityRepository.findByCity(city);
+        Optional<City> optionalCity = cityService.findByCity(city);
         if (optionalCity.isEmpty()) {
             throw new AppException("City not found", HttpStatus.NOT_FOUND);
         }

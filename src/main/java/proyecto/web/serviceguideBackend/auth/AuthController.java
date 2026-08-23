@@ -2,6 +2,7 @@ package proyecto.web.serviceguideBackend.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +11,9 @@ import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.JwtService;
-import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users/auth")
@@ -26,6 +27,7 @@ public class AuthController {
         try {
             return ResponseEntity.ok(authService.login(credentialsDto));
         } catch (RuntimeException e) {
+            log.warn("Login failed for email {}: {}", credentialsDto.getEmail(), e.getMessage());
             throw new AppException("User or password incorrect", HttpStatus.BAD_REQUEST);
         }
     }

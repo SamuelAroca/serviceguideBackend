@@ -3,7 +3,9 @@ package proyecto.web.serviceguideBackend.emailpassword.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -11,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import proyecto.web.serviceguideBackend.emailpassword.dto.EmailValuesDto;
+import proyecto.web.serviceguideBackend.exceptions.AppException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -42,7 +46,8 @@ public class EmailService {
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.error("Error sending email to {}: {}", dto.getMailTo(), e.getMessage(), e);
+            throw new AppException("Error sending email", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
