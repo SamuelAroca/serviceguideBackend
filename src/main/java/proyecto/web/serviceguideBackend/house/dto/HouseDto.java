@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.house.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,11 @@ public class HouseDto {
     @NotNull
     private City cities;
 
+    // Igual que House.user: nunca se serializa en la respuesta. Sin esto,
+    // Jackson intenta serializar la colección lazy User.house fuera de la
+    // transacción (falla con open-in-view=false, ej. en el perfil prod).
     @Nullable
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
 
     public HouseDto(@Nullable Long id, @NotNull String name, @NotNull Integer stratum, @NotNull String neighborhood, @Nullable String address, @NotNull String contract, @NotNull City cities) {
