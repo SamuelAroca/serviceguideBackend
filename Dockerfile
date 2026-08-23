@@ -8,4 +8,4 @@ RUN mvn -B -f /app/pom.xml package
 
 EXPOSE 5001
 
-CMD ["java", "-jar", "/app/target/servceguideBackend.jar"]
+CMD ["java", "-jar", "/app/target/serviceguideBackend.jar"]
