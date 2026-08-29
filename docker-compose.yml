@@ -6,6 +6,7 @@ services:
     container_name: ServiceGuideBack
     build: .
     image: myapp:latest
+    restart: unless-stopped
     ports:
       - "5001:5001"
     environment:
