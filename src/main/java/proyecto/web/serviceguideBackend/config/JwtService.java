@@ -2,7 +2,6 @@ package proyecto.web.serviceguideBackend.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,7 @@ import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.function.Function;
 
@@ -34,15 +33,15 @@ public class JwtService {
     private String getToken(Map<String, Object> extraClaims, UserDetails user) {
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
-                .setSubject(user.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 86400))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .claims(extraClaims)
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 86400))
+                .signWith(getKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
-    private Key getKey() {
+    private SecretKey getKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -59,10 +58,10 @@ public class JwtService {
     private Claims getAllClaims(String token) {
         return Jwts
                 .parser()
-                .setSigningKey(getKey())
+                .verifyWith(getKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
