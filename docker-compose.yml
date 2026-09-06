@@ -11,6 +11,7 @@ services:
       - "5001:5001"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - JAVA_TOOL_OPTIONS=-Xmx384m
     command: java -jar /app/target/serviceguideBackend.jar
     networks:
       - serviceguide-postgres_default
