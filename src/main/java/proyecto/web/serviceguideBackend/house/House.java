@@ -49,7 +49,12 @@ public class House {
     @JoinColumn(name = "FK_CITY", nullable = false)
     private City cities;
 
+    // WRITE_ONLY: sin esto, cada vez que se lista una casa Jackson serializa
+    // TODA su coleccion de recibos (lazy -> dispara una query por casa, y en
+    // un usuario real ya son 800+ recibos en total). El detalle de una casa
+    // trae sus recibos por separado via /api/receipt/getReceiptsByHouseAndUser.
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Receipt> receipts = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
