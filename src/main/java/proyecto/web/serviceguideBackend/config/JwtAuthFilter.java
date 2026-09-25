@@ -12,16 +12,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
+import proyecto.web.serviceguideBackend.token.Token;
 import proyecto.web.serviceguideBackend.token.interfaces.TokenRepository;
+import proyecto.web.serviceguideBackend.user.User;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,7 +30,6 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
     @Override
@@ -59,19 +59,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            var isTokenValid = tokenRepository.findByToken(token)
-                    .map(t -> !t.isExpired() && !t.isRevoked())
-                    .orElse(false);
-            if (jwtService.isTokenValid(token, userDetails) && isTokenValid) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            // Antes: loadUserByUsername(username) + findByToken(token), dos
+            // queries por request autenticado. El Token ya tiene el User
+            // (join fetch en el repositorio), asi que con una sola query
+            // alcanza para las dos cosas: validar el token Y tener el usuario.
+            Optional<Token> storedToken = tokenRepository.findByToken(token);
+            boolean isTokenValid = storedToken.map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (isTokenValid) {
+                User user = storedToken.get().getUser();
+                if (jwtService.isTokenValid(token, user)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            user.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         }
         filterChain.doFilter(request, response);
