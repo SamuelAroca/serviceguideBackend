@@ -12,7 +12,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - JAVA_TOOL_OPTIONS=-Xmx384m
-    command: java -jar /app/target/serviceguideBackend.jar
+    mem_limit: 640m
     networks:
       - serviceguide-postgres_default
 
