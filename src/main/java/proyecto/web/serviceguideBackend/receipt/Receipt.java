@@ -11,7 +11,7 @@ import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 import proyecto.web.serviceguideBackend.statistic.Statistic;
 import proyecto.web.serviceguideBackend.house.House;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -43,10 +43,9 @@ public class Receipt {
     @Column(length = 100)
     private String houseName;
 
-    @Temporal(TemporalType.DATE)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @NotNull
-    private Date date;
+    private LocalDate date;
 
 
     @NotNull

@@ -1,6 +1,5 @@
 package proyecto.web.serviceguideBackend.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -9,13 +8,14 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import proyecto.web.serviceguideBackend.dto.ErrorDto;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 
 @Component
 public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
     @Override
     public void commence(

@@ -26,7 +26,6 @@ import proyecto.web.serviceguideBackend.utils.Utils;
 import java.text.DateFormatSymbols;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
@@ -91,10 +90,9 @@ public class ReceiptService implements ReceiptInterface {
 
         receipt.setTypeService(resolveTypeService(receiptDto.getTypeService().name()));
 
-        Calendar newReceiptCalendar = Calendar.getInstance();
-        newReceiptCalendar.setTime(receiptDto.getDate());
-        int receiptMonth = newReceiptCalendar.get(Calendar.MONTH) + 1;
-        int receiptYear = newReceiptCalendar.get(Calendar.YEAR);
+        LocalDate receiptDate = receiptDto.getDate();
+        int receiptMonth = receiptDate.getMonthValue();
+        int receiptYear = receiptDate.getYear();
 
         List<Receipt> existingReceipts = receiptRepository.findByHouseAndTypeServiceAndMonthAndYear(optionalHouse.get(), receipt.getTypeService(), receiptMonth, receiptYear);
         if (!existingReceipts.isEmpty()) {
@@ -127,8 +125,7 @@ public class ReceiptService implements ReceiptInterface {
     public Message updateReceipt(ReceiptDto receiptDto, Long idReceipt) {
 
         if (receiptDto.getReceiptName().isEmpty() || receiptDto.getTypeService().name().isEmpty()
-                || receiptDto.getPrice().toString().isEmpty() || receiptDto.getAmount().toString().isEmpty()
-                || receiptDto.getDate().toString().isEmpty()) {
+                || receiptDto.getPrice().toString().isEmpty() || receiptDto.getAmount().toString().isEmpty()) {
             throw new AppException("Check the inputs", HttpStatus.BAD_REQUEST);
         }
 
@@ -151,15 +148,13 @@ public class ReceiptService implements ReceiptInterface {
             receipt.setReceiptName(receiptDto.getReceiptName());
         }
 
-        Calendar newDate = Calendar.getInstance();
-        newDate.setTime(receiptDto.getDate());
-        int newMonth = newDate.get(Calendar.MONTH) + 1;
-        int newYear = newDate.get(Calendar.YEAR);
+        LocalDate newDate = receiptDto.getDate();
+        int newMonth = newDate.getMonthValue();
+        int newYear = newDate.getYear();
 
-        Calendar currentDate = Calendar.getInstance();
-        currentDate.setTime(receipt.getDate());
-        int currentMonth = currentDate.get(Calendar.MONTH) + 1;
-        int currentYear = currentDate.get(Calendar.YEAR);
+        LocalDate currentDate = receipt.getDate();
+        int currentMonth = currentDate.getMonthValue();
+        int currentYear = currentDate.getYear();
 
         if (newMonth != currentMonth || newYear != currentYear) {
             List<Receipt> existingReceipts = receiptRepository
@@ -219,7 +214,7 @@ public class ReceiptService implements ReceiptInterface {
         ServiceReading gasReading = extractServiceReading(receiptText, PATTERN_GAS, "Gas");
 
         String receiptName = resolveReceiptName(receiptText);
-        Date formattedDate = resolveDate(receiptText, receiptName);
+        LocalDate formattedDate = resolveDate(receiptText, receiptName);
         String nameCapitalized = receiptName.substring(0, 1).toUpperCase() + receiptName.substring(1);
 
         // type, sufijo del nombre, lectura extraída
@@ -320,7 +315,7 @@ public class ReceiptService implements ReceiptInterface {
         return "Factura Genérica";
     }
 
-    private Date resolveDate(String receiptText, String receiptName) {
+    private LocalDate resolveDate(String receiptText, String receiptName) {
         Matcher matcherDate = PATTERN_DATE.matcher(receiptText);
         if (matcherDate.find()) {
             return formatDate(matcherDate.group(1), receiptName);
@@ -357,7 +352,7 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public Date formatDate(String date, String receiptName) {
+    public LocalDate formatDate(String date, String receiptName) {
         try {
             DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                     .parseCaseInsensitive()
@@ -391,7 +386,7 @@ public class ReceiptService implements ReceiptInterface {
                 }
             }
 
-            return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            return localDate;
         } catch (DateTimeParseException e) {
             throw new AppException("Error al Parsear la fecha " + e.getParsedString(), HttpStatus.BAD_REQUEST);
         }

@@ -7,7 +7,7 @@ import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.dto.ReceiptDto;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ public interface ReceiptInterface {
     Message deleteReceipt(Long id);
     Long getTwoReceiptById(Long idReceipt);
     Message extractReceiptInformation(String receiptText, Long idUser);
-    Date formatDate(String date, String receiptName);
+    LocalDate formatDate(String date, String receiptName);
     Message readPDF(MultipartFile multipartFile, HttpServletRequest request);
     List<Receipt> receiptCollection(Long idUser, Pageable pageable);
 

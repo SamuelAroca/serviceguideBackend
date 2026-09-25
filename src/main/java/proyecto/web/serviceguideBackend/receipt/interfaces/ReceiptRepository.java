@@ -8,8 +8,8 @@ import proyecto.web.serviceguideBackend.house.House;
 import proyecto.web.serviceguideBackend.receipt.Receipt;
 import proyecto.web.serviceguideBackend.receipt.typeService.TypeService;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     @Query(value = "select r from Receipt r inner join House h on h.id = r.house.id inner join User u on u.id = h.user.id where u.id = ?1 order by r.date DESC, r.id DESC")
     List<Receipt> findLastFourReceipt(@NotNull Long id, Pageable pageable);
     @Query(value = "select r from Receipt r where r.house.user.id = ?1 and r.house.id = ?2 and r.date between ?3 and ?4 order by r.date desc ")
-    List<Receipt> findLastTwoMonthsReceipts(Long userId, Long houseId, Date startDate, Date endDate);
+    List<Receipt> findLastTwoMonthsReceipts(Long userId, Long houseId, LocalDate startDate, LocalDate endDate);
     long count();
 
 }

@@ -157,7 +157,7 @@ public class StatisticService implements StatisticInterface {
                 .thenComparing(YearMonth::getMonthValue);
 
         List<YearMonth> sortedYearMonths = receiptList.stream()
-                .map(receipt -> toLocalDate(receipt.getDate()))
+                .map(Receipt::getDate)
                 .map(localDate -> YearMonth.of(localDate.getYear(), localDate.getMonth()))
                 .distinct()
                 .sorted(byYearThenMonth)
@@ -180,7 +180,7 @@ public class StatisticService implements StatisticInterface {
         // en vez de volver a consultar la BD por cada uno de los últimos dos meses.
         Map<YearMonth, Double> sumByYearMonth = receiptList.stream()
                 .collect(Collectors.groupingBy(
-                        receipt -> YearMonth.from(toLocalDate(receipt.getDate())),
+                        receipt -> YearMonth.from(receipt.getDate()),
                         Collectors.summingDouble(Receipt::getPrice)));
 
         double sumPriceLast = sumByYearMonth.getOrDefault(lastTwoMonths.get(0), 0D);
@@ -247,17 +247,21 @@ public class StatisticService implements StatisticInterface {
             pdf.addNewPage();
             document.add(title);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("inline", "reporte_estadistico.pdf");
-
-            ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
-            return ResponseEntity.ok().headers(headers).body(resource);
-
         } catch (Exception e) {
             log.error("Error generando el reporte PDF para userId={}, houseId={}", userId, houseId, e);
             return ResponseEntity.status(500).body(null);
         }
+
+        // El try-with-resources cierra `document` (y con él el PdfWriter) antes de
+        // llegar aquí; iText solo vuelca el contenido real (tablas, texto, xref) al
+        // stream en el close(), así que toByteArray() debe leerse después de ese
+        // bloque. Leerlo dentro del try devolvía un PDF con solo el header.
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("inline", "reporte_estadistico.pdf");
+
+        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 
     private String obtenerFechaActual() {
@@ -267,12 +271,9 @@ public class StatisticService implements StatisticInterface {
 
     private List<Receipt> obtenerUltimosRecibos(Long userId, Long houseId) {
         LocalDate startDate = LocalDate.now().minusMonths(2);
-        Date startDateParam = Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
         LocalDate endDate = LocalDate.now();
-        Date endDateParam = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        return receiptRepository.findLastTwoMonthsReceipts(userId, houseId, startDateParam, endDateParam);
+        return receiptRepository.findLastTwoMonthsReceipts(userId, houseId, startDate, endDate);
     }
 
     private void agregarTablaRecibos(Document document, List<Receipt> lastTwoMonthsReceipts) {
@@ -295,12 +296,8 @@ public class StatisticService implements StatisticInterface {
         document.add(table);
     }
 
-    private static LocalDate toLocalDate(Date date) {
-        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
-    }
-
-    private static String capitalizedSpanishMonth(Date date) {
-        String monthName = toLocalDate(date).getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES"));
+    private static String capitalizedSpanishMonth(LocalDate date) {
+        String monthName = date.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES"));
         return monthName.substring(0, 1).toUpperCase() + monthName.substring(1);
     }
 }
