@@ -1,6 +1,7 @@
 package proyecto.web.serviceguideBackend.house;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import proyecto.web.serviceguideBackend.city.City;
@@ -61,12 +62,12 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Collection<House> findAllByUserOrderById(Long idUser){
+    public Collection<House> findAllByUserOrderById(Long idUser, Pageable pageable){
         Optional<User> optionalUser = userRepository.findById(idUser);
         if (optionalUser.isEmpty()) {
             throw new AppException("User not found", HttpStatus.NOT_FOUND);
         }
-        return houseRepository.findAllByUserOrderById(optionalUser.get());
+        return houseRepository.findAllByUserOrderById(optionalUser.get(), pageable);
     }
 
     @Override

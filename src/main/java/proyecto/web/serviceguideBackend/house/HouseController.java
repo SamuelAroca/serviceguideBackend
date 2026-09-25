@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +29,9 @@ import java.util.Optional;
 @RequestMapping("/api/house")
 public class HouseController {
 
+    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int MAX_PAGE_SIZE = 500;
+
     private final HouseService houseService;
     private final ReceiptService receiptService;
     private final HouseRepository houseRepository;
@@ -45,9 +50,11 @@ public class HouseController {
 
     @GetMapping("/findAllByUserOrderById/{idUser}")
     public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable Long idUser,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "" + DEFAULT_PAGE_SIZE) int size,
                                                                      @AuthenticationPrincipal User currentUser){
         requireSelf(idUser, currentUser);
-        return ResponseEntity.ok(houseService.findAllByUserOrderById(idUser));
+        return ResponseEntity.ok(houseService.findAllByUserOrderById(idUser, pageable(page, size)));
     }
 
     @GetMapping("/getHouseName/{idUser}")
@@ -86,6 +93,11 @@ public class HouseController {
         if (currentUser == null || ownerId == null || !ownerId.equals(currentUser.getId())) {
             throw new AppException("Forbidden", HttpStatus.FORBIDDEN);
         }
+    }
+
+    private Pageable pageable(int page, int size) {
+        int clampedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        return PageRequest.of(Math.max(page, 0), clampedSize);
     }
 
     @GetMapping("/onlyHouse")

@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface ReceiptInterface {
 
     ReceiptDto newReceipt(ReceiptDto receiptDto, Long idUser);
-    List<Receipt> allReceiptsByUserId(Long idUser);
+    List<Receipt> allReceiptsByUserId(Long idUser, Pageable pageable);
     Optional<Receipt> getLastReceipt(Long idUser);
     Message updateReceipt(ReceiptDto receiptDto, Long id);
     Message deleteReceipt(Long id);

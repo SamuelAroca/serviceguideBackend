@@ -112,8 +112,8 @@ public class ReceiptService implements ReceiptInterface {
     }
 
     @Override
-    public List<Receipt> allReceiptsByUserId(Long idUser) {
-        return receiptRepository.getReceiptByUser(idUser);
+    public List<Receipt> allReceiptsByUserId(Long idUser, Pageable pageable) {
+        return receiptRepository.getReceiptByUser(idUser, pageable);
     }
 
     @Override

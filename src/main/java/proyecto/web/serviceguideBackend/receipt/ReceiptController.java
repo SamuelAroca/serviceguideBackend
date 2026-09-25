@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,6 +28,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReceiptController {
 
+    // Antes estos endpoints devolvian la lista completa sin limite: un
+    // usuario real de esta app ya tiene 856 recibos. El default cubre eso
+    // con margen; el tope evita que alguien pida un size absurdo.
+    private static final int DEFAULT_PAGE_SIZE = 2000;
+    private static final int MAX_PAGE_SIZE = 2000;
+
     private final ReceiptService receiptService;
     private final ReceiptRepository receiptRepository;
     private final StatisticService statisticService;
@@ -47,9 +55,11 @@ public class ReceiptController {
 
     @GetMapping("/allReceiptsByUserId/{idUser}")
     public ResponseEntity<List<Receipt>> allReceiptsByUserId(@PathVariable Long idUser,
+                                                              @RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "" + DEFAULT_PAGE_SIZE) int size,
                                                               @AuthenticationPrincipal User currentUser) {
         requireSelf(idUser, currentUser);
-        return ResponseEntity.ok(receiptService.allReceiptsByUserId(idUser));
+        return ResponseEntity.ok(receiptService.allReceiptsByUserId(idUser, pageable(page, size)));
     }
 
     @PutMapping("/update/{idReceipt}")
@@ -84,9 +94,11 @@ public class ReceiptController {
 
     @GetMapping("/getReceiptsByHouseAndUser/{idUser}/{houseId}")
     public ResponseEntity<List<Receipt>> getReceiptsByHouseAndUser(@PathVariable Long idUser, @PathVariable Long houseId,
+                                                                    @RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "" + DEFAULT_PAGE_SIZE) int size,
                                                                     @AuthenticationPrincipal User currentUser) {
         requireSelf(idUser, currentUser);
-        return ResponseEntity.ok(receiptRepository.getAllReceiptsByHouseId(idUser, houseId));
+        return ResponseEntity.ok(receiptRepository.getAllReceiptsByHouseId(idUser, houseId, pageable(page, size)));
     }
 
     // El JWT prueba quien llama, no que idUser/idReceipt (del path) le
@@ -96,6 +108,11 @@ public class ReceiptController {
         if (currentUser == null || !currentUser.getId().equals(idUser)) {
             throw new AppException("Forbidden", HttpStatus.FORBIDDEN);
         }
+    }
+
+    private Pageable pageable(int page, int size) {
+        int clampedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        return PageRequest.of(Math.max(page, 0), clampedSize);
     }
 
     private void requireReceiptOwner(Long idReceipt, User currentUser) {
