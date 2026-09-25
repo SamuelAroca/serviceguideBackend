@@ -47,26 +47,22 @@ public class EmailController {
 
     @PostMapping("/send-email")
     public ResponseEntity<?> sendEmailTemplate(@RequestBody EmailValuesDto dto) {
-        Optional<User> optionalUser = userService.getByEmail(dto.getMailTo());
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
-        User user = optionalUser.get();
+        // No revela si el correo existe o no (evita enumeracion de usuarios):
+        // siempre responde igual, y solo envia si de verdad hay una cuenta.
+        userService.getByEmail(dto.getMailTo()).ifPresent(user -> {
+            dto.setMailFrom(mailFrom);
+            dto.setMailTo(user.getEmail());
+            dto.setSubject(mailSubject);
+            dto.setUserName(user.getFirstName());
 
-        dto.setMailFrom(mailFrom);
-        dto.setMailTo(user.getEmail());
-        dto.setSubject(mailSubject);
-        dto.setUserName(user.getFirstName());
+            String tokenPassword = UUID.randomUUID().toString();
+            dto.setToken(tokenPassword);
+            user.setTokenPassword(tokenPassword);
 
-        UUID uuid = UUID.randomUUID();
-        String tokenPassword = uuid.toString();
-
-        dto.setToken(tokenPassword);
-        user.setTokenPassword(tokenPassword);
-
-        userService.save(user);
-        emailService.sendEmail(dto);
-        return ResponseEntity.ok(new Message("We have sent you an email"));
+            userService.save(user);
+            emailService.sendEmail(dto);
+        });
+        return ResponseEntity.ok(new Message("If the email is registered, you'll receive instructions"));
     }
 
     @PostMapping("/change-password")
@@ -91,23 +87,20 @@ public class EmailController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        // Misma respuesta exista o no la cuenta: evita que este endpoint sirva
+        // para averiguar que correos estan registrados.
+        userRepository.findByEmail(request.getEmail()).ifPresent(user -> {
+            String verificationCode = generateVerificationCode();
+            verificationCodeRepository.save(new VerificationCode(user, verificationCode));
+            emailService.sendVerificationEmail(request.getEmail(), verificationCode);
+        });
 
-        String verificationCode = generateVerificationCode();
-        VerificationCode code = new VerificationCode(optionalUser.get(), verificationCode);
-        verificationCodeRepository.save(code);
-
-        emailService.sendVerificationEmail(request.getEmail(), verificationCode);
-
-        return ResponseEntity.ok(new Message("Verification code sent", HttpStatus.OK));
+        return ResponseEntity.ok(new Message("If the email is registered, a verification code has been sent", HttpStatus.OK));
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<?> verifyCode(@RequestBody VerifyCodeRequest request) {
+    public ResponseEntity<?> verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
         Optional<VerificationCode> optionalCode = verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode());
         if (optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
             throw new AppException("Invalid or expired verification code", HttpStatus.BAD_REQUEST);
@@ -117,15 +110,16 @@ public class EmailController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new AppException("User not found", HttpStatus.NOT_FOUND);
-        }
 
-        Optional<VerificationCode> optionalCode = verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode());
-        if (optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
-            throw new AppException("Invalid or expired verification code", HttpStatus.BAD_REQUEST);
+        // Un solo mensaje generico para "correo no existe" y "codigo invalido":
+        // separarlos deja saber a un atacante que correos si estan registrados.
+        Optional<VerificationCode> optionalCode = optionalUser.isPresent()
+                ? verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode())
+                : Optional.empty();
+        if (optionalUser.isEmpty() || optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
+            throw new AppException("Invalid email or verification code", HttpStatus.BAD_REQUEST);
         }
 
         User user = optionalUser.get();

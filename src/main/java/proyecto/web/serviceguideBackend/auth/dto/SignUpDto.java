@@ -1,6 +1,8 @@
 package proyecto.web.serviceguideBackend.auth.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +21,11 @@ public class SignUpDto {
     private String lastName;
 
     @NotEmpty
+    @Email
     private String email;
 
     @NotEmpty
+    @Size(min = 8, max = 100)
     private String password;
 
 }

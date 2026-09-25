@@ -4,14 +4,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import proyecto.web.serviceguideBackend.dto.Message;
+import proyecto.web.serviceguideBackend.exceptions.AppException;
 import proyecto.web.serviceguideBackend.house.dto.HouseDto;
 import proyecto.web.serviceguideBackend.house.dto.OnlyHouse;
+import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.receipt.ReceiptService;
+import proyecto.web.serviceguideBackend.user.User;
 
 import java.net.URI;
 import java.util.Collection;
@@ -24,11 +29,13 @@ public class HouseController {
 
     private final HouseService houseService;
     private final ReceiptService receiptService;
+    private final HouseRepository houseRepository;
 
     @PostMapping("/add/{idUser}")
     @Transactional
-    public ResponseEntity<HouseDto> newHouse(@RequestBody @Valid HouseDto houseDto, @PathVariable Long idUser){
-
+    public ResponseEntity<HouseDto> newHouse(@RequestBody @Valid HouseDto houseDto, @PathVariable Long idUser,
+                                              @AuthenticationPrincipal User currentUser){
+        requireSelf(idUser, currentUser);
         HouseDto createdHouse = houseService.newHouse(houseDto, idUser);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -37,25 +44,48 @@ public class HouseController {
     }
 
     @GetMapping("/findAllByUserOrderById/{idUser}")
-    public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable Long idUser){
+    public ResponseEntity<Collection<House>> findAllByUserOrderById(@PathVariable Long idUser,
+                                                                     @AuthenticationPrincipal User currentUser){
+        requireSelf(idUser, currentUser);
         return ResponseEntity.ok(houseService.findAllByUserOrderById(idUser));
     }
 
     @GetMapping("/getHouseName/{idUser}")
-    public ResponseEntity<Collection<String>> getHouseName(@PathVariable Long idUser) {
+    public ResponseEntity<Collection<String>> getHouseName(@PathVariable Long idUser,
+                                                            @AuthenticationPrincipal User currentUser) {
+        requireSelf(idUser, currentUser);
         return ResponseEntity.ok(houseService.getHouseName(idUser));
     }
 
     @PutMapping("/update/{idHouse}")
     @Transactional
-    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse){
+    public Optional<Message> updateHouse(@RequestBody HouseDto houseDto, @PathVariable Long idHouse,
+                                          @AuthenticationPrincipal User currentUser){
+        requireHouseOwner(idHouse, currentUser);
         return houseService.updateHouse(houseDto, idHouse);
     }
 
     @DeleteMapping("/delete/{idHouse}")
     @Transactional
-    public Message deleteHouse(@PathVariable Long idHouse){
+    public Message deleteHouse(@PathVariable Long idHouse, @AuthenticationPrincipal User currentUser){
+        requireHouseOwner(idHouse, currentUser);
         return houseService.deleteHouse(idHouse);
+    }
+
+    // El JWT prueba quien llama, no que el idUser/idHouse del path sea suyo.
+    // Sin estos chequeos cualquier usuario autenticado podia leer, modificar
+    // o borrar casas de otros con solo cambiar el id en la URL.
+    private void requireSelf(Long idUser, User currentUser) {
+        if (currentUser == null || !currentUser.getId().equals(idUser)) {
+            throw new AppException("Forbidden", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    private void requireHouseOwner(Long idHouse, User currentUser) {
+        Long ownerId = houseRepository.findUserByHouseId(idHouse);
+        if (currentUser == null || ownerId == null || !ownerId.equals(currentUser.getId())) {
+            throw new AppException("Forbidden", HttpStatus.FORBIDDEN);
+        }
     }
 
     @GetMapping("/onlyHouse")

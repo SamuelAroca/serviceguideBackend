@@ -1,10 +1,12 @@
 package proyecto.web.serviceguideBackend.config;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
@@ -21,6 +23,7 @@ import proyecto.web.serviceguideBackend.token.interfaces.TokenRepository;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -36,14 +39,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         final String token = getTokenFromRequest(request);
-        final String username;
 
         if (token==null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        username = jwtService.getUsernameFromToken(token);
+        final String username;
+        try {
+            username = jwtService.getUsernameFromToken(token);
+        } catch (JwtException e) {
+            // Token invalido, vencido o con firma corrupta: se sigue el
+            // filtro SIN autenticar, en vez de dejar que la excepcion suba
+            // sin capturar. Antes esto tumbaba el request con un 500 crudo
+            // en lugar del 401 limpio que da UserAuthenticationEntryPoint.
+            log.debug("JWT invalido en el request: {}", e.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

@@ -16,7 +16,6 @@ import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -31,6 +30,11 @@ public class HouseService implements HouseInterface {
     private final HouseMapper houseMapper;
     private final CityService cityService;
     private final JwtService jwtService;
+
+    private static final Pattern PATTERN_STRATUM = Pattern.compile("Estrato:\\s*(\\d+)");
+    private static final Pattern PATTERN_CITY = Pattern.compile("([\\p{L}\\s]+)\\s*-\\s*Antioquia");
+    private static final Pattern PATTERN_ADDRESS = Pattern.compile("Dirección de cobro:\\s*(.*)");
+    private static final Pattern PATTERN_CONTRACT = Pattern.compile("Contrato\\s*(\\d+)");
 
     @Override
     public HouseDto newHouse(HouseDto houseDto, Long idUser){
@@ -69,13 +73,7 @@ public class HouseService implements HouseInterface {
     public Optional<Message> updateHouse(HouseDto houseDto, Long id) {
         return Optional.of(houseRepository.findById(id)
                 .map(house -> {
-                    Long idUser = houseRepository.findUserByHouseId(id);
-                    Optional<User> optionalUser = userRepository.findById(idUser);
-                    if (optionalUser.isEmpty()) {
-                        throw new AppException("User not found", HttpStatus.NOT_FOUND);
-                    }
-
-                    Optional<House> optionalHouse = houseRepository.findByUserAndName(optionalUser.get(), houseDto.getName());
+                    Optional<House> optionalHouse = houseRepository.findByUserAndName(house.getUser(), houseDto.getName());
                     if (optionalHouse.isPresent() && !optionalHouse.get().getId().equals(id)) {
                         throw new AppException("House name already registered", HttpStatus.BAD_REQUEST);
                     }
@@ -135,19 +133,16 @@ public class HouseService implements HouseInterface {
         }
         Collection<House> houseList = houseRepository.findAllByUserOrderById(optionalUser.get());
 
-        Collection<OnlyHouse> onlyHouses = new ArrayList<>();
-        for (House house : houseList) {
-            OnlyHouse onlyHouse = new OnlyHouse(
-                    house.getId(),
-                    house.getName(),
-                    house.getStratum(),
-                    house.getNeighborhood(),
-                    house.getAddress(),
-                    house.getContract(),
-                    house.getCities());
-            onlyHouses.add(onlyHouse);
-        }
-        return onlyHouses;
+        return houseList.stream()
+                .map(house -> new OnlyHouse(
+                        house.getId(),
+                        house.getName(),
+                        house.getStratum(),
+                        house.getNeighborhood(),
+                        house.getAddress(),
+                        house.getContract(),
+                        house.getCities()))
+                .toList();
     }
 
     @Override
@@ -166,10 +161,7 @@ public class HouseService implements HouseInterface {
 
         house.setUser(optionalUser.get());
 
-        // Expresión regular corregida
-        String patronStratum = "Estrato:\\s*(\\d+)";
-        Pattern patternStratum = Pattern.compile(patronStratum);
-        Matcher matcherStratum = patternStratum.matcher(receiptText);
+        Matcher matcherStratum = PATTERN_STRATUM.matcher(receiptText);
         String stratum;
         if (matcherStratum.find()) {
             stratum = matcherStratum.group(1);
@@ -182,10 +174,7 @@ public class HouseService implements HouseInterface {
             throw new AppException("Stratum not found", HttpStatus.NOT_FOUND);
         }
 
-        // Ciudad en Antioquia
-        String patronCity = "([\\p{L}\\s]+)\\s*-\\s*Antioquia";
-        Pattern patternCity = Pattern.compile(patronCity);
-        Matcher matcherCity = patternCity.matcher(receiptText);
+        Matcher matcherCity = PATTERN_CITY.matcher(receiptText);
         String city;
         if (matcherCity.find()) {
             city = matcherCity.group(1).trim();
@@ -199,9 +188,7 @@ public class HouseService implements HouseInterface {
         }
         house.setCities(optionalCity.get());
 
-        String patronAddress = "Dirección de cobro:\\s*(.*)";
-        Pattern patternAddress = Pattern.compile(patronAddress);
-        Matcher matcherAddress = patternAddress.matcher(receiptText);
+        Matcher matcherAddress = PATTERN_ADDRESS.matcher(receiptText);
         String address;
         if (matcherAddress.find()) {
             address = matcherAddress.group(1).trim();
@@ -210,9 +197,7 @@ public class HouseService implements HouseInterface {
             throw new AppException("Address not found", HttpStatus.NOT_FOUND);
         }
 
-        String patronContract = "Contrato\\s*(\\d+)";
-        Pattern patternContract = Pattern.compile(patronContract);
-        Matcher matcherContract = patternContract.matcher(receiptText);
+        Matcher matcherContract = PATTERN_CONTRACT.matcher(receiptText);
         String contract;
         if (matcherContract.find()) {
             contract = matcherContract.group(1);

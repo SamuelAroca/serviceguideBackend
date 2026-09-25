@@ -47,15 +47,14 @@ public class UserService implements UserInterface {
         User user = optionalUser.get();
 
         if (!updateUser.getEmail().equals(user.getEmail())) {
-            Optional<User> optionalUser1 = userRepository.findByEmail(updateUser.getEmail());
-            if (optionalUser1.isPresent()) {
+            if (userRepository.existsByEmail(updateUser.getEmail())) {
                 throw new AppException("Email already registered", HttpStatus.BAD_REQUEST);
             }
             user.setEmail(updateUser.getEmail());
         }
 
         if (updateUser.getPassword() != null) {
-            if (!updateUser.getPassword().isEmpty() || !passwordEncoder.matches(updateUser.getPassword(), user.getPassword())) {
+            if (!updateUser.getPassword().isEmpty() && !passwordEncoder.matches(updateUser.getPassword(), user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
             }
         }

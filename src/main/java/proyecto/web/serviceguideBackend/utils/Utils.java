@@ -23,9 +23,8 @@ public class Utils {
     private final JwtService jwtService;
 
     public String readPdf(MultipartFile file) {
-        try {
-            PdfReader pdfReader = new PdfReader(file.getInputStream());
-            PdfDocument pdfDocument = new PdfDocument(pdfReader);
+        try (PdfReader pdfReader = new PdfReader(file.getInputStream());
+             PdfDocument pdfDocument = new PdfDocument(pdfReader)) {
 
             // Obtener la página 2
             PdfPage page = pdfDocument.getPage(2);
@@ -38,13 +37,7 @@ public class Utils {
             processor.processPageContent(page);
 
             // Obtener el texto de la estrategia
-            String textoPagina = strategy.getResultantText();
-
-            // Cerrar el lector y el documento de PDF
-            pdfDocument.close();
-            pdfReader.close();
-
-            return textoPagina;
+            return strategy.getResultantText();
         } catch (Exception e) {
             // iText lanza com.itextpdf.io.exceptions.IOException (no
             // java.io.IOException) para PDFs corruptos, y un

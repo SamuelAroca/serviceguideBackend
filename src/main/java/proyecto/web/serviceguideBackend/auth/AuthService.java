@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
@@ -33,6 +34,7 @@ public class AuthService implements AuthInterface {
     private final TokenRepository tokenRepository;
 
     @Override
+    @Transactional
     public LoginResponse register(SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if (optionalUser.isPresent()) {
@@ -57,6 +59,7 @@ public class AuthService implements AuthInterface {
     }
 
     @Override
+    @Transactional
     public LoginResponse login(CredentialsDto credentialsDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentialsDto.getEmail(), credentialsDto.getPassword()));
         var user = userRepository.findByEmail(credentialsDto.getEmail()).orElseThrow();
