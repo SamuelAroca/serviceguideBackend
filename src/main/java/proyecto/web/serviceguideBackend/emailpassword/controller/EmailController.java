@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import proyecto.web.serviceguideBackend.config.RateLimiter;
 import proyecto.web.serviceguideBackend.dto.Message;
 import proyecto.web.serviceguideBackend.emailpassword.dto.*;
 import proyecto.web.serviceguideBackend.emailpassword.repository.VerificationCodeRepository;
@@ -22,6 +23,7 @@ import proyecto.web.serviceguideBackend.user.UserService;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,8 +38,15 @@ public class EmailController {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final VerificationCodeRepository verificationCodeRepository;
+    private final RateLimiter rateLimiter;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    // Mismo namespace de clave para verify-code y reset-password: los dos
+    // adivinan el mismo codigo de 6 digitos, asi que cuentan contra el mismo
+    // limite (si no, alcanzaba con pegarle directo a reset-password para
+    // saltarse el limite puesto solo en verify-code).
+    private static final int CODE_MAX_ATTEMPTS = 5;
+    private static final Duration CODE_WINDOW = Duration.ofMinutes(10);
 
     @Value("${spring.mail.username}")
     private String mailFrom;
@@ -101,16 +110,24 @@ public class EmailController {
 
     @PostMapping("/verify-code")
     public ResponseEntity<?> verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
+        String key = "code:" + request.getEmail().toLowerCase();
+        rateLimiter.checkAllowed(key, CODE_MAX_ATTEMPTS, CODE_WINDOW);
+
         Optional<VerificationCode> optionalCode = verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode());
         if (optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
+            rateLimiter.recordFailure(key, CODE_WINDOW);
             throw new AppException("Invalid or expired verification code", HttpStatus.BAD_REQUEST);
         }
+        rateLimiter.recordSuccess(key);
 
         return ResponseEntity.ok(new Message("Verification successful", HttpStatus.OK));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        String key = "code:" + request.getEmail().toLowerCase();
+        rateLimiter.checkAllowed(key, CODE_MAX_ATTEMPTS, CODE_WINDOW);
+
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
 
         // Un solo mensaje generico para "correo no existe" y "codigo invalido":
@@ -119,8 +136,10 @@ public class EmailController {
                 ? verificationCodeRepository.findByUserEmailAndCode(request.getEmail(), request.getCode())
                 : Optional.empty();
         if (optionalUser.isEmpty() || optionalCode.isEmpty() || optionalCode.get().getExpirationTime().isBefore(LocalDateTime.now())) {
+            rateLimiter.recordFailure(key, CODE_WINDOW);
             throw new AppException("Invalid email or verification code", HttpStatus.BAD_REQUEST);
         }
+        rateLimiter.recordSuccess(key);
 
         User user = optionalUser.get();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

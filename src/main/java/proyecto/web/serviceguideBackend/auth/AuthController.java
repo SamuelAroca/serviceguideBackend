@@ -11,7 +11,10 @@ import proyecto.web.serviceguideBackend.auth.dto.CredentialsDto;
 import proyecto.web.serviceguideBackend.auth.dto.LoginResponse;
 import proyecto.web.serviceguideBackend.auth.dto.SignUpDto;
 import proyecto.web.serviceguideBackend.config.JwtService;
+import proyecto.web.serviceguideBackend.config.RateLimiter;
 import proyecto.web.serviceguideBackend.exceptions.AppException;
+
+import java.time.Duration;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,14 +22,23 @@ import proyecto.web.serviceguideBackend.exceptions.AppException;
 @RequestMapping("/api/users/auth")
 public class AuthController {
 
+    private static final int LOGIN_MAX_ATTEMPTS = 5;
+    private static final Duration LOGIN_WINDOW = Duration.ofMinutes(15);
+
     private final AuthService authService;
     private final JwtService jwtService;
+    private final RateLimiter rateLimiter;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid CredentialsDto credentialsDto) {
+        String key = "login:" + credentialsDto.getEmail().toLowerCase();
+        rateLimiter.checkAllowed(key, LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW);
         try {
-            return ResponseEntity.ok(authService.login(credentialsDto));
+            LoginResponse response = authService.login(credentialsDto);
+            rateLimiter.recordSuccess(key);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
+            rateLimiter.recordFailure(key, LOGIN_WINDOW);
             log.warn("Login failed for email {}: {}", credentialsDto.getEmail(), e.getMessage());
             throw new AppException("User or password incorrect", HttpStatus.BAD_REQUEST);
         }
