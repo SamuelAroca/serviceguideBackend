@@ -45,7 +45,12 @@ public class House {
     @Column(length = 100)
     private String contract;
 
-    @OneToOne
+    // Antes era @OneToOne: JPA pone un constraint UNIQUE sobre fk_city, o
+    // sea que en todo el sistema (no por usuario) solo podia existir UNA
+    // casa por ciudad. La segunda casa que cualquier usuario intentara
+    // registrar en una ciudad ya usada tiraba 500
+    // (DataIntegrityViolationException por el unique constraint).
+    @ManyToOne
     @JoinColumn(name = "FK_CITY", nullable = false)
     private City cities;
 
