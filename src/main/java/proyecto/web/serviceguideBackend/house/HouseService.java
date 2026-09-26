@@ -14,6 +14,8 @@ import proyecto.web.serviceguideBackend.house.dto.OnlyHouse;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseInterface;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseMapper;
 import proyecto.web.serviceguideBackend.house.interfaces.HouseRepository;
+import proyecto.web.serviceguideBackend.receipt.Receipt;
+import proyecto.web.serviceguideBackend.receipt.interfaces.ReceiptRepository;
 import proyecto.web.serviceguideBackend.user.User;
 import proyecto.web.serviceguideBackend.user.interfaces.UserRepository;
 
@@ -31,6 +33,7 @@ public class HouseService implements HouseInterface {
     private final HouseMapper houseMapper;
     private final CityService cityService;
     private final JwtService jwtService;
+    private final ReceiptRepository receiptRepository;
 
     private static final Pattern PATTERN_STRATUM = Pattern.compile("Estrato:\\s*(\\d+)");
     private static final Pattern PATTERN_CITY = Pattern.compile("([\\p{L}\\s]+)\\s*-\\s*Antioquia");
@@ -84,6 +87,8 @@ public class HouseService implements HouseInterface {
                         throw new AppException("City not found", HttpStatus.NOT_FOUND);
                     }
 
+                    boolean nameChanged = !house.getName().equals(houseDto.getName());
+
                     house.setName(houseDto.getName());
                     house.setStratum(houseDto.getStratum());
                     house.setNeighborhood(houseDto.getNeighborhood());
@@ -91,6 +96,18 @@ public class HouseService implements HouseInterface {
                     house.setContract(houseDto.getContract());
                     house.setCities(optionalColombianCities.get());
                     houseRepository.save(house);
+
+                    // Receipt.houseName es una copia desnormalizada (se lee sola,
+                    // sin join, para listar recibos). Sin este cascade queda
+                    // "congelada" con el nombre viejo de la casa para siempre,
+                    // y el frontend (que agrupa recibos por houseName) termina
+                    // mostrando la misma casa como si fueran dos distintas.
+                    if (nameChanged) {
+                        Collection<Receipt> receipts = receiptRepository.findByHouse(house);
+                        receipts.forEach(receipt -> receipt.setHouseName(house.getName()));
+                        receiptRepository.saveAll(receipts);
+                    }
+
                     return new Message("House Updated successfully", HttpStatus.OK);
                 }).orElseThrow(() -> new AppException("House not found", HttpStatus.NOT_FOUND)));
     }
