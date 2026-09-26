@@ -10,7 +10,7 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=prod
       - JAVA_TOOL_OPTIONS=-Xmx384m
     mem_limit: 640m
     networks:
