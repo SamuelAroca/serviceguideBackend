@@ -39,3 +39,6 @@ target/serviceguideBackend-0.0.1-SNAPSHOT.jar
 
 # graphify
 graphify-out/
+
+# Artefactos de IntelliJ
+out/
