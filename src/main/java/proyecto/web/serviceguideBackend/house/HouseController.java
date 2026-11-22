@@ -117,7 +117,10 @@ public class HouseController {
     }
 
     @GetMapping("/findIdByName/{name}")
-    public ResponseEntity<Long> findIdByName(@PathVariable String name){
-        return ResponseEntity.ok(houseService.findIdByName(name));
+    public ResponseEntity<Long> findIdByName(@PathVariable String name, @AuthenticationPrincipal User currentUser){
+        if (currentUser == null) {
+            throw new AppException("Forbidden", HttpStatus.FORBIDDEN);
+        }
+        return ResponseEntity.ok(houseService.findIdByName(name, currentUser.getId()));
     }
 }

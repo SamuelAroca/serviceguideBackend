@@ -164,8 +164,8 @@ public class HouseService implements HouseInterface {
     }
 
     @Override
-    public Long findIdByName(String name) {
-        return houseRepository.findIdByName(name);
+    public Long findIdByName(String name, Long idUser) {
+        return houseRepository.findIdByName(name, idUser);
     }
 
     public House extractReceiptInformation(String receiptText, Long idUser) {
