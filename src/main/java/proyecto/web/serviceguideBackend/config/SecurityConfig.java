@@ -1,5 +1,6 @@
 package proyecto.web.serviceguideBackend.config;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,12 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/users/auth/login", "/api/users/auth/register",
                                         "/api/email/send-email", "/api/email/change-password", "/api/email/forgot-password",
                                         "/api/email/verify-code", "/api/email/reset-password").permitAll()
+                                // Un error no manejado (p. ej. PDF demasiado grande o una
+                                // excepcion de BD) redirige internamente a /error. Sin esto
+                                // esa redireccion exigia autenticacion y el cliente recibia
+                                // un 401 "Unauthorized path" en lugar del error real, que el
+                                // frontend interpretaba como sesion expirada.
+                                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager->
